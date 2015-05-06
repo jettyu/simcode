@@ -46,7 +46,9 @@ private:
     template<typename T>
     std::string atostr(T i)
     {
-        atostr<uint64_t>(i);
+        std::ostringstream o;
+        o<<i;
+        return o.str();
     }
     
     std::vector<std::string> args_;
@@ -92,16 +94,7 @@ template<>
 std::string command::atostr(double i)
 {
     std::ostringstream o;
-    if (!(o << i))
-    return "";
-    return o.str();
-}
-template<>
-std::string command::atostr(float i)
-{
-    std::ostringstream o;
-    if (!(o << i))
-    return "";
+    o<<i;
     return o.str();
 }
 
