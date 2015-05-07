@@ -44,15 +44,6 @@ public:
     {
         return reply_;
     }
-    RedisReply& operator=(redisReply* r)
-    {
-        if (r != reply_)
-        {
-            Free();
-            reply_ = r;
-        }
-        return *this;
-    }
     operator const bool ()
     {
         return reply_!=NULL;
@@ -62,26 +53,70 @@ public:
         if (reply_) freeReplyObject(reply_);
         reply_ = NULL;
     }
+
+private:
+    RedisReply( const RedisReply& ) {}
+    const RedisReply& operator=( const RedisReply& ) {}
 private:
     redisReply* reply_;
+};
+
+class RedisReplyObj
+{
+public:
+    RedisReplyObj(redisReply* r=NULL):reply_(r){}
+    
+    redisReply* operator->() const
+    {
+        return reply_;
+    }
+    
+    operator const bool ()
+    {
+        return reply_!=NULL;
+    }
+private:
+    redisReply* reply_;
+};
+
+class RedisReplyList
+{
+public:
+    RedisReplyList(const std::vector<redisReply*>& rs):
+        redisReplys_(rs)
+    {
+        it_ = redisReplys_.begin();
+    }
+    ~RedisReplyList()
+    {
+        for (it_=redisReplys_.begin(); it_!=redisReplys_.end(); ++it_)
+            freeReplyObject(*it_);
+    }
+    RedisReplyObj FetchReply()
+    {
+        if (it_==redisReplys_.end()) return RedisReplyObj(NULL);
+        return RedisReplyObj(*(++it_-1));
+    }
+private:
+    RedisReplyList( const RedisReplyList& ) {}
+    const RedisReplyList& operator=( const RedisReplyList& ) {}
+private:
+    std::vector<redisReply*> redisReplys_;
+    std::vector<redisReply*>::iterator it_;
 };
 
 class Redis
 {
 public:
-    Redis():m_errcode(0),m_ctxt(NULL) {}
-    Redis(const Redis& h):m_errcode(0),m_ctxt(NULL)
-    {
-        *this = h;
-    }
-    Redis(const RedisInfo& _info):m_errcode(0),m_ctxt(NULL)
+    Redis():errcode_(0),ctxt_(NULL) {}
+    Redis(const RedisInfo& _info):errcode_(0),ctxt_(NULL)
     {
         Reset(_info);
     }
     Redis(const std::string& host,
           const int port,
           const struct timeval& time_out)
-        :m_errcode(0), m_ctxt(NULL)
+        :errcode_(0), ctxt_(NULL)
     {
         Reset(host, port, time_out);
     }
@@ -89,23 +124,22 @@ public:
     {
         DisConnect();
     }
-    Redis& operator=(const Redis& );
 
     bool is_connect()const
     {
-        return !(m_ctxt == NULL);
+        return !(ctxt_ == NULL);
     }
     int errcode()const
     {
-        return m_errcode;
+        return errcode_;
     }
     const std::string& errmsg()const
     {
-        return m_errmsg;
+        return errmsg_;
     }
     const RedisInfo& info()const
     {
-        return m_info;
+        return info_;
     }
     void swap(Redis& h);
     bool Ping(void);
@@ -119,7 +153,7 @@ public:
     }
     void Reset(const Redis& h)
     {
-        Reset(h.m_info);
+        Reset(h.info_);
     }
 
     int Connect(void);
@@ -151,10 +185,14 @@ public:
     bool Expire(const std::string& key, int expire_time);
 
 private:
-    int m_errcode;
-    std::string m_errmsg;
-    redisContext *m_ctxt;
-    RedisInfo m_info;
+    Redis( const Redis& ) {}
+    const Redis& operator=( const Redis& ) {}
+
+private:
+    int errcode_;
+    std::string errmsg_;
+    redisContext *ctxt_;
+    RedisInfo info_;
 };
 
 inline bool Redis::Ping(void)
@@ -172,8 +210,8 @@ inline bool Redis::Expire(const std::string& key, int expire_time)
     if (!r) return false;
     if (r->type == REDIS_REPLY_ERROR)
     {
-        m_errcode = r->integer;
-        m_errmsg = "reply:" + std::string(r->str);
+        errcode_ = r->integer;
+        errmsg_ = "reply:" + std::string(r->str);
         return false;
     }
     return true;
