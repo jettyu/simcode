@@ -44,7 +44,7 @@ public:
     {
         return reply_;
     }
-    operator const bool ()
+    operator const bool () const
     {
         return reply_!=NULL;
     }
@@ -89,13 +89,27 @@ public:
     }
     ~RedisReplyList()
     {
-        for (it_=redisReplys_.begin(); it_!=redisReplys_.end(); ++it_)
-            freeReplyObject(*it_);
+        Free();
     }
     RedisReplyObj FetchReply()
     {
         if (it_==redisReplys_.end()) return RedisReplyObj(NULL);
         return RedisReplyObj(*(++it_-1));
+    }
+    void Free()
+    {
+        for (it_=redisReplys_.begin(); it_!=redisReplys_.end(); ++it_)
+            freeReplyObject(*it_);
+        redisReplys_.clear();
+    }
+    
+    operator const bool () const
+    {
+        return !redisReplys_.empty();
+    }
+    size_t size() const
+    {
+        return redisReplys_.size();
     }
 private:
     RedisReplyList( const RedisReplyList& ) {}
