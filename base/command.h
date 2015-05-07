@@ -32,7 +32,7 @@ public:
         return *this;
     }
     
-    inline operator const std::vector<std::string>& ()
+    inline operator const std::vector<std::string>& () const
     {
         return args_;
     }

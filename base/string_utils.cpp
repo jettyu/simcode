@@ -59,7 +59,7 @@ std::string StrToUp(char* s, const size_t len)
 }
 
 template<typename T>
-int StrSplit(const std::string &src, const T& ch, std::vector<std::string> &dest)
+int StrSplit(const std::string &src, T ch, std::vector<std::string> &dest)
 {
     size_t offset = 0, lastset = 0;
     while (lastset < src.length())
@@ -78,12 +78,12 @@ int StrSplit(const std::string &src, const T& ch, std::vector<std::string> &dest
     return lastset;
 }
 
-int split(const std::string &src, const char ch, std::vector<std::string> &dest)
+int simcode::split(const std::string& src, char ch, std::vector<std::string>& dest)
 {
     return StrSplit<char>(src, ch, dest);
 }
-int split(const std::string &src, const std::string& ch, std::vector<std::string> &dest)
+int simcode::split(const std::string& src, const std::string& ch, std::vector<std::string>& dest)
 {
-    return StrSplit<std::string>(src, ch, dest);
+    return StrSplit<const std::string&>(src, ch, dest);
 }
 
