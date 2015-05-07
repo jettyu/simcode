@@ -46,12 +46,13 @@ private:
     template<typename T>
     std::string atostr(T i)
     {
-        std::ostringstream o;
-        o<<i;
-        return o.str();
+        osteam_.clear();
+        osteam_<<i;
+        return osteam_.str();
     }
     
     std::vector<std::string> args_;
+    std::ostringstream osteam_;
 };
 
 template<>
@@ -79,25 +80,6 @@ inline command& command::operator()(const char* arg)
     args_.push_back(arg);
     return *this;
 }
-
-template<>
-std::string command::atostr(uint64_t i)
-{
-#ifndef MAX_INT_LENGH
-#define MAX_INT_LENGH 21
-#endif
-    char data[MAX_INT_LENGH]= {0};
-    sprintf(data, "%llu", i);
-    return data;
-}
-template<>
-std::string command::atostr(double i)
-{
-    std::ostringstream o;
-    o<<i;
-    return o.str();
-}
-
 
 }
 #endif

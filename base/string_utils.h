@@ -26,6 +26,14 @@ std::string StrToUp(char* s, const size_t len);
 //字符串转大写
 int split(const std::string &src, const char ch, std::vector<std::string> &dest);
 int split(const std::string &src, const std::string& ch, std::vector<std::string> &dest);
+//查找c在s中偏移量为pos后第n次出现的位置
+template<typename T>
+inline int strnfind(const std::string& s, T c, int n, int pos=0)
+{
+    pos = s.find(c, pos);
+    if (n <= 1) return pos;
+    return strnfind(s, c, --n, pos+1);
+}
 
 //整数转字符串
 inline std::string itostr(uint64_t i)
@@ -41,7 +49,10 @@ inline std::string itostr(uint64_t i)
 template<typename T>
 inline std::string atostr(T i)
 {
-    return atostr<uint64_t>(i);
+    std::ostringstream o;
+    if (!(o << i))
+    return "";
+    return o.str();
 }
 
 template<>
@@ -79,14 +90,6 @@ inline std::string AtoStr(T i)
     return atostr(i);
 }
 
-//查找c在s中偏移量为pos后第n次出现的位置
-template<typename T>
-inline int strnfind(const std::string& s, T c, int n, int pos=0)
-{
-    pos = s.find(c, pos);
-    if (n <= 1) return pos;
-    return strnfind(s, c, --n, pos+1);
-}
 
 template<typename T>
 T strtoa(const char* src,
