@@ -102,7 +102,14 @@ public:
             freeReplyObject(*it_);
         redisReplys_.clear();
     }
-    
+    bool isFetchAll() const
+    {
+        return it_ == redisReplys_.end();
+    }
+    void resetFetch()
+    {
+        it_ = redisReplys_.begin();
+    }
     operator const bool () const
     {
         return !redisReplys_.empty();
