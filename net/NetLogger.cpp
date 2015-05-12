@@ -3,11 +3,11 @@
 using namespace simcode;
 using namespace net;
 
-int NetLogLevel::LEVEL_DEBUG = 2;
-int NetLogLevel::LEVEL_INFO  = 3;
-int NetLogLevel::LEVEL_WARN  = 4;
-int NetLogLevel::LEVEL_ERROR = 5;
-int NetLogLevel::LEVEL_FATAL = 6;
+int NetLogLevel::LEVEL_DEBUG = 1;
+int NetLogLevel::LEVEL_INFO  = 2;
+int NetLogLevel::LEVEL_WARN  = 3;
+int NetLogLevel::LEVEL_ERROR = 4;
+int NetLogLevel::LEVEL_FATAL = 5;
 
 int NetLogger::level_ = NetLogLevel::LEVEL_DEBUG;
 NetLogger::log_func_t NetLogger::log_func_ = NetLogger::log_out;
@@ -43,7 +43,7 @@ void NetLogger::log_out_valist(int level,
 {
     char buf[LOG_BUF_LEN];
     vsnprintf(buf, LOG_BUF_LEN, fmt, ap);
-    log_out(level, filename, linenum, buf);
+    log_func_(level, filename, linenum, buf);
 }
 
 
