@@ -19,16 +19,20 @@ public:
     }
 
     template<typename T>
-    inline command& operator<<(T arg)
+    inline command& operator<<(const T arg)
     {
-        args_.push_back(atostr(arg));
+        ostream_.str("");
+        ostream_<<arg;
+        args_.push_back(ostream_.str());
         return *this;
     }
 
     template<typename T>
-    inline command& operator()(T arg)
+    inline command& operator()(const T arg)
     {
-        args_.push_back(atostr(arg));
+        ostream_.str("");
+        ostream_<<arg;
+        args_.push_back(ostream_.str());
         return *this;
     }
     
@@ -43,24 +47,10 @@ public:
     }
 
 private:
-    template<typename T>
-    std::string atostr(T i)
-    {
-        osteam_.clear();
-        osteam_<<i;
-        return osteam_.str();
-    }
-    
+    std::ostringstream ostream_;
     std::vector<std::string> args_;
-    std::ostringstream osteam_;
 };
 
-template<>
-inline command& command::operator<<(const std::string& arg)
-{
-    args_.push_back(arg);
-    return *this;
-}
 template<>
 inline command& command::operator<<(const char* arg)
 {
@@ -69,13 +59,21 @@ inline command& command::operator<<(const char* arg)
 }
 
 template<>
-inline command& command::operator()(const std::string& arg)
+inline command& command::operator<<(const std::string& arg)
 {
     args_.push_back(arg);
     return *this;
 }
+
 template<>
 inline command& command::operator()(const char* arg)
+{
+    args_.push_back(arg);
+    return *this;
+}
+
+template<>
+inline command& command::operator()(const std::string& arg)
 {
     args_.push_back(arg);
     return *this;
