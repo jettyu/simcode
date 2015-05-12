@@ -57,17 +57,18 @@ private:
     static log_func_t log_func_;
 };
 
+}
+}
+
 #define NETLOG_DEBUG(fmt, args...)    \
-        NetLogger::log_write(NetLogLevel::LEVEL_DEBUG, __FILE__, __LINE__, fmt, ##args)
+        simcode::net::NetLogger::log_write(simcode::net::NetLogLevel::LEVEL_DEBUG, __FILE__, __LINE__, fmt, ##args)
 #define NETLOG_INFO(fmt, args...)    \
-        NetLogger::log_write(NetLogLevel::LEVEL_INFO,  __FILE__, __LINE__, fmt, ##args)
+        simcode::net::NetLogger::log_write(simcode::net::NetLogLevel::LEVEL_INFO,  __FILE__, __LINE__, fmt, ##args)
 #define NETLOG_WARN(fmt, args...)    \
-        NetLogger::log_write(NetLogLevel::LEVEL_WARN,  __FILE__, __LINE__, fmt, ##args)
+        simcode::net::NetLogger::log_write(simcode::net::NetLogLevel::LEVEL_WARN,  __FILE__, __LINE__, fmt, ##args)
 #define NETLOG_ERROR(fmt, args...)    \
-        NetLogger::log_write(NetLogLevel::LEVEL_ERROR, __FILE__, __LINE__, fmt, ##args)
+        simcode::net::NetLogger::log_write(simcode::net::NetLogLevel::LEVEL_ERROR, __FILE__, __LINE__, fmt, ##args)
 #define NETLOG_FATAL(fmt, args...)    \
-        NetLogger::log_write(NetLogLevel::LEVEL_FATAL, __FILE__, __LINE__, fmt, ##args
-}
-}
+        simcode::net::NetLogger::log_write(simcode::net::NetLogLevel::LEVEL_FATAL, __FILE__, __LINE__, fmt, ##args
 
 #endif
