@@ -56,11 +56,11 @@ public:
     }
     void setBeginOffset(size_t n)
     {
-        const_cast<size_t>(beginIndex_) = n;
+        beginIndex_ = n;
     }
     void setEndOffset(size_t n)
     {
-        const_cast<size_t>(endIndex_) = n;
+        endIndex_ = n;
     }
 };
 
