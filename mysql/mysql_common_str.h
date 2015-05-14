@@ -3,7 +3,7 @@
 
 #include <string>
 #include <simcode/mysql/mysql.h>
-#include <simcode/base/string_common.h>
+#include <simcode/base/string_utils.h>
 #include <simcode/base/typedef.h>
 
 namespace simcode

@@ -2,7 +2,7 @@
 #define UPDATE_TEMPLATE_H
 #include <simcode/mysql/mysql.h>
 #include <simcode/mysql/mysql_escape.h>
-#include <simcode/base/string_common.h>
+#include <simcode/base/string_utils.h>
 namespace simcode
 {
 namespace mysql
