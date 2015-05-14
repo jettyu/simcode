@@ -24,12 +24,13 @@ void Logger::set_log_fun(log_func_t f)
 void Logger::log_write(int level, 
                           const char* filename, 
                           int linenum, 
+                          const char* funcname,
                           const char* fmt, ...)
 {
     if (level < level_) return;
     va_list ap;
     va_start(ap, fmt);
-    log_out_valist(level, filename, linenum, fmt, ap);
+    log_out_valist(level, filename, linenum, funcname, fmt, ap);
     va_end(ap);
 }
 
@@ -37,19 +38,21 @@ void Logger::log_write(int level,
 void Logger::log_out_valist(int level,
                         const char* filename,
                         int linenum,
+                        const char* funcname,
                         const char* fmt,
                         va_list ap)
 {
     char buf[LOG_BUF_LEN];
     vsnprintf(buf, LOG_BUF_LEN, fmt, ap);
-    log_func_(level, filename, linenum, buf);
+    log_func_(level, filename, linenum, funcname, buf);
 }
 
 
 void Logger::log_out(int level, 
                         const char* filename, 
                         int linenum, 
+                        const char* funcname,
                         const char* msg)
 {
-    printf("log_level=%d|%s|%d|%s\n", level, filename, linenum, msg);
+    printf("log_level=%d|%s|%d|%s|%s\n", level, filename, linenum, funcname, msg);
 }

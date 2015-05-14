@@ -1,5 +1,5 @@
-#ifndef SIMCODE_NET_NETLOGGER_H
-#define SIMCODE_NET_NETLOGGER_H
+#ifndef SIMCODE_LOGGER_H
+#define SIMCODE_LOGGER_H
 #include <stdarg.h>
 namespace simcode
 {
@@ -33,21 +33,25 @@ public:
     typedef void (*log_func_t)(int level,
                                const char* filename,
                                int linenum,
+                               const char* funcname,
                                const char* msg);
     static void set_level(int l);
     static void set_log_fun(log_func_t f);
     static void log_write(int level,
                          const char* filename,
                          int linenum,
+                         const char* funcname,
                          const char *fmt, ...);
 private:
     static void log_out(int level,
                         const char* filename,
                         int linenum,
+                        const char* funcname,
                         const char* msg);
     static void log_out_valist(int level,
                                const char* filename,
                                int linenum,
+                               const char* funcname,
                                const char*fmt,
                                va_list ap);
 private:
@@ -58,14 +62,14 @@ private:
 }
 
 #define LOG_DEBUG(fmt, args...)    \
-        simcode::Logger::log_write(simcode::LogLevel::LEVEL_DEBUG, __FILE__, __LINE__, fmt, ##args)
+        simcode::Logger::log_write(simcode::LogLevel::LEVEL_DEBUG, __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_INFO(fmt, args...)    \
-        simcode::Logger::log_write(simcode::LogLevel::LEVEL_INFO,  __FILE__, __LINE__, fmt, ##args)
+        simcode::Logger::log_write(simcode::LogLevel::LEVEL_INFO,  __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_WARN(fmt, args...)    \
-        simcode::Logger::log_write(simcode::LogLevel::LEVEL_WARN,  __FILE__, __LINE__, fmt, ##args)
+        simcode::Logger::log_write(simcode::LogLevel::LEVEL_WARN,  __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_ERROR(fmt, args...)    \
-        simcode::Logger::log_write(simcode::LogLevel::LEVEL_ERROR, __FILE__, __LINE__, fmt, ##args)
+        simcode::Logger::log_write(simcode::LogLevel::LEVEL_ERROR, __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_FATAL(fmt, args...)    \
-        simcode::Logger::log_write(simcode::LogLevel::LEVEL_FATAL, __FILE__, __LINE__, fmt, ##args
+        simcode::Logger::log_write(simcode::LogLevel::LEVEL_FATAL, __FILE__, __LINE__, __func__, fmt, ##args
 
 #endif
