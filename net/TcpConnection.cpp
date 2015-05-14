@@ -1,5 +1,5 @@
 #include <simcode/net/TcpConnection.h>
-#include <simcode/net/NetLogger.h>
+#include <simcode/base/logger.h>
 using namespace simcode;
 using namespace net;
 
@@ -47,7 +47,7 @@ void TcpConnection::handleRead()
     if (n < 0)
     {
         errcode_ = errno;
-        NETLOG_ERROR("read error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+        LOG_ERROR("read error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
         return;
     }
     else if (n == 0)
@@ -79,7 +79,7 @@ void TcpConnection::handleWrite()
         int fd = socket_.sockfd();
         ssize_t n;
         n = ::write(fd, tmpBuf.data(), tmpBuf.size());
-        if (n > 0) 
+        if (n > 0)
         {
             if (n < tmpBuf.size())
             {
@@ -91,7 +91,7 @@ void TcpConnection::handleWrite()
                 writeBuf_.swap(tmpBuf);
                 }
             }
-            else 
+            else
             {
                 {
                 ScopeLock lock(mutex_);
@@ -106,7 +106,7 @@ void TcpConnection::handleWrite()
         else
         {
             errcode_ = errno;
-            NETLOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+            LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
             //disableWriting();
         }
     }

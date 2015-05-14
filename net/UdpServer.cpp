@@ -1,5 +1,5 @@
 #include <simcode/net/UdpServer.h>
-#include <simcode/net/NetLogger.h>
+#include <simcode/base/logger.h>
 using namespace simcode;
 using namespace net;
 using namespace thread;
@@ -40,18 +40,18 @@ void UdpServer::hanleRead()
     {
         UdpConnector c(socket_.sockfd());
         std::string buf;
-        
+
         if ((n=c.Recv(&buf)) < 0)
         {
             //log error
-            NETLOG_ERROR("read error|errno=%d|errmsg=%s", errno, strerror(errno));
+            LOG_ERROR("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
         }
         uint64_t id = c.peerAddr().id();
         UdpConnectionPtr conn = connManager_.get(id);
         if (!conn)
         {
-            NETLOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu", c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
+            LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu", c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
             conn.reset(new UdpConnection(c));
             conn->setCloseCallback(SimBind(&UdpServer::removeConnection, this, _1));
             connManager_.add(id, conn);
@@ -71,6 +71,6 @@ void UdpServer::onMessage(const UdpConnectionPtr& c, std::string* msg)
 
 void UdpServer::removeConnection(int64_t connId)
 {
-    NETLOG_DEBUG("client remove|id=%ld", connId);
+    LOG_DEBUG("client remove|id=%ld", connId);
     connManager_.erase(connId);
 }

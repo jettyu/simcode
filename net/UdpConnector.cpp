@@ -1,5 +1,5 @@
 #include <simcode/net/UdpConnector.h>
-#include <simcode/net/NetLogger.h>
+#include <simcode/base/logger.h>
 using namespace simcode;
 using namespace net;
 
@@ -30,6 +30,6 @@ int UdpConnector::Send(const char* buf, size_t len)
 {
     int ret = sendto(sockfd_, buf, len, 0, peerAddr_.addr(), addrLen_);
     errcode_ = errno;
-    NETLOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+    LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
     return ret;
 }
