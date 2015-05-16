@@ -16,7 +16,7 @@ void EventLoop::loop()
     }
 }
 
-void EventLoop::runAfter(int afterTime, const Timer::EventCallback& c)
+void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
 {
     TimerPtr timer(new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, afterTime);
@@ -26,7 +26,7 @@ void EventLoop::runAfter(int afterTime, const Timer::EventCallback& c)
     timerList_[timer->timerfd()] = timer;
 }
 
-void EventLoop::runEvery(int intervalTime, const Timer::EventCallback& c)
+void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
 {
     TimerPtr timer (new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, 0, intervalTime, 0);

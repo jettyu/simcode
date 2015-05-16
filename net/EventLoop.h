@@ -13,8 +13,8 @@ class EventLoop : noncopyable
 public:
     void runInLoop(int id, const EPollPoller::EventCallback& c, int events=EPOLLIN|EPOLLPRI);
     void loop();
-    void runAfter(int afterTime, const Timer::EventCallback& c);
-    void runEvery(int intervalTime, const Timer::EventCallback& c);
+    void runAfter(double afterTime, const Timer::EventCallback& c);
+    void runEvery(double intervalTime, const Timer::EventCallback& c);
     void modifyEvent(int id, int events);
     void removeInLoop(int id);
 private:

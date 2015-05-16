@@ -16,7 +16,7 @@ private:
     struct TimerHandler
     {
         int surplusTimes;
-        int intervalTime;
+        double intervalTime;
         EventCallback eventCallback;
     };
 public:
@@ -24,8 +24,8 @@ public:
     ~Timer();
     void handleEvent(int events);
     void setTimer(const EventCallback& b,
-                  int afterTime,              //多少时间后开始执行
-                  int intervalTime = 0,       //每隔多久时间执行1次
+                  double afterTime,              //多少时间后开始执行
+                  double intervalTime = 0,       //每隔多久时间执行1次
                   int maxTimes = 1);      //最多执行多少次,0表示不限次数
     int timerfd() const
     {

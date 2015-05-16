@@ -42,16 +42,21 @@ void Timer::handleEvent(int events)
     if (handler_.surplusTimes != 0) handler_.surplusTimes--;
 }
 
-void Timer::setTimer(const EventCallback& b, int afterTime, int intervalTime, int maxTimes)
+void Timer::setTimer(const EventCallback& b, double afterTime, double intervalTime, int maxTimes)
 {
     int now = time(NULL);
     handler_.eventCallback = b;
     handler_.surplusTimes = maxTimes;
     handler_.intervalTime = intervalTime;
+    struct timespec curValue;
     struct itimerspec newValue;
+    bzero(&curValue, sizeof(curValue));
     bzero(&newValue, sizeof(newValue));
-    newValue.it_value.tv_sec = time(NULL) + afterTime;
-    newValue.it_interval.tv_sec = intervalTime;
+    clock_gettime(CLOCK_REALTIME, &curValue);
+    newValue.it_value.tv_sec = curValue.tv_sec + int(afterTime);
+    newValue.it_value.tv_nsec = curValue.tv_nsec + (afterTime-int(afterTime))*1000000000;
+    newValue.it_interval.tv_sec = int(intervalTime);
+    newValue.it_interval.tv_nsec = (intervalTime - int(intervalTime))*1000000000;
     assert(timerfd_settime(timerfd_, TFD_TIMER_ABSTIME, &newValue, NULL)!= -1);
 }
 
