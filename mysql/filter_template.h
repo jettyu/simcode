@@ -81,7 +81,7 @@ inline OBJ& SqlFilter<OBJ>::Filter(const std::string& name,
                                    const std::string& symbol)
 {
     if (flag_) filter_ += " " + logic + " ";
-    filter_ += name + symbol + "'" + escape_(value)  + "'";
+    filter_ += name + " " + symbol + " '" + escape_(value)  + "'";
     flag_ = true;
     return obj_;
 }
@@ -93,7 +93,7 @@ inline OBJ& SqlFilter<OBJ>::Filter(const std::string& name,
                                    const std::string& symbol)
 {
     if (flag_) filter_ += " " + logic + " ";
-    filter_ += name + symbol + AtoStr(value);
+    filter_ += name + " " + symbol + " " + AtoStr(value);
     flag_ = true;
     return obj_;
 }
