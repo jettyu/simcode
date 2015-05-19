@@ -11,6 +11,11 @@ TcpClient::TcpClient(EventLoop* loop, const SockAddr& addr, const std::string& n
     connector_.setNewConnectionCallback(simex::bind(&TcpClient::onConnect, this));
 }
 
+TcpClient::~TcpClient()
+{
+    if (conn_) loop_->removeInLoop(conn_->connfd());
+}
+
 void TcpClient::active()
 {
     connector_.Connect();
