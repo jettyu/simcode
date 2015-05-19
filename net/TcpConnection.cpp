@@ -84,8 +84,7 @@ void TcpConnection::handleWrite()
         {
             if (n < tmpBuf.size())
             {
-                std::string tmp;
-                std::swap_ranges(tmpBuf.begin(),tmpBuf.begin()+n, tmp.begin());
+                tmpBuf = tmpBuf.substr(n);
                 {
                 ScopeLock lock(mutex_);
                 tmpBuf.append(writeBuf_);

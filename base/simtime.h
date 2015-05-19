@@ -1,6 +1,6 @@
 #ifndef SIMCODE_SIMTIME_H
 #define SIMCODE_SIMTIME_H
-//#include <sys/time.h>
+#include <sys/time.h>
 #include <time.h>
 
 namespace simcode
