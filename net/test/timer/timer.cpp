@@ -8,6 +8,7 @@
 #include <simcode/net/Socket.h>
 #include <simcode/net/Timer.h>
 #include <simcode/net/EventLoop.h>
+#include <simcode/net/EventLoopThreadPool.h>
 using namespace simcode;
 using namespace simcode::net;
 
@@ -22,6 +23,15 @@ void printTime(int i)
 
 int main(void)
 {
+
+   EventLoopThreadPool loopPool;
+   loopPool.setThreadNum(1);
+   loopPool.start();
+   EventLoop* ioLoop = loopPool.getNextLoop();
+   if (ioLoop) ioLoop->runAfter(0, simex::bind(printTime, 1));
+   getchar();
+   return 1;
+
    EventLoop loop;
    loop.runAfter(0, simex::bind(printTime, 1));
    loop.runEvery(1, simex::bind(printTime, 2));

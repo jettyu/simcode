@@ -24,9 +24,17 @@ public:
     {
         return socket_.sockfd();
     }
-    const SockAddr& peerAddr()
+    const SockAddr& peerAddr() const
     {
         return peerAddr_;
+    }
+    const SockAddr& localAddr() const
+    {
+        return localAddr_;
+    }
+    EventLoop* getLoop() const
+    {
+        return loop_;
     }
     void setCloseCallback(const CloseCallback& b)
     {
@@ -64,6 +72,10 @@ public:
     {
         revents_ = events;
     }
+    void shutdown()
+    {
+        socket_.ShutdownWrite();
+    }
 private:
     void eventHandle(int events);
     void onClose();
@@ -83,7 +95,8 @@ private:
 private:
     EventLoop* loop_;
     Socket socket_;
-    SockAddr peerAddr_;
+    const SockAddr peerAddr_;
+    const SockAddr localAddr_;
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
     std::string readBuf_;
@@ -95,6 +108,7 @@ private:
     simex::any context_;
 };
 
+typedef simex::shared_ptr<TcpConnection> TcpConnectionPtr;
 }
 }
 

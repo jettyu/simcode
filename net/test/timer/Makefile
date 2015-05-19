@@ -9,7 +9,7 @@ LIBS=  -lpthread \
        -lboost_system -lboost_thread \
        -lprotoc -lprotobuf -lprotobuf-lite \
        -lhiredis \
-       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread \
+       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode\
        -lrt
 
 SOURCES=$(shell echo *.cpp $(ADD_SRC))

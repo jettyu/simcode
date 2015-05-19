@@ -22,7 +22,8 @@ void TcpServer::start()
 void TcpServer::onClose(const TcpConnectionPtr& conn)
 {
     if (closeCallback_) closeCallback_(conn);
-
+    EventLoop* ioLoop = conn->getLoop();
+    ioLoop->removeInLoop(conn->connfd());
     LOG_DEBUG("client close|ip=%s|port=%u", conn->peerAddr().ip().c_str(), conn->peerAddr().port());
     conntectionList_.erase(conn->connfd());
 }

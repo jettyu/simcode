@@ -5,8 +5,8 @@ using namespace net;
 EventLoop* EventLoopThreadPool::getNextLoop()
 {
     if (loopPool_.empty()) return NULL;
-    if (next_++ >= threadNum_) next_ = 0;
-    return loopPool_[next_];
+    if (next_ >= threadNum_) next_ = 0;
+    return loopPool_[next_++];
 }
 
 void EventLoopThreadPool::start()

@@ -1,6 +1,7 @@
 #ifndef SIMCODE_NET_EVENTLOOP_THREAD_POOL_H
 #define SIMCODE_NET_EVENTLOOP_THREAD_POOL_H
 #include <simcode/net/EventLoopThread.h>
+#include <atomic>
 namespace simcode
 {
 namespace net
@@ -24,7 +25,7 @@ private:
     std::vector<EventLoopThreadPtr> loopThreadPool_;
     std::vector<EventLoop*> loopPool_;
     int threadNum_;
-    int next_;
+    std::atomic_int next_;
 };
 }
 }

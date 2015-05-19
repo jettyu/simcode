@@ -7,6 +7,7 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     loop_(loop),
     socket_(connfd),
     peerAddr_(peerAddr),
+    localAddr_(SockAddr(socket_.getLocalAddr())),
     errcode_(0),
     events_(EPOLLIN|EPOLLPRI),
     revents_(0)
