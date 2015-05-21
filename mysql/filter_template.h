@@ -3,6 +3,7 @@
 #include <simcode/mysql/mysql.h>
 #include <simcode/mysql/mysql_escape.h>
 #include <simcode/base/string_utils.h>
+#include <vector>
 namespace simcode
 {
 
@@ -55,6 +56,16 @@ public:
     OBJ& OrderByDesc(const std::string& name);
     OBJ& Limit(size_t i);
     OBJ& Limit(size_t i, size_t j);
+    OBJ& In(const std::string& name, 
+            const std::vector<std::string>& value,
+            const std::string& logic=" and ");
+    OBJ& In(const std::string& name, 
+            const std::vector<uint64_t>& value,
+            const std::string& logic=" and ")
+    OBJ& Between(const std::string& name,
+                 uint64_t value1, 
+                 uint64_t value2,
+                 const std::string& logic=" and ");
     OBJ& ClearFilter()
     {
         filter_.clear();
@@ -161,6 +172,49 @@ template<class OBJ>
 OBJ& SqlFilter<OBJ>::Limit(size_t i, size_t j)
 {
     filter_ += " limit " + AtoStr(i) + "," + AtoStr(j);
+    return obj_;
+}
+
+template<class OBJ>
+OBJ& SqlFilter<OBJ>::In(const std::string& name, 
+                        const std::vector<std::string>& value,
+                        const std::string& logic)
+{
+    if (value.empty()) return obj_;
+    if (flag_) filter_ += " " + logic + " ";
+    filter_ += name + " in (";
+    std::vector<std::string>::const_iterator it;
+    for (it=value.begin(); it!=value.end(); ++it)
+        filter_ += "'" + escape_(*it) + "',";
+    filter_.erase(filter_.size()-1);
+    filter_ += ")";
+    return obj_;
+}
+
+template<class OBJ>
+OBJ& SqlFilter<OBJ>::In(const std::string& name, 
+                        const std::vector<uint64_t>& value,
+                        const std::string& logic)
+{
+    if (value.empty()) return obj_;
+    if (flag_) filter_ += " " + logic + " ";
+    filter_ += name + " in (";
+    std::vector<std::string>::const_iterator it;
+    for (it=value.begin(); it!=value.end(); ++it)
+        filter_ += AtoStr(*it) + ",";
+    filter_.erase(filter_.size()-1);
+    filter_ += ")";
+    return obj_;
+}
+
+template<class OBJ>
+OBJ& SqlFilter<OBJ>::Between(const std::string& name,
+                             uint64_t value1, 
+                             uint64_t value2,
+                             const std::string& logic=" and ")
+{
+    if (flag_) filter_ += " " + logic + " ";
+    filter_ += name + " between (" + AtoStr<value1> + "," + AtoStr<value2> + ")";
     return obj_;
 }
 
