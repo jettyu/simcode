@@ -41,16 +41,16 @@ private:
 template<class OBJ>
 OBJ& SqlInsert<OBJ>::Insert(const std::string& name, const std::string& value)
 {
-    begin_ += name + ",";
-    end_ += "'" + escape_(value) + "',";
+    begin_.append(name).append(",");
+    end_.append("'").append(escape_(value)).append("',");
     return obj_;
 }
 
 template<class OBJ>
 OBJ& SqlInsert<OBJ>::Insert(const std::string& name, uint64_t value)
 {
-    begin_ += name + ",";
-    end_ += AtoStr(value) + ",";
+    begin_.append(name).append(",");
+    end_.append(AtoStr(value)).append(",");
     return obj_;
 }
 

@@ -57,14 +57,14 @@ private:
 template<class OBJ>
 OBJ& SqlUpdate<OBJ>::Update(const std::string& name, const std::string& value)
 {
-    field_ += name + "='" + escape_(value) + "',";
+    field_.append(name).append("='").append(escape_(value)).append("',");
     return obj_;
 }
 
 template<class OBJ>
 OBJ& SqlUpdate<OBJ>::Update(const std::string& name, uint64_t value)
 {
-    field_ += name + "=" + AtoStr(value) + ",";
+    field_.append(name).append("=").append(AtoStr(value)).append(",");
     return obj_;
 }
 
