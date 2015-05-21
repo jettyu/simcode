@@ -39,10 +39,17 @@ public:
                 const std::string& symbol="="
                );
 
+    //嵌套，eg: a.id=b.id
+    OBJ& FilterNest(const std::string& name,
+                const std::string& value,
+                const std::string& logic="and",
+                const std::string& symbol="="
+               );
     OBJ& Filter(const OBJ& f,
                 const std::string& logic="and",
                 const std::string& left_symbol="(",
                 const std::string& right_symbol=")");
+
     OBJ& Filter(const std::string& str);
     OBJ& OrderBy(const std::string& name);
     OBJ& OrderByDesc(const std::string& name);
@@ -94,6 +101,18 @@ inline OBJ& SqlFilter<OBJ>::Filter(const std::string& name,
 {
     if (flag_) filter_ += " " + logic + " ";
     filter_ += name + " " + symbol + " " + AtoStr(value);
+    flag_ = true;
+    return obj_;
+}
+
+template<class OBJ>
+inline OBJ& SqlFilter<OBJ>::FilterNest(const std::string& name,
+                                   const std::string& value,
+                                   const std::string& logic,
+                                   const std::string& symbol)
+{
+    if (flag_) filter_ += " " + logic + " ";
+    filter_ += name + " " + symbol + " " + value;
     flag_ = true;
     return obj_;
 }
