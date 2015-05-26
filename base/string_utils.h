@@ -1,6 +1,6 @@
 #ifndef SIMCODE_STRING_UTILS_H
 #define SIMCODE_STRING_UTILS_H
-
+#include <stdint.h>
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,10 +41,10 @@ inline int strnfind(const std::string& s, T c, int n, int pos=0)
 inline std::string itostr(uint64_t i)
 {
 #ifndef MAX_INT_LENGH
-#define MAX_INT_LENGH 21
+#define MAX_INT_LENGH 20
 #endif
-    char data[MAX_INT_LENGH]= {0};
-    sprintf(data, "%llu", i);
+    char data[MAX_INT_LENGH];
+    snprintf(data, MAX_INT_LENGH, "%llu", i);
     return data;
 }
 
@@ -58,10 +58,10 @@ template<>
 inline std::string atostr(uint64_t i)
 {
 #ifndef MAX_INT_LENGH
-#define MAX_INT_LENGH 21
+#define MAX_INT_LENGH 20
 #endif
-    char data[MAX_INT_LENGH]= {0};
-    sprintf(data, "%llu", i);
+    char data[MAX_INT_LENGH];
+    snprintf(data, MAX_INT_LENGH, "%llu", i);
     return data;
 }
 
