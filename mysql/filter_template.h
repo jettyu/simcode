@@ -157,7 +157,7 @@ OBJ& SqlFilter<OBJ>::OrderBy(const std::string& name)
 template<class OBJ>
 OBJ& SqlFilter<OBJ>::OrderByDesc(const std::string& name)
 {
-    filter_.append(" order by ").append(name).append(" desc");
+    filter_.append(" order by ").append(name).append(" desc ");
     return obj_;
 }
 
