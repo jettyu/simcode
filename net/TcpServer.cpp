@@ -38,4 +38,5 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
     if (connectionCallback_) connectionCallback_(conn);
     conntectionList_.add(conn->connfd(), conn);
+    conn->run();
 }

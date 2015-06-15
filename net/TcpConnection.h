@@ -19,6 +19,7 @@ public:
     typedef simex::function<void()> CloseCallback;
     typedef simex::function<void(const TcpConnectionPtr&, std::string* msg)> MessageCallback;
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
+    void run();
     void send(const char* data, size_t len);
     int connfd() const
     {

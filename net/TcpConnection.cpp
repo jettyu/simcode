@@ -13,7 +13,11 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     revents_(0)
 {
     socket_.setKeepAlive(true);
-    loop_->runInLoop(connfd, simex::bind(&TcpConnection::eventHandle, this, _1), events_);
+}
+
+void TcpConnection::run()
+{
+    loop_->runInLoop(socket_.sockfd(), simex::bind(&TcpConnection::eventHandle, this, _1), events_);
 }
 
 void TcpConnection::eventHandle(int events)
@@ -49,6 +53,7 @@ void TcpConnection::handleRead()
     {
         errcode_ = errno;
         LOG_ERROR("read error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+        onClose();
         return;
     }
     else if (n == 0)
@@ -105,9 +110,13 @@ void TcpConnection::handleWrite()
         }
         else
         {
-            errcode_ = errno;
+            int e = errno;
+	    errcode_ = e;
             LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-            //disableWriting();
+            disableWriting();
+	    if (e == EINTR){}
+	    else if (e == EAGAIN){}
+	    else {onClose();}
         }
     }
 }
@@ -119,6 +128,7 @@ void TcpConnection::send(const char* data, size_t len)
     writeBuf_.append(data, len);
     enableWriting();
     }
+    //handleWrite();
 }
 
 void TcpConnection::update()

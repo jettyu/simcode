@@ -37,6 +37,7 @@ void TcpClient::onConnect()
     newConn->setCloseCallback(simex::bind(&TcpClient::onClose, this, conn_));
     newConn->setMessageCallback(messageCallback_);
     conn_ = newConn;
+    conn_->run();
     if (connectionCallback_) connectionCallback_(conn_);
 }
 
