@@ -113,10 +113,19 @@ void TcpConnection::handleWrite()
             int e = errno;
 	    errcode_ = e;
             LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-            disableWriting();
-	    if (e == EINTR){}
-	    else if (e == EAGAIN){}
-	    else {onClose();}
+            //disableWriting();
+	    if (e == EINTR || e == EAGAIN)
+	    {
+		{
+		ScopeLock lock(mutex_);
+                tmpBuf.append(writeBuf_);
+                writeBuf_.swap(tmpBuf);
+		}
+	    }
+	    else 
+	    {
+		onClose();
+	    }
         }
     }
 }
