@@ -35,7 +35,7 @@ public:
         args_.push_back(ostream_.str());
         return *this;
     }
-    
+
     inline operator const std::vector<std::string>& () const
     {
         return args_;

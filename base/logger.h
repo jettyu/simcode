@@ -8,10 +8,10 @@ class LogLevel
 {
 public:
     static void Init(int debug=2,
-                int info=3,
-                int warn=4,
-                int error=5,
-                int fatal=6)
+                     int info=3,
+                     int warn=4,
+                     int error=5,
+                     int fatal=6)
     {
         LEVEL_DEBUG = debug;
         LEVEL_INFO = info;
@@ -38,10 +38,10 @@ public:
     static void set_level(int l);
     static void set_log_fun(log_func_t f);
     static void log_write(int level,
-                         const char* filename,
-                         int linenum,
-                         const char* funcname,
-                         const char *fmt, ...);
+                          const char* filename,
+                          int linenum,
+                          const char* funcname,
+                          const char *fmt, ...);
 private:
     static void log_out(int level,
                         const char* filename,

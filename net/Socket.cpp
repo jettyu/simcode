@@ -146,11 +146,11 @@ int Socket::getError() const
 
     if (::getsockopt(sockfd_, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
     {
-      return errno;
+        return errno;
     }
     else
     {
-      return optval;
+        return optval;
     }
 }
 
@@ -168,14 +168,14 @@ struct sockaddr_in Socket::getLocalAddr() const
 
 struct sockaddr_in Socket::getPeerAddr() const
 {
-  struct sockaddr_in peeraddr;
-  bzero(&peeraddr, sizeof peeraddr);
-  socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
-  if (::getpeername(sockfd_, (struct sockaddr*)(&peeraddr), &addrlen) < 0)
-  {
-      //LOG_SYSERR << "sockets::getPeerAddr";
-  }
-  return peeraddr;
+    struct sockaddr_in peeraddr;
+    bzero(&peeraddr, sizeof peeraddr);
+    socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+    if (::getpeername(sockfd_, (struct sockaddr*)(&peeraddr), &addrlen) < 0)
+    {
+        //LOG_SYSERR << "sockets::getPeerAddr";
+    }
+    return peeraddr;
 }
 
 bool Socket::isSelfConnect() const
@@ -183,5 +183,5 @@ bool Socket::isSelfConnect() const
     struct sockaddr_in localaddr = getLocalAddr();
     struct sockaddr_in peeraddr = getPeerAddr();
     return localaddr.sin_port == peeraddr.sin_port
-      && localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
+           && localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
 }

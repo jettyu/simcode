@@ -27,8 +27,8 @@ int Redis::Connect(void)
     errcode_ = 0;
     errmsg_.clear();
     ctxt_ = redisConnectWithTimeout(info_.host.c_str(),
-                                     info_.port,
-                                     info_.time_out);
+                                    info_.port,
+                                    info_.time_out);
 
     if (ctxt_->err)
     {

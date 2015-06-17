@@ -21,7 +21,7 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
     TimerPtr timer(new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, afterTime);
     ScopeLock lock(mutex_);
-    poller_.addEvent(timer->timerfd(), 
+    poller_.addEvent(timer->timerfd(),
                      simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
     timerList_[timer->timerfd()] = timer;
 }
@@ -31,7 +31,7 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
     TimerPtr timer (new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, 0, intervalTime, 0);
     ScopeLock lock(mutex_);
-    poller_.addEvent(timer->timerfd(), 
+    poller_.addEvent(timer->timerfd(),
                      simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
     timerList_[timer->timerfd()] = timer;
 }
@@ -52,7 +52,7 @@ void EventLoop::removeTimer(int id)
 {
     removeInLoop(id);
     {
-    ScopeLock lock(mutex_);
-    timerList_.erase(id);
+        ScopeLock lock(mutex_);
+        timerList_.erase(id);
     }
 }

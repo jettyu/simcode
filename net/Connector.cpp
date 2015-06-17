@@ -8,7 +8,7 @@ void Connector::Connect()
     socket_->setReuseAddr(true);
     socket_->setReusePort(true);
     socket_->setNonBlockAndCloseOnExec();
-    TryConnect();    
+    TryConnect();
 }
 
 void Connector::TryConnect()
@@ -18,40 +18,40 @@ void Connector::TryConnect()
     int flag = 0;
     switch (savedErrno)
     {
-        case 0:
-        case EINPROGRESS:
-        case EINTR:
-        case EISCONN:
-            flag = 0;
-            break;
+    case 0:
+    case EINPROGRESS:
+    case EINTR:
+    case EISCONN:
+        flag = 0;
+        break;
 
-        case EAGAIN:
-        case EADDRINUSE:
-        case EADDRNOTAVAIL:
-        case ECONNREFUSED:
-        case ENETUNREACH:
-            flag = 1;
-            //retry(sockfd);
-            break;
+    case EAGAIN:
+    case EADDRINUSE:
+    case EADDRNOTAVAIL:
+    case ECONNREFUSED:
+    case ENETUNREACH:
+        flag = 1;
+        //retry(sockfd);
+        break;
 
-        case EACCES:
-        case EPERM:
-        case EAFNOSUPPORT:
-        case EALREADY:
-        case EBADF:
-        case EFAULT:
-        case ENOTSOCK:
-            //LOG_SYSERR << "connect error in Connector::startInLoop " << savedErrno;
-            socket_.reset();
-            flag = 2;
-            break;
+    case EACCES:
+    case EPERM:
+    case EAFNOSUPPORT:
+    case EALREADY:
+    case EBADF:
+    case EFAULT:
+    case ENOTSOCK:
+        //LOG_SYSERR << "connect error in Connector::startInLoop " << savedErrno;
+        socket_.reset();
+        flag = 2;
+        break;
 
-        default:
-            //LOG_SYSERR << "Unexpected error in Connector::startInLoop " << savedErrno;
-            socket_.reset();
-            flag = 2;
-            // connectErrorCallback_();
-            break;
+    default:
+        //LOG_SYSERR << "Unexpected error in Connector::startInLoop " << savedErrno;
+        socket_.reset();
+        flag = 2;
+        // connectErrorCallback_();
+        break;
     }
     if (0 == flag)
     {

@@ -91,41 +91,42 @@ void TcpConnection::handleWrite()
             {
                 tmpBuf = tmpBuf.substr(n);
                 {
-                ScopeLock lock(mutex_);
-                tmpBuf.append(writeBuf_);
-                writeBuf_.swap(tmpBuf);
+                    ScopeLock lock(mutex_);
+                    tmpBuf.append(writeBuf_);
+                    writeBuf_ = tmpBuf;
                 }
             }
             else
             {
                 {
-                ScopeLock lock(mutex_);
-                if (writeBuf_.empty())
-                {
-                    disableWriting();
-                    //write complete
-                }
+                    ScopeLock lock(mutex_);
+                    if (writeBuf_.empty())
+                    {
+                        disableWriting();
+                        //write complete
+                    }
                 }
             }
         }
         else
         {
             int e = errno;
-	    errcode_ = e;
-            LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-            //disableWriting();
-	    if (e == EINTR || e == EAGAIN)
-	    {
-		{
-		ScopeLock lock(mutex_);
-                tmpBuf.append(writeBuf_);
-                writeBuf_.swap(tmpBuf);
-		}
-	    }
-	    else 
-	    {
-		onClose();
-	    }
+            errcode_ = e;
+
+            disableWriting();
+            if (e == EINTR || e == EAGAIN)
+            {
+                {
+                    ScopeLock lock(mutex_);
+                    tmpBuf.append(writeBuf_);
+                    writeBuf_.swap(tmpBuf);
+                }
+            }
+            else
+            {
+                LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+                onClose();
+            }
         }
     }
 }
@@ -133,11 +134,20 @@ void TcpConnection::handleWrite()
 void TcpConnection::send(const char* data, size_t len)
 {
     {
-    ScopeLock lock(mutex_);
-    writeBuf_.append(data, len);
-    enableWriting();
+        ScopeLock lock(mutex_);
+        writeBuf_.append(data, len);
+        enableWriting();
     }
     //handleWrite();
+}
+
+void TcpConnection::send(const std::string& data)
+{
+    {
+        ScopeLock lock(mutex_);
+        writeBuf_.append(data);
+        enableWriting();
+    }
 }
 
 void TcpConnection::update()

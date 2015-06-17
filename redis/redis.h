@@ -64,13 +64,13 @@ private:
 class RedisReplyObj
 {
 public:
-    RedisReplyObj(redisReply* r=NULL):reply_(r){}
-    
+    RedisReplyObj(redisReply* r=NULL):reply_(r) {}
+
     redisReply* operator->() const
     {
         return reply_;
     }
-    
+
     operator const bool ()
     {
         return reply_!=NULL;

@@ -25,8 +25,8 @@ void TcpClient::send(const char* data, size_t len)
 {
     TcpConnectionPtr conn;
     {
-    ScopeLock lock(mutex_);
-    conn = conn_;
+        ScopeLock lock(mutex_);
+        conn = conn_;
     }
     if (conn) conn->send(data, len);
 }

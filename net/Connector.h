@@ -40,9 +40,9 @@ public:
 protected:
 private:
     enum States { kDisconnected, kConnecting, kConnected };
-    void setState(States s) 
-    { 
-        state_ = s; 
+    void setState(States s)
+    {
+        state_ = s;
     }
     EventLoop* loop_;
     NewConnectionCallback newConnectionCallback_;

@@ -3,7 +3,7 @@
 using namespace simcode;
 using namespace simcode::net;
 
-EventLoopThread::EventLoopThread(const ThreadInitCallback& cb) : 
+EventLoopThread::EventLoopThread(const ThreadInitCallback& cb) :
     callback_(cb)
 {
 }

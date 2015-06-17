@@ -42,10 +42,10 @@ public:
 
     //嵌套，eg: a.id=b.id
     OBJ& FilterNest(const std::string& name,
-                const std::string& value,
-                const std::string& logic="and",
-                const std::string& symbol="="
-               );
+                    const std::string& value,
+                    const std::string& logic="and",
+                    const std::string& symbol="="
+                   );
     OBJ& Filter(const OBJ& f,
                 const std::string& logic="and",
                 const std::string& left_symbol="(",
@@ -56,14 +56,14 @@ public:
     OBJ& OrderByDesc(const std::string& name);
     OBJ& Limit(size_t i);
     OBJ& Limit(size_t i, size_t j);
-    OBJ& In(const std::string& name, 
+    OBJ& In(const std::string& name,
             const std::vector<std::string>& value,
             const std::string& logic=" and ");
-    OBJ& In(const std::string& name, 
+    OBJ& In(const std::string& name,
             const std::vector<uint64_t>& value,
             const std::string& logic=" and ");
     OBJ& Between(const std::string& name,
-                 uint64_t value1, 
+                 uint64_t value1,
                  uint64_t value2,
                  const std::string& logic=" and ");
     OBJ& ClearFilter()
@@ -118,9 +118,9 @@ inline OBJ& SqlFilter<OBJ>::Filter(const std::string& name,
 
 template<class OBJ>
 inline OBJ& SqlFilter<OBJ>::FilterNest(const std::string& name,
-                                   const std::string& value,
-                                   const std::string& logic,
-                                   const std::string& symbol)
+                                       const std::string& value,
+                                       const std::string& logic,
+                                       const std::string& symbol)
 {
     if (flag_) filter_.append(" ").append(logic).append(" ");
     filter_.append(name).append(" ").append(symbol).append(" ").append(value);
@@ -176,7 +176,7 @@ OBJ& SqlFilter<OBJ>::Limit(size_t i, size_t j)
 }
 
 template<class OBJ>
-OBJ& SqlFilter<OBJ>::In(const std::string& name, 
+OBJ& SqlFilter<OBJ>::In(const std::string& name,
                         const std::vector<std::string>& value,
                         const std::string& logic)
 {
@@ -192,7 +192,7 @@ OBJ& SqlFilter<OBJ>::In(const std::string& name,
 }
 
 template<class OBJ>
-OBJ& SqlFilter<OBJ>::In(const std::string& name, 
+OBJ& SqlFilter<OBJ>::In(const std::string& name,
                         const std::vector<uint64_t>& value,
                         const std::string& logic)
 {
@@ -209,7 +209,7 @@ OBJ& SqlFilter<OBJ>::In(const std::string& name,
 
 template<class OBJ>
 OBJ& SqlFilter<OBJ>::Between(const std::string& name,
-                             uint64_t value1, 
+                             uint64_t value1,
                              uint64_t value2,
                              const std::string& logic)
 {

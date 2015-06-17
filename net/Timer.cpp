@@ -33,8 +33,8 @@ void Timer::handleEvent(int events)
     uint64_t s;
     read(timerfd_, &s, sizeof(s));
     if (handler_.intervalTime == 0 || //没有间隔时间，只执行1次
-        handler_.surplusTimes == 1 //达到了最大次数
-      ) 
+            handler_.surplusTimes == 1 //达到了最大次数
+       )
     {
         if (removeCallback_) removeCallback_(timerfd_);
         return;

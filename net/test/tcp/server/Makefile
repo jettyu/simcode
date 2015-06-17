@@ -9,9 +9,7 @@ FLAGS=-o
 CPPFLAGS= -g -O0 -std=c++11 $(INC_DIR)
 LIBS=  -lpthread \
        -lboost_system -lboost_thread \
-       -lprotoc -lprotobuf -lprotobuf-lite \
-       -lhiredis \
-       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread
+       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode
 
 SOURCES=$(shell echo *.cpp $(ADD_SRC))
 HEADERS=$(shell echo *.h)

@@ -11,7 +11,7 @@ template<class T>
 class VecMap16 : noncopyable
 {
 public:
-    VecMap16() : objs_(maxVecSize_){}
+    VecMap16() : objs_(maxVecSize_) {}
     T get(uint64_t id)
     {
         T c;
@@ -26,7 +26,7 @@ public:
     {
         objs_[id&maxVecSize_].erase(id>>offset_);
     }
-    
+
 private:
     std::vector<SafeMap<uint64_t, T>> objs_;
     static const int maxVecSize_ = uint16_t(-1);

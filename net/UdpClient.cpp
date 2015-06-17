@@ -33,7 +33,8 @@ void UdpClient::eventHandle()
             return;
         }
         onMessage(conn_, &buf);
-    }while (n > 0);
+    }
+    while (n > 0);
     //queue_.push_back(conn_->id(), SimBind(&UdpClient::onMessage, this, conn_, buf));
 }
 

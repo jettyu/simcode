@@ -30,7 +30,7 @@ void UdpServer::setThreadNum(int n)
 
 void UdpServer::eventHandle(int events)
 {
-     queue_.push_back(threadNum_+1, SimBind(&UdpServer::hanleRead, this));
+    queue_.push_back(threadNum_+1, SimBind(&UdpServer::hanleRead, this));
 }
 
 void UdpServer::hanleRead()
@@ -61,7 +61,8 @@ void UdpServer::hanleRead()
             queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, &buf));
         else
             onMessage(conn, &buf);
-    } while (n > 0);
+    }
+    while (n > 0);
 }
 
 void UdpServer::onMessage(const UdpConnectionPtr& c, std::string* msg)

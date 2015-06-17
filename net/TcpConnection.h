@@ -21,6 +21,7 @@ public:
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
     void run();
     void send(const char* data, size_t len);
+    void send(const std::string& data);
     int connfd() const
     {
         return socket_.sockfd();
@@ -82,8 +83,8 @@ private:
     void onClose();
     void enableWriting()
     {
-         events_ |= EPOLLOUT; 
-         update();
+        events_ |= EPOLLOUT;
+        update();
     }
     void disableWriting()
     {
