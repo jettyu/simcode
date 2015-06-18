@@ -30,6 +30,10 @@ public:
     UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name);
     void start();
     void setThreadNum(int n);
+    void setConnManager(const SharedPtr<BaseUdpConnManager>& m)
+    {
+        conntectionList_ = m;
+    }
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;
