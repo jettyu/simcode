@@ -10,9 +10,11 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     localAddr_(SockAddr(socket_.getLocalAddr())),
     errcode_(0),
     events_(EPOLLIN|EPOLLPRI),
-    revents_(0)
+    revents_(0),
+    isClosed_(false)
 {
     socket_.setKeepAlive(true);
+    readBuf_.reserve(10240);
 }
 
 void TcpConnection::run()
@@ -133,6 +135,7 @@ void TcpConnection::handleWrite()
 
 void TcpConnection::send(const char* data, size_t len)
 {
+    if (!isClosed_)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data, len);
@@ -143,6 +146,7 @@ void TcpConnection::send(const char* data, size_t len)
 
 void TcpConnection::send(const std::string& data)
 {
+    if (!isClosed_)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
@@ -157,6 +161,8 @@ void TcpConnection::update()
 
 void TcpConnection::onClose()
 {
+    shutdown();
+    isClosed_ = true;
     loop_->removeInLoop(socket_.sockfd());
     if (closeCallback_) closeCallback_();
 }

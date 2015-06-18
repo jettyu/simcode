@@ -17,28 +17,44 @@ using namespace simcode::thread;
 
 ThreadSafeQueue threadQueue;
 
-void eventHandle(const TcpConnectionPtr& conn, const char* data, int size)
+void eventHandle(const TcpConnectionPtr& conn, const void* data, int size)
 {
     //cout<<string(data+2, size-2)<<endl;
-    threadQueue.push_back(conn->connfd() , simex::bind(&TcpConnection::send, conn.get(), std::string(data, size)));
-   // conn->send(data, size);
+    threadQueue.push_back(conn->connfd() , simex::bind(&TcpConnection::send, conn.get(), std::string((const char*)data, size)));
+    //conn->send((const char*)data, size);
 }
 
-void codec(const TcpConnectionPtr& conn, std::string *msg)
+struct Head
 {
-    int length = msg->size();
-    int offset = 0;
-    while (length > 2)
+    uint16_t size;
+    void ParseFromPointer(const void* data)
     {
-        if (length < 2) break;
-        int size = ntohs(*(uint16_t*)(msg->data()+offset));
-        int totle_len = size + 2;
-        if (length < totle_len) break;
-        eventHandle(conn, msg->data() + offset, totle_len);
-        offset += totle_len;
-        length -= totle_len;
+        *this = *static_cast<const Head*>(data);
+        size = ntohs(size);
     }
-    if (offset != 0) *msg = msg->substr(msg->size()-length);
+    void SerializeToPointer(void* data)
+    {
+        int s = htons(size);
+        memcpy(data, this, LENGTH);
+    }
+    static const size_t LENGTH;
+};
+
+const size_t Head::LENGTH = sizeof(Head);
+
+void codec(const TcpConnectionPtr& conn, simcode::net::Buffer *msg)
+{
+    while (msg->readableBytes() >= Head::LENGTH)
+    {
+        Head head;
+        head.ParseFromPointer(msg->peek());
+        int totle_len = head.size + Head::LENGTH;
+        if (msg->readableBytes() < totle_len) break;
+        //cout<<"msgLen="<<totle_len<<endl;
+        eventHandle(conn, msg->peek(), totle_len);
+        msg->seek(totle_len);
+    }
+    msg->retrieve(msg->getSeek());
 }
 
 //#include "oci_api.h"
@@ -55,7 +71,8 @@ int main(int argc, char **argv)
     server.setMessageCallback(simex::bind(codec, _1, _2));
     server.setThreadNum(16);
     server.start();
-    loop.loop();
 
+    loop.loop();
+    threadQueue.stop();
     return 0;
 }

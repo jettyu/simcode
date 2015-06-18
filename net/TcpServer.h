@@ -15,7 +15,7 @@ namespace net
 class TcpServer : noncopyable
 {
 public:
-    typedef simex::function<void (const TcpConnectionPtr&, std::string* msg)> MessageCallback;
+    typedef simex::function<void (const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> ConnectionCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> CloseCallback;
     TcpServer(EventLoop* loop, const SockAddr& addr, const std::string& name);

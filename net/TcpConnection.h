@@ -5,7 +5,7 @@
 #include <simcode/net/EventLoop.h>
 #include <simcode/base/typedef.h>
 #include <simcode/base/noncopyable.h>
-
+#include <simcode/net/Buffer.h>
 namespace simcode
 {
 namespace net
@@ -17,7 +17,7 @@ class TcpConnection : noncopyable,
 {
 public:
     typedef simex::function<void()> CloseCallback;
-    typedef simex::function<void(const TcpConnectionPtr&, std::string* msg)> MessageCallback;
+    typedef simex::function<void(const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
     void run();
     void send(const char* data, size_t len);
@@ -76,6 +76,7 @@ public:
     }
     void shutdown()
     {
+        isClosed_ = true;
         socket_.ShutdownWrite();
     }
 private:
@@ -101,11 +102,12 @@ private:
     const SockAddr localAddr_;
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
-    std::string readBuf_;
+    Buffer readBuf_;
     std::string writeBuf_;
     int errcode_; //use to save errno
     int events_;
     int revents_;
+    bool isClosed_;
     Mutex mutex_;
     simex::any context_;
 };
