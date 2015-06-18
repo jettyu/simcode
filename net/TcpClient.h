@@ -17,6 +17,7 @@ public:
     ~TcpClient();
     void active();
     void send(const char* data, size_t len);
+    void send(const std::string& data);
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;

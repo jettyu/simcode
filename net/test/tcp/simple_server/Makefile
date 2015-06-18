@@ -1,7 +1,7 @@
 TOP_DIR=../../../../build
 INC_DIR=-I$(TOP_DIR)/
 VPATH=$(TOP_DIR)/simcode/base:$(TOP_DIR)/simcode/net:$(TOP_DIR)/simcode/thread
-ADD_SRC= 
+ADD_SRC=
 
 
 CPP=g++
@@ -14,7 +14,7 @@ LIBS=  -lpthread \
 SOURCES=$(shell echo *.cpp $(ADD_SRC))
 HEADERS=$(shell echo *.h)
 OBJECTS=$(SOURCES:.cpp=.o)
-TARGET=client
+TARGET=server
 
 target:
 	make all

@@ -20,8 +20,8 @@ ThreadSafeQueue threadQueue;
 void eventHandle(const TcpConnectionPtr& conn, const void* data, int size)
 {
     //cout<<string(data+2, size-2)<<endl;
-    //threadQueue.push_back(conn->connfd() , simex::bind(&TcpConnection::send, conn.get(), std::string((const char*)data, size)));
-    conn->send((const char*)data, size);
+    threadQueue.push_back(conn->connfd() , simex::bind(&TcpConnection::send, conn.get(), std::string((const char*)data, size)));
+    //conn->send((const char*)data, size);
 }
 
 struct Head
@@ -34,7 +34,7 @@ struct Head
     }
     void SerializeToPointer(void* data)
     {
-        int s = htons(size);
+        size = htons(size);
         memcpy(data, this, LENGTH);
     }
     static const size_t LENGTH;

@@ -14,7 +14,7 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     isClosed_(false)
 {
     socket_.setKeepAlive(true);
-    readBuf_.reserve(10240);
+    //readBuf_.reserve(10240);
     //writeBuf_.mutableReadBuf()->reserve(10240);
     //writeBuf_.mutableWriteBuf()->reserve(10240);
 }
