@@ -15,8 +15,8 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
 {
     socket_.setKeepAlive(true);
     readBuf_.reserve(10240);
-    writeBuf_.mutableReadBuf()->reserve(10240);
-    writeBuf_.mutableWriteBuf()->reserve(10240);
+    //writeBuf_.mutableReadBuf()->reserve(10240);
+    //writeBuf_.mutableWriteBuf()->reserve(10240);
 }
 
 void TcpConnection::run()
@@ -79,15 +79,20 @@ void TcpConnection::handleRead()
 
 void TcpConnection::handleWrite()
 {
-    std::string& tmpBuf = *writeBuf_.mutableReadBuf();
-    if (!tmpBuf.empty())
+   // if (isClosed_) return;
+    if (writeBuf_.readableBytes() == 0)
+    {
+        ScopeLock lock(mutex_);
+        writeBuf_.changeIndex();
+    }
+    if (writeBuf_.readableBytes() != 0)
     {
         int fd = socket_.sockfd();
         ssize_t n;
-        n = ::write(fd, tmpBuf.data(), tmpBuf.size());
+        n = ::write(fd, writeBuf_.peek(), writeBuf_.readableBytes());
         if (n > 0)
         {
-            if (n < tmpBuf.size())
+            if (n < writeBuf_.readableBytes())
             {
 
             }
@@ -102,35 +107,39 @@ void TcpConnection::handleWrite()
             errcode_ = e;
 
             disableWriting();
-            if (e == EINTR || e == EAGAIN)
+            if (errno != EWOULDBLOCK)
             {
-
-            }
-            else
-            {
-                LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-                onClose();
-                return;
+                LOG_DEBUG("write error|errmsg=%s|port=%d", strerror(errno), peerAddr().port());
+                if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
+                {
+                    //shutdown();
+                    onClose();
+                    return;
+                }
             }
         }
         writeBuf_.seek(n);
-    }
-    if (writeBuf_.readableBytes() == 0)
-    {
-        tmpBuf.clear();
-        ScopeLock lock(mutex_);
-        writeBuf_.changeIndex();
-        writeBuf_.resetSeek();
         if (writeBuf_.readableBytes() == 0)
         {
-            disableWriting();
+            ScopeLock lock(mutex_);
+            writeBuf_.mutableReadBuf()->clear();
+            writeBuf_.resetSeek();
+            if (writeBuf_.mutableWriteBuf()->empty())
+            {
+                disableWriting();
+            }
+            else
+            {
+                writeBuf_.changeIndex();
+            }
         }
     }
+
 }
 
 void TcpConnection::send(const char* data, size_t len)
 {
-    if (!isClosed_)
+  //  if (!isClosed_)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data, len);
@@ -141,7 +150,7 @@ void TcpConnection::send(const char* data, size_t len)
 
 void TcpConnection::send(const std::string& data)
 {
-    if (!isClosed_)
+  //  if (!isClosed_)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
@@ -156,8 +165,9 @@ void TcpConnection::update()
 
 void TcpConnection::onClose()
 {
-    shutdown();
     isClosed_ = true;
+    //shutdown();
+
     loop_->removeInLoop(socket_.sockfd());
     if (closeCallback_) closeCallback_();
 }
