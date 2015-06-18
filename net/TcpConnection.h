@@ -6,6 +6,7 @@
 #include <simcode/base/typedef.h>
 #include <simcode/base/noncopyable.h>
 #include <simcode/net/Buffer.h>
+#include <simcode/net/OutBuffer.h>
 namespace simcode
 {
 namespace net
@@ -103,7 +104,7 @@ private:
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
     Buffer readBuf_;
-    std::string writeBuf_;
+    OutBuffer writeBuf_;
     int errcode_; //use to save errno
     int events_;
     int revents_;

@@ -1,5 +1,7 @@
 #ifndef SIMCODE_NET_BUFFER_H
 #define SIMCODE_NET_BUFFER_H
+#include <string>
+#include <string.h>
 namespace simcode
 {
 namespace net

@@ -15,6 +15,8 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
 {
     socket_.setKeepAlive(true);
     readBuf_.reserve(10240);
+    writeBuf_.mutableReadBuf()->reserve(10240);
+    writeBuf_.mutableWriteBuf()->reserve(10240);
 }
 
 void TcpConnection::run()
@@ -77,11 +79,7 @@ void TcpConnection::handleRead()
 
 void TcpConnection::handleWrite()
 {
-    std::string tmpBuf;
-    {
-        ScopeLock lock(mutex_);
-        tmpBuf.swap(writeBuf_);
-    }
+    std::string& tmpBuf = *writeBuf_.mutableReadBuf();
     if (!tmpBuf.empty())
     {
         int fd = socket_.sockfd();
@@ -91,44 +89,41 @@ void TcpConnection::handleWrite()
         {
             if (n < tmpBuf.size())
             {
-                tmpBuf = tmpBuf.substr(n);
-                {
-                    ScopeLock lock(mutex_);
-                    tmpBuf.append(writeBuf_);
-                    writeBuf_ = tmpBuf;
-                }
+
             }
             else
             {
-                {
-                    ScopeLock lock(mutex_);
-                    if (writeBuf_.empty())
-                    {
-                        disableWriting();
-                        //write complete
-                    }
-                }
             }
         }
         else
         {
+            n = 0;
             int e = errno;
             errcode_ = e;
 
             disableWriting();
             if (e == EINTR || e == EAGAIN)
             {
-                {
-                    ScopeLock lock(mutex_);
-                    tmpBuf.append(writeBuf_);
-                    writeBuf_.swap(tmpBuf);
-                }
+
             }
             else
             {
                 LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
                 onClose();
+                return;
             }
+        }
+        writeBuf_.seek(n);
+    }
+    if (writeBuf_.readableBytes() == 0)
+    {
+        tmpBuf.clear();
+        ScopeLock lock(mutex_);
+        writeBuf_.changeIndex();
+        writeBuf_.resetSeek();
+        if (writeBuf_.readableBytes() == 0)
+        {
+            disableWriting();
         }
     }
 }
