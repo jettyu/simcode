@@ -6,10 +6,23 @@
 #include <simcode/net/Socket.h>
 #include <simcode/net/UdpConnection.h>
 #include <simcode/net/VecMap.h>
+#include <simcode/net/ConnManager.h>
 namespace simcode
 {
 namespace net
 {
+typedef BaseConnManager<UdpConnectionPtr> BaseUdpConnManager;
+class UdpConnMap : public BaseUdpConnManager
+{
+public:
+    void add(uint64_t id, const UdpConnectionPtr& conn);
+    UdpConnectionPtr get(uint64_t id);
+    void erase(uint64_t);
+private:
+    SharedMutex mutex_;
+    std::map<uint64_t, UdpConnectionPtr> connMap_;
+};
+
 class UdpServer : noncopyable
 {
 public:
@@ -31,9 +44,9 @@ private:
     simcode::thread::ThreadSafeQueue queue_;
     Socket socket_;
     MessageCallback messageCallback_;
-    //VecMap16<UdpConnectionPtr> connManager_;
-    std::map<uint64_t, UdpConnectionPtr> connManager_;
-    Mutex mutex_;
+    SharedPtr<BaseUdpConnManager> conntectionList_;
+    //std::map<uint64_t, UdpConnectionPtr> connManager_;
+    //Mutex mutex_;
     int threadNum_;
 };
 }

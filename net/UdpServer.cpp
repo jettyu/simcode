@@ -7,6 +7,7 @@ using namespace thread;
 UdpServer::UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name):
     loop_(loop),
     socket_(PF_INET, SOCK_DGRAM, 0),
+    conntectionList_(new UdpConnMap),
     threadNum_(0)
 {
     assert(socket_.sockfd() != -1);
@@ -48,31 +49,21 @@ void UdpServer::hanleRead()
             return;
         }
         uint64_t id = c.peerAddr().id();
-        //UdpConnectionPtr conn = connManager_.get(id);
-        UdpConnectionPtr conn;
-        {
-        ScopeLock lock(mutex_);
-        std::map<uint64_t, UdpConnectionPtr>::iterator it = connManager_.find(id);
-        if (it != connManager_.end())
-        {
-            conn = it->second;
-        }
-        else
+        //UdpConnectionPtr conn = conntectionList_.get(id);
+        UdpConnectionPtr conn = conntectionList_->get(id);
+        if (!conn)
         {
             LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu", c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
             conn.reset(new UdpConnection(c));
             conn->setCloseCallback(SimBind(&UdpServer::removeConnection, this, _1));
-            //connManager_.add(id, conn);
-            connManager_[id] = conn;
-        }
+            conntectionList_->add(id, conn);
         }
         //onMessage(conn, buf);
         if (threadNum_)
             queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, buf));
         else
             onMessage(conn, buf);
-    }
-    while (n > 0);
+    }while (n > 0);
 }
 
 void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
@@ -83,8 +74,40 @@ void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
 void UdpServer::removeConnection(int64_t connId)
 {
     LOG_DEBUG("client remove|id=%ld", connId);
+    conntectionList_->erase(connId);
+    //{
+    //ScopeLock lock(mutex_);
+    //conntectionList_.erase(connId);
+    //}
+}
+
+void UdpConnMap::add(uint64_t id, const UdpConnectionPtr& conn)
+{
     {
-    ScopeLock lock(mutex_);
-    connManager_.erase(connId);
+    WriteLock lock(mutex_);
+    connMap_[id] = conn;
     }
 }
+
+UdpConnectionPtr UdpConnMap::get(uint64_t id)
+{
+    UdpConnectionPtr ptr;
+    {
+    ReadLock lock(mutex_);
+    std::map<uint64_t, UdpConnectionPtr>::iterator it;
+    if ((it=connMap_.find(id)) != connMap_.end())
+    {
+        ptr = it->second;
+    }
+    }
+    return ptr;
+}
+
+void UdpConnMap::erase(uint64_t id)
+{
+    {
+        WriteLock lock(mutex_);
+        connMap_.erase(id);
+    }
+}
+

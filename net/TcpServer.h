@@ -8,10 +8,22 @@
 #include <simcode/net/VecMap.h>
 #include <simcode/net/EventLoopThreadPool.h>
 #include <simcode/net/Acceptor.h>
+#include <simcode/net/ConnManager.h>
 namespace simcode
 {
 namespace net
 {
+typedef BaseConnManager<TcpConnectionPtr> BaseTcpConnManager;
+class TcpConnMap : public BaseTcpConnManager
+{
+public:
+    void add(uint64_t id, const TcpConnectionPtr& conn);
+    TcpConnectionPtr get(uint64_t id);
+    void erase(uint64_t);
+private:
+    SharedMutex mutex_;
+    std::map<uint64_t, TcpConnectionPtr> connMap_;
+};
 class TcpServer : noncopyable
 {
 public:
@@ -23,6 +35,10 @@ public:
     void setThreadNum(int n)
     {
         threadNum_ = n;
+    }
+    void setConnManager(const SharedPtr<BaseTcpConnManager>& m)
+    {
+        conntectionList_ = m;
     }
     void setMessageCallback(const MessageCallback& c)
     {
@@ -48,9 +64,9 @@ private:
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;
     Acceptor acceptor_;
-    //VecMap16<TcpConnectionPtr> conntectionList_;
-    std::map<uint64_t, TcpConnectionPtr> conntectionList_;
-    Mutex mutex_;
+    SharedPtr<BaseTcpConnManager> conntectionList_;
+    //std::map<uint64_t, TcpConnectionPtr> conntectionList_;
+    //Mutex mutex_;
     int threadNum_;
     EventLoopThreadPool loopThreadPool_;
 };
