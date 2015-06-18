@@ -13,9 +13,10 @@ namespace net
 class UdpClient : noncopyable
 {
 public:
-    typedef simex::function<void (const UdpConnectionPtr&, std::string* msg)> MessageCallback;
+    typedef simex::function<void (const UdpConnectionPtr&, const std::string& msg)> MessageCallback;
     UdpClient(EventLoop*, const SockAddr&, const std::string& name);
     int Send(const char* buf, size_t len);
+    int Send(const std::string& data);
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;
@@ -26,7 +27,7 @@ public:
     }
 private:
     void eventHandle();
-    void onMessage(const UdpConnectionPtr& c, std::string* msg);
+    void onMessage(const UdpConnectionPtr& c, const std::string& msg);
 private:
     Socket socket_;
     UdpConnectionPtr conn_;

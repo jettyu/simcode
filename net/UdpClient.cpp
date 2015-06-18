@@ -21,6 +21,11 @@ int UdpClient::Send(const char* buf, size_t len)
     return conn_->Send(buf, len);
 }
 
+int UdpClient::Send(const std::string& data)
+{
+    return conn_->Send(data);
+}
+
 void UdpClient::eventHandle()
 {
     UdpConnector c(socket_.sockfd());
@@ -32,13 +37,13 @@ void UdpClient::eventHandle()
         {
             return;
         }
-        onMessage(conn_, &buf);
+        onMessage(conn_, buf);
     }
     while (n > 0);
     //queue_.push_back(conn_->id(), SimBind(&UdpClient::onMessage, this, conn_, buf));
 }
 
-void UdpClient::onMessage(const UdpConnectionPtr& c, std::string* msg)
+void UdpClient::onMessage(const UdpConnectionPtr& c, const std::string& msg)
 {
     messageCallback_(c, msg);
 }

@@ -30,6 +30,10 @@ int UdpConnector::Send(const char* buf, size_t len)
 {
     int ret = sendto(sockfd_, buf, len, 0, peerAddr_.addr(), addrLen_);
     errcode_ = errno;
-    LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+    if (ret < 0)
+    {
+        LOG_ERROR("write error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
+    }
+
     return ret;
 }

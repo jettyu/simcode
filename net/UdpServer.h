@@ -13,7 +13,7 @@ namespace net
 class UdpServer : noncopyable
 {
 public:
-    typedef simex::function<void (const UdpConnectionPtr&, std::string* msg)> MessageCallback;
+    typedef simex::function<void (const UdpConnectionPtr&, const std::string& msg)> MessageCallback;
     UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name);
     void start();
     void setThreadNum(int n);
@@ -22,7 +22,7 @@ public:
         messageCallback_ = c;
     }
 private:
-    void onMessage(const UdpConnectionPtr& c, std::string* msg);
+    void onMessage(const UdpConnectionPtr& c, const std::string& msg);
     void eventHandle(int events);
     void hanleRead();
     void removeConnection(int64_t connId);
@@ -31,7 +31,8 @@ private:
     simcode::thread::ThreadSafeQueue queue_;
     Socket socket_;
     MessageCallback messageCallback_;
-    VecMap16<UdpConnectionPtr> connManager_;
+    //VecMap16<UdpConnectionPtr> connManager_;
+    std::map<uint64_t, UdpConnectionPtr> connManager_;
     int threadNum_;
 };
 }

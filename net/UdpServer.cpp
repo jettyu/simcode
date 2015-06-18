@@ -48,24 +48,31 @@ void UdpServer::hanleRead()
             return;
         }
         uint64_t id = c.peerAddr().id();
-        UdpConnectionPtr conn = connManager_.get(id);
-        if (!conn)
+        //UdpConnectionPtr conn = connManager_.get(id);
+        UdpConnectionPtr conn;
+        std::map<uint64_t, UdpConnectionPtr>::iterator it = connManager_.find(id);
+        if (it != connManager_.end())
+        {
+            conn = it->second;
+        }
+        else
         {
             LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu", c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
             conn.reset(new UdpConnection(c));
             conn->setCloseCallback(SimBind(&UdpServer::removeConnection, this, _1));
-            connManager_.add(id, conn);
+            //connManager_.add(id, conn);
+            connManager_[id] = conn;
         }
         //onMessage(conn, buf);
         if (threadNum_)
-            queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, &buf));
+            queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, buf));
         else
-            onMessage(conn, &buf);
+            onMessage(conn, buf);
     }
     while (n > 0);
 }
 
-void UdpServer::onMessage(const UdpConnectionPtr& c, std::string* msg)
+void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
 {
     messageCallback_(c, msg);
 }

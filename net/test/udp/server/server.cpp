@@ -13,9 +13,9 @@ using namespace simcode::net;
 //#include "oci_api.h"
 
 
-void eventHandle(const UdpConnectionPtr& conn, std::string* msg)
+void eventHandle(const UdpConnectionPtr& conn, const std::string& msg)
 {
-    cout<<"recv:"<<*msg<<endl;
+    cout<<"recv:"<<msg<<endl;
     conn->Send("pong", 4);
 }
 
