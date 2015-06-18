@@ -16,6 +16,7 @@ public:
     void seek(size_t n);
     size_t getSeek() const;
     void retrieve(size_t n);
+    void retrieveSeek();
     std::string* mutableBuf();
     const std::string& buf() const;
 
@@ -62,6 +63,11 @@ inline void Buffer::retrieve(size_t n)
         buf_.resize(length);
         seek_ = 0;
     }
+}
+
+inline void Buffer::retrieveSeek()
+{
+    retrieve(seek_);
 }
 
 inline std::string* Buffer::mutableBuf()
