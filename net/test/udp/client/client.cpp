@@ -13,9 +13,9 @@ using namespace std;
 using namespace simcode;
 using namespace simcode::net;
 
-void Recv(const UdpConnectionPtr& conn, const std::string& msg)
+void Recv(const UdpConnectionPtr& conn, std::string* msg)
 {
-    cout<<"recv:"<<msg<<endl;
+    cout<<"recv:"<<*msg<<endl;
     sleep(1);
     conn->Send("ping", 4);
 }
