@@ -48,7 +48,8 @@ private:
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;
     Acceptor acceptor_;
-    VecMap16<TcpConnectionPtr> conntectionList_;
+    //VecMap16<TcpConnectionPtr> conntectionList_;
+    std::map<uint64_t, TcpConnectionPtr> conntectionList_;
     int threadNum_;
     EventLoopThreadPool loopThreadPool_;
 };
