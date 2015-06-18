@@ -50,6 +50,8 @@ void UdpServer::hanleRead()
         uint64_t id = c.peerAddr().id();
         //UdpConnectionPtr conn = connManager_.get(id);
         UdpConnectionPtr conn;
+        {
+        ScopeLock lock(mutex_);
         std::map<uint64_t, UdpConnectionPtr>::iterator it = connManager_.find(id);
         if (it != connManager_.end())
         {
@@ -62,6 +64,7 @@ void UdpServer::hanleRead()
             conn->setCloseCallback(SimBind(&UdpServer::removeConnection, this, _1));
             //connManager_.add(id, conn);
             connManager_[id] = conn;
+        }
         }
         //onMessage(conn, buf);
         if (threadNum_)
@@ -80,5 +83,8 @@ void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
 void UdpServer::removeConnection(int64_t connId)
 {
     LOG_DEBUG("client remove|id=%ld", connId);
+    {
+    ScopeLock lock(mutex_);
     connManager_.erase(connId);
+    }
 }

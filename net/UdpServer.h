@@ -33,6 +33,7 @@ private:
     MessageCallback messageCallback_;
     //VecMap16<UdpConnectionPtr> connManager_;
     std::map<uint64_t, UdpConnectionPtr> connManager_;
+    Mutex mutex_;
     int threadNum_;
 };
 }

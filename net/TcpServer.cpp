@@ -25,7 +25,10 @@ void TcpServer::onClose(const TcpConnectionPtr& conn)
    // EventLoop* ioLoop = conn->getLoop();
     //ioLoop->removeInLoop(conn->connfd());
     LOG_DEBUG("client close|ip=%s|port=%u", conn->peerAddr().ip().c_str(), conn->peerAddr().port());
+    {
+    ScopeLock lock(mutex_);
     conntectionList_.erase(conn->connfd());
+    }
 }
 
 void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
@@ -38,6 +41,9 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
     if (connectionCallback_) connectionCallback_(conn);
     //conntectionList_.add(conn->connfd(), conn);
+    {
+    ScopeLock lock(mutex_);
     conntectionList_[conn->connfd()] = conn;
+    }
     conn->run();
 }

@@ -50,6 +50,7 @@ private:
     Acceptor acceptor_;
     //VecMap16<TcpConnectionPtr> conntectionList_;
     std::map<uint64_t, TcpConnectionPtr> conntectionList_;
+    Mutex mutex_;
     int threadNum_;
     EventLoopThreadPool loopThreadPool_;
 };
