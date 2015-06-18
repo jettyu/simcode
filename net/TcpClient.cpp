@@ -6,7 +6,8 @@ using namespace net;
 
 TcpClient::TcpClient(EventLoop* loop, const SockAddr& addr, const std::string& name):
     loop_(loop),
-    connector_(loop, addr)
+    connector_(loop, addr),
+    retry_(true)
 {
     connector_.setNewConnectionCallback(simex::bind(&TcpClient::onConnect, this));
 }
@@ -54,5 +55,5 @@ void TcpClient::onConnect()
 void TcpClient::onClose(const TcpConnectionPtr& conn)
 {
     if (closeCallback_) closeCallback_(conn);
-    connector_.Connect();
+    if (retry_) connector_.Connect();
 }

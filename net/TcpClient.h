@@ -35,7 +35,10 @@ public:
     {
         return loop_;
     }
-
+    void setRetry(bool retry)
+    {
+        retry_ = retry;
+    }
 private:
     void onConnect();
     void onClose(const TcpConnectionPtr&);
@@ -46,6 +49,7 @@ private:
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;
     Mutex mutex_;
+    bool retry_;
 };
 }
 }
