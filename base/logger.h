@@ -1,6 +1,7 @@
 #ifndef SIMCODE_LOGGER_H
 #define SIMCODE_LOGGER_H
 #include <stdarg.h>
+#include <stdio.h>
 namespace simcode
 {
 
@@ -26,32 +27,37 @@ public:
     static int LEVEL_FATAL;
 };
 
+class BaseLogger
+{
+public:
+     //日志级别，文件名，文件行号，日志内容
+    virtual void log_out(int level,
+                        const char* filename,
+                        int linenum,
+                        const char* funcname,
+                        const char* msg)
+    {
+        printf("log_level=%d|%s|%d|%s|%s\n", level, filename, linenum, funcname, msg);
+    }
+    virtual bool check_level(int setlevel, int curlevel)
+    {
+        return curlevel < setlevel;
+    }
+};
+
 class Logger
 {
 public:
     Logger();
-    //日志级别，文件名，文件行号，日志内容
-    typedef void (*log_func_t)(int level,
-                               const char* filename,
-                               int linenum,
-                               const char* funcname,
-                               const char* msg);
-    typedef bool(*log_checklevel_func_t)(int setlevel, int curlevel);
+    ~Logger();
     void set_level(int l);
-    void set_log_func(log_func_t f);
-    void set_log_checklevel_func(log_checklevel_func_t f);
+    void set_base_logger(BaseLogger* b);
     void log_write(int level,
                    const char* filename,
                    int linenum,
                    const char* funcname,
                    const char *fmt, ...);
 private:
-    static void log_out(int level,
-                        const char* filename,
-                        int linenum,
-                        const char* funcname,
-                        const char* msg);
-    static bool log_checklevel(int setlevel, int curlevel);
     void log_out_valist(int level,
                         const char* filename,
                         int linenum,
@@ -60,8 +66,7 @@ private:
                         va_list ap);
 private:
     int level_;
-    log_func_t log_func_;
-    log_checklevel_func_t log_checklevel_func_;
+    BaseLogger* base_logger_;
 };
 
 class GlobalLogger
@@ -71,13 +76,9 @@ public:
     {
         logger_.set_level(l);
     }
-    static void set_log_func(Logger::log_func_t f)
+    static void set_base_logger(BaseLogger* f)
     {
-        logger_.set_log_func(f);
-    }
-    static void set_log_checklevel_func(Logger::log_checklevel_func_t f)
-    {
-        logger_.set_log_checklevel_func(f);
+        logger_.set_base_logger(f);
     }
     static Logger& logger()
     {

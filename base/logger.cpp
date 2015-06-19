@@ -1,5 +1,4 @@
 #include <simcode/base/logger.h>
-#include <stdio.h>
 using namespace simcode;
 
 int LogLevel::LEVEL_DEBUG = 1;
@@ -11,10 +10,14 @@ int LogLevel::LEVEL_FATAL = 5;
 Logger GlobalLogger::logger_;
 
 Logger::Logger():
-    level_(LogLevel::LEVEL_DEBUG)
+    level_(LogLevel::LEVEL_DEBUG),
+    base_logger_(new BaseLogger)
 {
-    log_func_ = Logger::log_out;
-    log_checklevel_func_ = Logger::log_checklevel;
+}
+
+Logger::~Logger()
+{
+    if (base_logger_) delete base_logger_;
 }
 
 void Logger::set_level(int l)
@@ -22,14 +25,10 @@ void Logger::set_level(int l)
     level_ = l;
 }
 
-void Logger::set_log_func(log_func_t f)
+void Logger::set_base_logger(BaseLogger* b)
 {
-    log_func_ = f;
-}
-
-void Logger::set_log_checklevel_func(log_checklevel_func_t f)
-{
-    log_checklevel_func_ = f;
+    if (base_logger_) delete base_logger_;
+    base_logger_ = b;
 }
 
 void Logger::log_write(int level,
@@ -38,7 +37,7 @@ void Logger::log_write(int level,
                        const char* funcname,
                        const char* fmt, ...)
 {
-    if (log_checklevel_func_(level_, level)) return;
+    if (base_logger_->check_level(level_, level)) return;
     va_list ap;
     va_start(ap, fmt);
     log_out_valist(level, filename, linenum, funcname, fmt, ap);
@@ -55,20 +54,6 @@ void Logger::log_out_valist(int level,
 {
     char buf[LOG_BUF_LEN];
     vsnprintf(buf, LOG_BUF_LEN, fmt, ap);
-    log_func_(level, filename, linenum, funcname, buf);
+    base_logger_->log_out(level, filename, linenum, funcname, buf);
 }
 
-
-void Logger::log_out(int level,
-                     const char* filename,
-                     int linenum,
-                     const char* funcname,
-                     const char* msg)
-{
-    printf("log_level=%d|%s|%d|%s|%s\n", level, filename, linenum, funcname, msg);
-}
-
-bool Logger::log_checklevel(int setlevel, int curlevel)
-{
-    return curlevel < setlevel;
-}
