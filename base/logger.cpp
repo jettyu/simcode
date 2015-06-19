@@ -38,11 +38,13 @@ void Logger::log_write(int level,
                        const char* funcname,
                        const char* fmt, ...)
 {
-    if (base_logger_->check_level(level_, level)) return;
-    va_list ap;
-    va_start(ap, fmt);
-    log_out_valist(level, filename, linenum, funcname, fmt, ap);
-    va_end(ap);
+    if (base_logger_->check_level(level_, level))
+    {
+        va_list ap;
+        va_start(ap, fmt);
+        log_out_valist(level, filename, linenum, funcname, fmt, ap);
+        va_end(ap);
+    }
 }
 
 #define LOG_BUF_LEN       4096
