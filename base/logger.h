@@ -75,6 +75,10 @@ public:
     {
         logger_.set_log_func(f);
     }
+    static void set_log_checklevel_func(Logger::log_checklevel_func_t f)
+    {
+        logger_.set_log_checklevel_func(f);
+    }
     static Logger& logger()
     {
         return logger_;
