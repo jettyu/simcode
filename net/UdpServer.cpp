@@ -45,7 +45,7 @@ void UdpServer::hanleRead()
         if ((n=c.Recv(&buf)) < 0)
         {
             //log error
-            LOG_ERROR("read error|errno=%d|errmsg=%s", errno, strerror(errno));
+            //LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
         }
         uint64_t id = c.peerAddr().id();
@@ -84,7 +84,7 @@ void UdpServer::removeConnection(int64_t connId)
 void UdpConnMap::add(uint64_t id, const UdpConnectionPtr& conn)
 {
     {
-    WriteLock lock(mutex_);
+    ScopeLock lock(mutex_);
     connMap_[id] = conn;
     }
 }
@@ -93,7 +93,7 @@ UdpConnectionPtr UdpConnMap::get(uint64_t id)
 {
     UdpConnectionPtr ptr;
     {
-    ReadLock lock(mutex_);
+    ScopeLock lock(mutex_);
     std::map<uint64_t, UdpConnectionPtr>::iterator it;
     if ((it=connMap_.find(id)) != connMap_.end())
     {
@@ -106,7 +106,7 @@ UdpConnectionPtr UdpConnMap::get(uint64_t id)
 void UdpConnMap::erase(uint64_t id)
 {
     {
-        WriteLock lock(mutex_);
+        ScopeLock lock(mutex_);
         connMap_.erase(id);
     }
 }

@@ -19,7 +19,7 @@ public:
     UdpConnectionPtr get(uint64_t id);
     void erase(uint64_t);
 private:
-    SharedMutex mutex_;
+    Mutex mutex_;
     std::map<uint64_t, UdpConnectionPtr> connMap_;
 };
 

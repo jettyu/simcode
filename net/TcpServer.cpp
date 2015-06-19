@@ -51,7 +51,7 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
 void TcpConnMap::add(uint64_t id, const TcpConnectionPtr& conn)
 {
     {
-    WriteLock lock(mutex_);
+    ScopeLock lock(mutex_);
     connMap_[id] = conn;
     }
 }
@@ -60,7 +60,7 @@ TcpConnectionPtr TcpConnMap::get(uint64_t id)
 {
     TcpConnectionPtr ptr;
     {
-    ReadLock lock(mutex_);
+    ScopeLock lock(mutex_);
     std::map<uint64_t, TcpConnectionPtr>::iterator it;
     if ((it=connMap_.find(id)) != connMap_.end())
     {
@@ -73,7 +73,7 @@ TcpConnectionPtr TcpConnMap::get(uint64_t id)
 void TcpConnMap::erase(uint64_t id)
 {
     {
-        WriteLock lock(mutex_);
+        ScopeLock lock(mutex_);
         connMap_.erase(id);
     }
 }
