@@ -14,6 +14,7 @@ Logger::Logger():
     level_(LogLevel::LEVEL_DEBUG)
 {
     log_func_ = Logger::log_out;
+    log_checklevel_func_ = Logger::log_checklevel;
 }
 
 void Logger::set_level(int l)
@@ -21,9 +22,14 @@ void Logger::set_level(int l)
     level_ = l;
 }
 
-void Logger::set_log_fun(log_func_t f)
+void Logger::set_log_func(log_func_t f)
 {
     log_func_ = f;
+}
+
+void Logger::set_log_checklevel_func(log_checklevel_func_t f)
+{
+    log_checklevel_func_ = f;
 }
 
 void Logger::log_write(int level,
@@ -32,7 +38,7 @@ void Logger::log_write(int level,
                        const char* funcname,
                        const char* fmt, ...)
 {
-    if (level < level_) return;
+    if (log_checklevel_func_(level_, level)) return;
     va_list ap;
     va_start(ap, fmt);
     log_out_valist(level, filename, linenum, funcname, fmt, ap);
@@ -60,4 +66,9 @@ void Logger::log_out(int level,
                      const char* msg)
 {
     printf("log_level=%d|%s|%d|%s|%s\n", level, filename, linenum, funcname, msg);
+}
+
+bool Logger::log_checklevel(int setlevel, int curlevel)
+{
+    return curlevel < setlevel;
 }

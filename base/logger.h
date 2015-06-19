@@ -7,7 +7,7 @@ namespace simcode
 class LogLevel
 {
 public:
-     static void Init(int debug=2,
+    static void Init(int debug=2,
                      int info=3,
                      int warn=4,
                      int error=5,
@@ -19,11 +19,11 @@ public:
         LEVEL_ERROR = error;
         LEVEL_FATAL = fatal;
     }
-     static int LEVEL_DEBUG;
-     static int LEVEL_INFO;
-     static int LEVEL_WARN;
-     static int LEVEL_ERROR;
-     static int LEVEL_FATAL;
+    static int LEVEL_DEBUG;
+    static int LEVEL_INFO;
+    static int LEVEL_WARN;
+    static int LEVEL_ERROR;
+    static int LEVEL_FATAL;
 };
 
 class Logger
@@ -36,28 +36,32 @@ public:
                                int linenum,
                                const char* funcname,
                                const char* msg);
-     void set_level(int l);
-     void set_log_fun(log_func_t f);
-     void log_write(int level,
-                          const char* filename,
-                          int linenum,
-                          const char* funcname,
-                          const char *fmt, ...);
+    typedef bool(*log_checklevel_func_t)(int setlevel, int curlevel);
+    void set_level(int l);
+    void set_log_func(log_func_t f);
+    void set_log_checklevel_func(log_checklevel_func_t f);
+    void log_write(int level,
+                   const char* filename,
+                   int linenum,
+                   const char* funcname,
+                   const char *fmt, ...);
 private:
-     static void log_out(int level,
+    static void log_out(int level,
                         const char* filename,
                         int linenum,
                         const char* funcname,
                         const char* msg);
-     void log_out_valist(int level,
-                               const char* filename,
-                               int linenum,
-                               const char* funcname,
-                               const char*fmt,
-                               va_list ap);
+    static bool log_checklevel(int setlevel, int curlevel);
+    void log_out_valist(int level,
+                        const char* filename,
+                        int linenum,
+                        const char* funcname,
+                        const char*fmt,
+                        va_list ap);
 private:
-     int level_;
-     log_func_t log_func_;
+    int level_;
+    log_func_t log_func_;
+    log_checklevel_func_t log_checklevel_func_;
 };
 
 class GlobalLogger
@@ -67,9 +71,9 @@ public:
     {
         logger_.set_level(l);
     }
-    static void set_log_fun(Logger::log_func_t f)
+    static void set_log_func(Logger::log_func_t f)
     {
-        logger_.set_log_fun(f);
+        logger_.set_log_func(f);
     }
     static Logger& logger()
     {
