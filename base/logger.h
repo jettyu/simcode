@@ -8,18 +8,21 @@ namespace simcode
 class LogLevel
 {
 public:
-    static void Init(int debug=2,
+    static void Init(int trace = 1;
+                     int debug=2,
                      int info=3,
                      int warn=4,
                      int error=5,
                      int fatal=6)
     {
+        LEVEL_TRACE = trace;
         LEVEL_DEBUG = debug;
         LEVEL_INFO = info;
         LEVEL_WARN = warn;
         LEVEL_ERROR = error;
         LEVEL_FATAL = fatal;
     }
+    static int LEVEL_TRACE;
     static int LEVEL_DEBUG;
     static int LEVEL_INFO;
     static int LEVEL_WARN;
@@ -90,6 +93,8 @@ private:
 
 }
 
+#define LOG_TRACE(fmt, args...)    \
+        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_TRACE, __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_DEBUG(fmt, args...)    \
         simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_DEBUG, __FILE__, __LINE__, __func__, fmt, ##args)
 #define LOG_INFO(fmt, args...)    \

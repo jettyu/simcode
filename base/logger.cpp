@@ -1,11 +1,12 @@
 #include <simcode/base/logger.h>
 using namespace simcode;
 
-int LogLevel::LEVEL_DEBUG = 1;
-int LogLevel::LEVEL_INFO  = 2;
-int LogLevel::LEVEL_WARN  = 3;
-int LogLevel::LEVEL_ERROR = 4;
-int LogLevel::LEVEL_FATAL = 5;
+int LogLevel::LEVEL_TRACE = 1;
+int LogLevel::LEVEL_DEBUG = 2;
+int LogLevel::LEVEL_INFO  = 3;
+int LogLevel::LEVEL_WARN  = 4;
+int LogLevel::LEVEL_ERROR = 5;
+int LogLevel::LEVEL_FATAL = 6;
 
 Logger GlobalLogger::logger_;
 
