@@ -8,8 +8,13 @@ int LogLevel::LEVEL_WARN  = 3;
 int LogLevel::LEVEL_ERROR = 4;
 int LogLevel::LEVEL_FATAL = 5;
 
-int Logger::level_ = LogLevel::LEVEL_DEBUG;
-Logger::log_func_t Logger::log_func_ = Logger::log_out;
+Logger GlobalLogger::logger_;
+
+Logger::Logger():
+    level_(LogLevel::LEVEL_DEBUG)
+{
+    log_func_ = Logger::log_out;
+}
 
 void Logger::set_level(int l)
 {
