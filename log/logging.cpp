@@ -14,7 +14,7 @@ static const char* LogLevelName[]={
 
 static const char* get_level_name(int level)
 {
-    return LogLevelName[level];
+    return LogLevelName[level-1];
 }
 
 
