@@ -24,7 +24,7 @@ private:
 class GlobalLogging
 {
 public:
-    int Init(const std::string& name, uint64_t rotate_size, int level);
+    static int Init(const std::string& name, uint64_t rotate_size, int level);
 };
 
 }
