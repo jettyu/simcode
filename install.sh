@@ -5,7 +5,7 @@ TARGET_PATH=$PWD/build
 MAKE_FLAGS=" DEBUG=y TARGET_PATH=$TARGET_PATH"
 cd base;make $MAKE_FLAGS;cd -;
 cd thread;make $MAKE_FLAGS;cd -;
-cd log;make $MAKE_FLAGS;cd-;
+cd log;make $MAKE_FLAGS;cd -;
 cd net;make $MAKE_FLAGS;cd -;
 cd redis;make $MAKE_FLAGS;cd -;
 cd mysql;make $MAKE_FLAGS;cd -;
