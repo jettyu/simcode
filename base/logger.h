@@ -8,7 +8,7 @@ namespace simcode
 class LogLevel
 {
 public:
-    static void Init(int trace = 1;
+    static void Init(int trace = 1,
                      int debug=2,
                      int info=3,
                      int warn=4,
@@ -44,7 +44,7 @@ public:
     }
     virtual bool check_level(int setlevel, int curlevel)
     {
-        return curlevel < setlevel;
+        return curlevel >= setlevel;
     }
 };
 

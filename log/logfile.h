@@ -6,7 +6,7 @@
 
 namespace simcode
 {
-namespace logfile
+namespace log
 {
 
 class LogFile
@@ -20,8 +20,8 @@ public:
     int open(FILE *fp);
     int open(const std::string& filename,  uint64_t rotate_size=0);
     void close();
-    int logWrite(const char*data, int len);
-    int logData(const char* data, int len, char buf[LOG_BUF_LEN]);
+    int logWrite(const char*data, int size);
+    int logData(const char* data, int size, const char* levelName, char buf[LOG_BUF_LEN]);
 private:
     void rotate();
 private:
