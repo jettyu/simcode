@@ -19,6 +19,7 @@ class TcpConnection : noncopyable,
 public:
     typedef simex::function<void()> CloseCallback;
     typedef simex::function<void(const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
+	typedef simex::function<bool(const TcpConnectionPtr&, OutBuffer* buf)> HighWaterCallback;
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
     void run();
     void send(const char* data, size_t len);
@@ -80,6 +81,14 @@ public:
         isClosed_ = true;
         socket_.ShutdownWrite();
     }
+	void setHighWaterCallback(const HighWaterCallback& c)
+	{
+		highWaterCallback_ = c;
+	}
+	void setHighWaterSize(int n)
+	{
+		highWaterSize_ = n;
+	}
 private:
     void eventHandle(int events);
     void onClose();
@@ -103,11 +112,14 @@ private:
     const SockAddr localAddr_;
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
+	HighWaterCallback highWaterCallback_;
+	
     Buffer readBuf_;
     OutBuffer writeBuf_;
     int errcode_; //use to save errno
     int events_;
     int revents_;
+	int highWaterSize_;
     bool isClosed_;
     Mutex mutex_;
     simex::any context_;

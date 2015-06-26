@@ -2,7 +2,7 @@
 #include <simcode/base/logger.h>
 using namespace simcode;
 using namespace net;
-
+static const int DEF_HIGHWATERSIZE = 64*1024*1024;
 TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr):
     loop_(loop),
     socket_(connfd),
@@ -11,6 +11,7 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     errcode_(0),
     events_(EPOLLIN|EPOLLPRI),
     revents_(0),
+	highWaterSize_(DEF_HIGHWATERSIZE),
     isClosed_(false)
 {
     socket_.setKeepAlive(true);
@@ -139,9 +140,16 @@ void TcpConnection::handleWrite()
 
 void TcpConnection::send(const char* data, size_t len)
 {
-  //  if (!isClosed_)
+    if (!isClosed_)
     {
         ScopeLock lock(mutex_);
+		//HighWater
+		/*if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
+		{
+			if (!highWaterCallback_) writeBuf_.clear();
+			else if (!highWaterCallback_(shared_from_this(), &writeBuf_)) return;
+		}
+		 */
         writeBuf_.append(data, len);
         enableWriting();
     }
@@ -150,7 +158,7 @@ void TcpConnection::send(const char* data, size_t len)
 
 void TcpConnection::send(const std::string& data)
 {
-  //  if (!isClosed_)
+    if (!isClosed_)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
