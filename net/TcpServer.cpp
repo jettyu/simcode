@@ -38,7 +38,7 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     EventLoop* ioLoop = loopThreadPool_.getNextLoop();
     if (!ioLoop) ioLoop = loop_;
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connfd, peerAddr));
-    conn->setCloseCallback(simex::bind(&TcpServer::onClose, this, conn));
+    conn->setCloseCallback(simex::bind(&TcpServer::onClose, this, _1));
     conn->setMessageCallback(messageCallback_);
     LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
     if (connectionCallback_) connectionCallback_(conn);

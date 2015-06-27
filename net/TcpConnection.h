@@ -17,9 +17,10 @@ class TcpConnection : noncopyable,
     public simex::enable_shared_from_this<TcpConnection>
 {
 public:
-    typedef simex::function<void()> CloseCallback;
+    typedef simex::function<void(const TcpConnectionPtr&)> CloseCallback;
     typedef simex::function<void(const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
 	typedef simex::function<bool(const TcpConnectionPtr&, OutBuffer* buf)> HighWaterCallback;
+	typedef simex::function<void(const TcpConnectionPtr&)> WriteCompleteCallback;
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
     void run();
     void send(const char* data, size_t len);
@@ -89,6 +90,10 @@ public:
 	{
 		highWaterSize_ = n;
 	}
+	void setWriteCompleteCallback(const WriteCompleteCallback& c)
+	{
+		writeCompleteCallback_ = c;
+	}
 private:
     void eventHandle(int events);
     void onClose();
@@ -113,7 +118,7 @@ private:
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
 	HighWaterCallback highWaterCallback_;
-	
+	WriteCompleteCallback writeCompleteCallback_;
     Buffer readBuf_;
     OutBuffer writeBuf_;
     int errcode_; //use to save errno

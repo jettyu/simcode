@@ -45,7 +45,7 @@ void TcpClient::send(const std::string& data)
 void TcpClient::onConnect()
 {
     TcpConnectionPtr newConn(new TcpConnection(loop_, connector_.getSocket()->sockfd(), connector_.connAddr()));
-    newConn->setCloseCallback(simex::bind(&TcpClient::onClose, this, conn_));
+    newConn->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
     newConn->setMessageCallback(messageCallback_);
     conn_ = newConn;
     conn_->run();

@@ -99,6 +99,7 @@ void TcpConnection::handleWrite()
             }
             else
             {
+				if (writeCompleteCallback_) writeCompleteCallback_(shared_from_this());
             }
         }
         else
@@ -177,5 +178,5 @@ void TcpConnection::onClose()
     //shutdown();
 
     loop_->removeInLoop(socket_.sockfd());
-    if (closeCallback_) closeCallback_();
+    if (closeCallback_) closeCallback_(shared_from_this());
 }
