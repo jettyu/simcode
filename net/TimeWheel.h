@@ -32,19 +32,19 @@ public:
     }
     void start()
     {
-        loop->runEvery(double(1.0), simex::bind(&TimerWheel::onTimer, this));
+        loop_->runEvery(double(1.0), simex::bind(&TimerWheel::onTimer, this));
     }
     void AddTimer(int duration, const TimerCallback& c)
     {
         NodePtr ptr(new Node(c));
         ScopeLock lock(mutex_);
-        node_buckets_.back().insert(c);
+        node_buckets_.back().insert(ptr);
     }
 private:
     void onTimer()
     {
         ScopeLock lock(mutex_);
-        node_buckets_.push_back(Bucket);
+        node_buckets_.push_back(Bucket());
     }
 private:
     typedef simex::weak_ptr<Node> WeakNodePtr;
@@ -58,7 +58,8 @@ private:
 class TimerWheels
 {
 public:
-    TimerWheels(){}
+    TimerWheels(EventLoopThreadPool* loop_pool__):loop_pool_(loop_pool__)
+    {}
     ~TimerWheels()
     {
         ScopeLock lock(mutex_);
@@ -67,7 +68,7 @@ public:
             delete it->second;
         wheels_.clear();
     }
-    void AddTimer(int duration, const TimerCallback& c)
+    void AddTimer(int duration, const TimerWheel::TimerCallback& c)
     {
         TimerWheel *wheel = NULL;
         std::map<int, TimerWheel*>::iterator it;
@@ -80,7 +81,7 @@ public:
 
         if (!wheel)
         {
-            wheel = new TimerWheel(loop_pool_.getNextLoop(), duration);
+            wheel = new TimerWheel(loop_pool_->getNextLoop(), duration);
             wheel->start();
             {
                 ScopeLock lock(mutex_);
@@ -91,7 +92,7 @@ public:
     }
 private:
     std::map<int, TimerWheel*> wheels_;
-    EventLoopThreadPool loop_pool_;
+    EventLoopThreadPool* loop_pool_;
     Mutex mutex_;
 };
 
