@@ -7,7 +7,10 @@ ThreadQueue::ThreadQueue()
     :is_started_(false), max_size_(0), thread_count_(0),size_(0)
 {
 }
-
+ThreadQueue::~ThreadQueue()
+{
+    stop();
+}
 void ThreadQueue::start()
 {
     if (!is_started_)

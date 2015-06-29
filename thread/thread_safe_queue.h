@@ -10,6 +10,7 @@ class ThreadSafeQueue
 {
 public:
     ThreadSafeQueue();
+    ~ThreadSafeQueue();
     void start();
     void stop();
     int push_back(size_t id, const ThreadHandlerFunc& h);

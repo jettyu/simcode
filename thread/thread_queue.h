@@ -13,6 +13,7 @@ class ThreadQueue
 {
 public:
     ThreadQueue();
+    ~ThreadQueue();
     void start();
     void stop();
     int push_back(const ThreadHandlerFunc& func);

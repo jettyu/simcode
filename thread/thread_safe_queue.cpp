@@ -7,6 +7,11 @@ ThreadSafeQueue::ThreadSafeQueue()
     maxQueueSize_ = 1024;
 }
 
+ThreadSafeQueue::~ThreadSafeQueue()
+{
+    stop();
+}
+
 void ThreadSafeQueue::start()
 {
     queues_.reserve(threadNum_);
