@@ -5,7 +5,7 @@
 #include <librtmp/log.h>
 #include <string>
 #include <simcode/librtmp/RtmpPacket.h>
-
+#include <simcode/base/logger.h>
 namespace simcode
 {
 namespace rtmp
@@ -97,7 +97,8 @@ private:
 			rtmp_ = RTMP_Alloc();
 			RTMP_Init(rtmp_);
 			rtmp_->Link.timeout=timeout_;
-			RTMP_SetupURL(rtmp_, (char*)url_.data());//…Ë÷√url
+			int ret = RTMP_SetupURL(rtmp_, (char*)url_.data());//…Ë÷√url
+			LOG_DEBUG("SetupURL ret=%d", ret);
 		}
 	}
 
