@@ -10,6 +10,7 @@ cd net;make $MAKE_FLAGS;cd -;
 cd redis;make $MAKE_FLAGS;cd -;
 cd mysql;make $MAKE_FLAGS;cd -;
 cd cache/redis;make $MAKE_FLAGS;cd -;
+cd librtmp;make $MAKE_FLAGS; cd -;
 
 cd base;make clean;cd -;
 cd thread;make clean;cd -;
@@ -17,5 +18,6 @@ cd net;make clean;cd -;
 cd redis;make clean;cd -;
 cd mysql;make clean;cd -;
 cd cache/redis;make clean;cd -;
+cd librtmp; make clean; cd -;
 
 exit
