@@ -46,7 +46,7 @@ public:
     void Active(const WeakNodePtr& c)
     {
         NodePtr ptr = c.lock();
-        if (c) node_buckets_.back().insert(ptr);
+        if (ptr) node_buckets_.back().insert(ptr);
     }
 private:
     void onTimer()
@@ -98,7 +98,7 @@ public:
         }
         return wheel->AddTimer(duration, c);
     }
-    void Active(int duration, const WeakNodePtr& c)
+    void Active(int duration, const simcode::net::TimerWheel::WeakNodePtr& c)
     {
         TimerWheel::NodePtr ptr = c.lock();
         if (ptr)
@@ -109,7 +109,7 @@ public:
                 it = wheels_.find(duration);
                 if (it != wheels_.end())
                 {
-                    it->second.Active(ptr);
+                    it->second->Active(ptr);
                 }
             }
         }
