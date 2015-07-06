@@ -26,19 +26,27 @@ public:
         TimerCallback timerCallback_;
     };
     typedef SharedPtr<Node> NodePtr;
+    typedef simex::weak_ptr<Node> WeakNodePtr;
 public:
-    TimerWheel(EventLoop* loop, int len) : loop_(loop), node_buckets_(len)
+    TimerWheel(EventLoop* loop, int len, double intervalTime=double(1.0)) :
+        loop_(loop), node_buckets_(len), intervalTime_(intervalTime_)
     {
     }
     void start()
     {
-        loop_->runEvery(double(1.0), simex::bind(&TimerWheel::onTimer, this));
+        loop_->runEvery(intervalTime_, simex::bind(&TimerWheel::onTimer, this));
     }
-    void AddTimer(int duration, const TimerCallback& c)
+    WeakNodePtr AddTimer(int duration, const TimerCallback& c)
     {
         NodePtr ptr(new Node(c));
         ScopeLock lock(mutex_);
         node_buckets_.back().insert(ptr);
+        return WeakNodePtr(ptr);
+    }
+    void Active(const WeakNodePtr& c)
+    {
+        NodePtr ptr = c.lock();
+        if (c) node_buckets_.back().insert(ptr);
     }
 private:
     void onTimer()
@@ -47,11 +55,11 @@ private:
         node_buckets_.push_back(Bucket());
     }
 private:
-    typedef simex::weak_ptr<Node> WeakNodePtr;
     typedef boost::unordered_set<NodePtr> Bucket;
     typedef boost::circular_buffer<Bucket> WeakNodeList;
     EventLoop* loop_;
     WeakNodeList node_buckets_;
+    double intervalTime_;
     Mutex mutex_;
 };
 
@@ -68,7 +76,7 @@ public:
             delete it->second;
         wheels_.clear();
     }
-    void AddTimer(int duration, const TimerWheel::TimerCallback& c)
+    TimerWheel::WeakNodePtr AddTimer(int duration, const TimerWheel::TimerCallback& c)
     {
         TimerWheel *wheel = NULL;
         std::map<int, TimerWheel*>::iterator it;
@@ -88,7 +96,23 @@ public:
                 wheels_[duration] = wheel;
             }
         }
-        wheel->AddTimer(duration, c);
+        return wheel->AddTimer(duration, c);
+    }
+    void Active(int duration, const WeakNodePtr& c)
+    {
+        TimerWheel::NodePtr ptr = c.lock();
+        if (ptr)
+        {
+            std::map<int, TimerWheel*>::iterator it;
+            {
+                ScopeLock lock(mutex_);
+                it = wheels_.find(duration);
+                if (it != wheels_.end())
+                {
+                    it->second.Active(ptr);
+                }
+            }
+        }
     }
 private:
     std::map<int, TimerWheel*> wheels_;
