@@ -23,7 +23,7 @@ int Logging::Init(const std::string& filename, uint64_t rotate_size)
 {
     int ret;
     ret = logFile_.open(filename, rotate_size);
-    if (0 != ret) return ret;
+    return ret;
 }
 
 void Logging::log_out(int level,
@@ -37,7 +37,7 @@ void Logging::log_out(int level,
     int len;
     len = snprintf(data, sizeof(data), "%s|%d|%s|%s",
              filename, linenum, funcname, msg);
-    len = logFile_.logData(data, len, 
+    len = logFile_.logData(data, len,
                            get_level_name(level), buf);
     {
     ScopeLock lock(mutex_);

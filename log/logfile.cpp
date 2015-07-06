@@ -2,6 +2,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <strings.h>
+#include <errno.h>
+#include <simcode/base/logger.h>
 using namespace simcode;
 using namespace simcode::log;
 
@@ -29,6 +32,7 @@ int LogFile::open(const std::string& filename,  uint64_t rotate_size)
     fp = fopen(filename.c_str(), "a");
     if (fp == NULL)
     {
+        LOG_ERROR("error=%s\n", strerror(errno));
         return 1;
     }
     fp_ = fp;
@@ -36,6 +40,7 @@ int LogFile::open(const std::string& filename,  uint64_t rotate_size)
     int ret = ::fstat(fileno(fp), &st);
     if(ret == -1)
     {
+        LOG_ERROR("error=%s\n", strerror(errno));
         return 1;
     }
     else
@@ -107,7 +112,7 @@ int LogFile::logData(const char* data, int size, const char* levelName, char buf
     time = tv.tv_sec;
     tm = localtime(&time);
     /* %3ld 在数值位数超过3位的时候不起作用, 所以这里转成int */
-    len = sprintf(ptr, "%04d-%02d-%02d %02d:%02d:%02d.%03d ",
+    len = snprintf(ptr, LOG_BUF_LEN, "%04d-%02d-%02d %02d:%02d:%02d.%03d ",
                   tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
                   tm->tm_hour, tm->tm_min, tm->tm_sec, (int)(tv.tv_usec/1000));
     if(len < 0)
@@ -115,11 +120,11 @@ int LogFile::logData(const char* data, int size, const char* levelName, char buf
         return -1;
     }
     ptr += len;
-
-    memcpy(ptr, levelName, LEVEL_NAME_LEN);
-    ptr += LEVEL_NAME_LEN;
-    int space = sizeof(buf) - (ptr - buf) - 10;
-    space < size ? space : size;
+    int levelNameLen = strlen(levelName);
+    memcpy(ptr, levelName, levelNameLen);
+    ptr += levelNameLen;
+    int space = LOG_BUF_LEN - (ptr - buf) - 10;
+    space = space < size ? space : size;
     memcpy(ptr, data, space);
 
     ptr += space;
