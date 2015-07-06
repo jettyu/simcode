@@ -3,8 +3,6 @@
 
 #include <librtmp/rtmp_sys.h>
 #include <librtmp/log.h>
-#include <simcode/base/typedef.h>
-
 namespace simcode
 {
 namespace rtmp
@@ -17,6 +15,7 @@ public:
     {
         packet_=(RTMPPacket*)malloc(sizeof(RTMPPacket));
         RTMPPacket_Alloc(packet_,size);
+        Reset();
     }
     ~CRtmpPacket()
     {
@@ -37,7 +36,7 @@ public:
               uint32_t bodySize,
               char *body)
     {
-        Reset();
+//        Reset();
         packet_->m_nInfoField2 = infoFiled2;
         packet_->m_headerType = headerType;
 		packet_->m_nTimeStamp = timeStamp;
@@ -53,7 +52,6 @@ public:
 
     void Free()
     {
-        ScopeLock lock(mutex_);
         if (packet_)
         {
             RTMPPacket_Free(packet_);
@@ -64,7 +62,6 @@ public:
 
 private:
     RTMPPacket*	packet_;
-    Mutex mutex_;
 };
 
 }

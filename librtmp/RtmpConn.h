@@ -5,7 +5,6 @@
 #include <librtmp/log.h>
 #include <string>
 #include <simcode/librtmp/RtmpPacket.h>
-#include <simcode/base/logger.h>
 namespace simcode
 {
 namespace rtmp
@@ -29,6 +28,10 @@ public:
 	void set_url(const std::string& url)
 	{
 		url_ = url;
+	}
+	void set_timeout(int t)
+	{
+	    timeout_ = t;
 	}
 	void set_recv_callback(RtmpRecvCallback* c)
 	{
@@ -98,7 +101,6 @@ private:
 			RTMP_Init(rtmp_);
 			rtmp_->Link.timeout=timeout_;
 			int ret = RTMP_SetupURL(rtmp_, (char*)url_.data());//…Ë÷√url
-			LOG_DEBUG("SetupURL ret=%d", ret);
 		}
 	}
 
