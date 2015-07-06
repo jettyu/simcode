@@ -12,22 +12,20 @@ class CRtmpPacket
 {
 public:
     CRtmpPacket()
-    {
-        packet_=(RTMPPacket*)malloc(sizeof(RTMPPacket));
-        //RTMPPacket_Alloc(packet_,size);
+    {        //RTMPPacket_Alloc(packet_,size);
         Reset();
     }
     ~CRtmpPacket()
     {
-        Free();
+//        Free();
     }
 
     void Reset()
     {
-        RTMPPacket_Reset(packet_);
+        RTMPPacket_Reset(&packet_);
 
-        packet_->m_hasAbsTimestamp = 0;
-        packet_->m_nChannel = 0x04;
+        packet_.m_hasAbsTimestamp = 0;
+        packet_.m_nChannel = 0x04;
     }
     void Fill(uint32_t infoFiled2,
               uint8_t headerType,
@@ -37,31 +35,22 @@ public:
               char *body)
     {
 //        Reset();
-        packet_->m_nInfoField2 = infoFiled2;
-        packet_->m_headerType = headerType;
-		packet_->m_nTimeStamp = timeStamp;
-		packet_->m_packetType = packetType;
-		packet_->m_nBodySize  = bodySize;
-		packet_->m_body = body;
+        packet_.m_nInfoField2 = infoFiled2;
+        packet_.m_headerType = headerType;
+		packet_.m_nTimeStamp = timeStamp;
+		packet_.m_packetType = packetType;
+		packet_.m_nBodySize  = bodySize;
+		packet_.m_body = body;
     }
 
-    RTMPPacket* getPacket() const
+    RTMPPacket* getPacket()
     {
-        return packet_;
+        return &packet_;
     }
 
-    void Free()
-    {
-        if (packet_)
-        {
-         //   RTMPPacket_Free(packet_);
-            free(packet_);
-            packet_=NULL;
-        }
-    }
 
 private:
-    RTMPPacket*	packet_;
+    RTMPPacket	packet_;
 };
 
 }

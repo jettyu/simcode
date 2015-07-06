@@ -76,7 +76,7 @@ public:
 	{
 	    return rtmp_->m_stream_id;
 	}
-    int SendPacket(const CRtmpPacket& packet)
+    int SendPacket(CRtmpPacket& packet)
     {
         if (IsConnect()) return RTMP_SendPacket(rtmp_, packet.getPacket(), 0);
         else return 0;
