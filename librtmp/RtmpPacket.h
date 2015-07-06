@@ -11,10 +11,10 @@ namespace rtmp
 class CRtmpPacket
 {
 public:
-    CRtmpPacket(int size)
+    CRtmpPacket()
     {
         packet_=(RTMPPacket*)malloc(sizeof(RTMPPacket));
-        RTMPPacket_Alloc(packet_,size);
+        //RTMPPacket_Alloc(packet_,size);
         Reset();
     }
     ~CRtmpPacket()
@@ -54,7 +54,7 @@ public:
     {
         if (packet_)
         {
-            RTMPPacket_Free(packet_);
+         //   RTMPPacket_Free(packet_);
             free(packet_);
             packet_=NULL;
         }
