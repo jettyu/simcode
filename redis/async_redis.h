@@ -15,7 +15,7 @@ class AsyncRedis
 {
 public:
     typedef simex::function<void(AsyncRedis*, redisReply*)> CommandCallback;
-    typedef simex::function<void(redisAsyncContext* c)> ConnectCallback;
+    typedef simex::function<void(redisAsyncContext* c)> AttachCallback;
     AsyncRedis();
     ~AsyncRedis();
     void set_redisinfo(const RedisInfo& info__)
@@ -26,20 +26,27 @@ public:
     {
         return info_;
     }
-    void set_connectCallback(const ConnectCallback& b)
-    {
-        connectCallback_ = b;
-    }
-
-    const bool isConnected() const
-    {
-        return ctx_ != NULL;//&& (ctx_->c.flags & REDIS_CONNECTED);
-    }
     redisAsyncContext* getContext()
     {
         return ctx_;
     }
+    const bool isConnected() const
+    {
+        return ctx_ != NULL;//&& (ctx_->c.flags & REDIS_CONNECTED);
+    }
+    void set_attachCallback(const AttachCallback& b)
+    {
+        attachCallback_ = b;
+    }
     int Connect();
+    static void set_connectCallback(redisConnectCallback* fn)
+    {
+        connectCallback_ = fn;
+    }
+    static void set_disconnectCallback(redisDisconnectCallback* fn)
+    {
+        disconnectCallback_ = fn;
+    }
     int vCommand(const CommandCallback& b, const char* format, va_list argptr);
     int Command(const CommandCallback& b, const char* format, ...);
     int CommandArgv(const CommandCallback& b, const std::vector<std::string>& argvec);
@@ -60,7 +67,9 @@ private:
 private:
     RedisInfo info_;
     redisAsyncContext* ctx_;
-    ConnectCallback connectCallback_;
+    AttachCallback attachCallback_;
+    static redisConnectCallback* connectCallback_;
+    static redisDisconnectCallback* disconnectCallback_;
 };
 
 }

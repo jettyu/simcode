@@ -3,6 +3,9 @@
 using namespace simcode;
 using namespace redis;
 
+redisConnectCallback* AsyncRedis::connectCallback_ = NULL;
+redisDisconnectCallback* AsyncRedis::disconnectCallback_ = NULL;
+
 AsyncRedis::AsyncRedis() :
     ctx_(NULL)
 {
@@ -23,7 +26,7 @@ int AsyncRedis::Connect()
     else
     {
         ctx_ = c;
-        if (connectCallback_) connectCallback_(ctx_);
+        if (attachCallback_) attachCallback_(ctx_);
         redisAsyncSetConnectCallback(ctx_, connectCallback);
         redisAsyncSetDisconnectCallback(ctx_, disconnectCallback);
     }
@@ -67,16 +70,23 @@ int AsyncRedis::CommandArgv(const CommandCallback& b, const std::vector<std::str
 /*static*/
 void AsyncRedis::connectCallback(const struct redisAsyncContext* c, int status)
 {
-    if (status == REDIS_OK)
+    if (connectCallback_)
     {
-        printf("redis connect success!\n");
+        connectCallback_(c, status);
     }
     else
     {
-        printf("redis connect failed\n");
-        if (c != NULL)
+        if (status == REDIS_OK)
         {
-            printf("errmsg=%s\n", c->errstr);
+            printf("redis connect success!\n");
+        }
+        else
+        {
+            printf("redis connect failed\n");
+            if (c != NULL)
+            {
+                printf("errmsg=%s\n", c->errstr);
+            }
         }
     }
 }
@@ -84,6 +94,7 @@ void AsyncRedis::connectCallback(const struct redisAsyncContext* c, int status)
 /*static*/
 void AsyncRedis::disconnectCallback(const redisAsyncContext *c, int status)
 {
+    if (disconnectCallback_) disconnectCallback_(c, status);
     printf("redis disconnected!\n");
 }
 
