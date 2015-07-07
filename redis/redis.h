@@ -129,15 +129,15 @@ private:
 class Redis
 {
 public:
-    Redis():errcode_(0),ctxt_(NULL) {}
-    Redis(const RedisInfo& _info):errcode_(0),ctxt_(NULL)
+    Redis():errcode_(0),ctx_(NULL) {}
+    Redis(const RedisInfo& _info):errcode_(0),ctx_(NULL)
     {
         Reset(_info);
     }
     Redis(const std::string& host,
           const int port,
           const struct timeval& time_out)
-        :errcode_(0), ctxt_(NULL)
+        :errcode_(0), ctx_(NULL)
     {
         Reset(host, port, time_out);
     }
@@ -148,7 +148,7 @@ public:
 
     bool is_connect()const
     {
-        return !(ctxt_ == NULL);
+        return !(ctx_ == NULL);
     }
     int errcode()const
     {
@@ -212,7 +212,7 @@ private:
 private:
     int errcode_;
     std::string errmsg_;
-    redisContext *ctxt_;
+    redisContext *ctx_;
     RedisInfo info_;
 };
 
