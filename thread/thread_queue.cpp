@@ -1,5 +1,6 @@
-#include <simcode/thread/thread_queue.h>
+#include <simcode/base/typedef.h>
 #include <algorithm>
+#include <simcode/thread/thread_queue.h>
 using namespace simcode;
 using namespace simcode::thread;
 
@@ -25,6 +26,7 @@ void ThreadQueue::start()
     }
 }
 
+
 void ThreadQueue::stop()
 {
     if (!is_started_)
@@ -32,7 +34,7 @@ void ThreadQueue::stop()
     is_started_ = false;
     cond_.notify_all();
     std::for_each(work_tasks_.begin(), work_tasks_.end(),
-                  boost::bind(&SimThread::join, _1));
+                  simex::bind(&SimThread::join, _1));
 }
 
 int ThreadQueue::push_back(const ThreadHandlerFunc& bp)

@@ -1,8 +1,9 @@
 #ifndef SIMCODE_TYPEDEF_H
 #define SIMCODE_TYPEDEF_H
 
-#include <memory>
 #include <sstream>
+
+#ifdef BOOST
 
 #include <boost/function.hpp>
 #include <boost/weak_ptr.hpp>
@@ -24,34 +25,65 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
 
-namespace simex = boost;
+inline std::string NewUuid()
+{
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    std::stringstream ss;
+    ss << uuid;
+    return ss.str();
+}
+
+#else
+
+#include <memory>
+#include <functional>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <simcode/base/any.h>
+using namespace std::placeholders;
+#define get_pointer(shared_pointer) shared_pointer.get()
+#endif // BOOST
+
+namespace simcode
+{
+
+namespace simex
+{
+#ifdef BOOST
+using namespace boost;
+#define PLACEHOLDERS(_N) _N
+#else
+using namespace std;
+#define PLACEHOLDERS(_N) std::placeholders::_N
+#endif // BOOST
 
 #define SharedPtr simex::shared_ptr
 #define WeakPtr simex::weak_ptr
 #define SimBind simex::bind
 #define SimFunction simex::function
 #define SimThread simex::thread
-typedef SharedPtr<SimThread> SimThreadPtr;
 
-namespace simcode
-{
-
-inline std::string NewUuid()
-{
-    simex::uuids::uuid uuid = simex::uuids::random_generator()();
-    std::stringstream ss;
-    ss << uuid;
-    return ss.str();
 }
 
 //#define SharedPtr boost::shared_ptr
+typedef SharedPtr<SimThread> SimThreadPtr;
 typedef simex::mutex Mutex;
 typedef simex::unique_lock<Mutex> ScopeLock;
 typedef simex::condition_variable ConditionVar;
+#ifdef BOOST
 
 typedef simex::shared_mutex            SharedMutex;
 typedef simex::unique_lock<SharedMutex>   WriteLock;
 typedef simex::shared_lock<SharedMutex>   ReadLock;
+
+#else
+
+typedef std::mutex SharedMutex;
+typedef std::lock_guard<Mutex> WriteLock;
+typedef std::lock_guard<Mutex> ReadLock;
+
+#endif // BOOST
 
 template<class T>
 class SimNoLock

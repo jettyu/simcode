@@ -17,4 +17,5 @@
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <assert.h>
+#include <string.h>
 #endif // COMHEAD_H_INCLUDED

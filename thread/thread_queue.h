@@ -1,8 +1,8 @@
 #ifndef _THREAD_QUEUE_H_
 #define _THREAD_QUEUE_H_
-#include <simcode/base/typedef.h>
 #include <vector>
 #include <deque>
+#include <simcode/base/typedef.h>
 
 namespace simcode
 {
