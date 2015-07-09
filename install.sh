@@ -14,6 +14,7 @@ cd librtmp;make $MAKE_FLAGS; cd -;
 
 cd base;make clean;cd -;
 cd thread;make clean;cd -;
+cd log; make clean; cd -;
 cd net;make clean;cd -;
 cd redis;make clean;cd -;
 cd mysql;make clean;cd -;

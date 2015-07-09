@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         sendStr.resize(Head::LENGTH);
         head.SerializeToPointer(&sendStr[0]);
         sendStr.append(inputStr);
-        client.send(sendStr);
+        client.sendString(sendStr);
     }
     return 0;
 }

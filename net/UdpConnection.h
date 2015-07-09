@@ -25,7 +25,7 @@ public:
     }
     int errcode() const;
     int Send(const char* buf, size_t len);
-    int Send(const std::string& data);
+    int SendString(const std::string& data);
     void Close();
     const SockAddr& peerAddr() const;
     uint64_t id() const;
@@ -50,9 +50,9 @@ inline int UdpConnection::Send(const char* buf, size_t len)
     return connector_.Send(buf, len);
 }
 
-inline int UdpConnection::Send(const std::string& data)
+inline int UdpConnection::SendString(const std::string& data)
 {
-    return connector_.Send(data);
+    return connector_.SendString(data);
 }
 
 inline void UdpConnection::Close()

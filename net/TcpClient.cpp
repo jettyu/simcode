@@ -32,14 +32,14 @@ void TcpClient::send(const char* data, size_t len)
     if (conn) conn->send(data, len);
 }
 
-void TcpClient::send(const std::string& data)
+void TcpClient::sendString(const std::string& data)
 {
     TcpConnectionPtr conn;
     {
         ScopeLock lock(mutex_);
         conn = conn_;
     }
-    if (conn) conn->send(data);
+    if (conn) conn->sendString(data);
 }
 
 void TcpClient::onConnect()

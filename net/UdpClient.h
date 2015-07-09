@@ -16,7 +16,7 @@ public:
     typedef simex::function<void (const UdpConnectionPtr&, const std::string& msg)> MessageCallback;
     UdpClient(EventLoop*, const SockAddr&, const std::string& name);
     int Send(const char* buf, size_t len);
-    int Send(const std::string& data);
+    int SendString(const std::string& data);
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;

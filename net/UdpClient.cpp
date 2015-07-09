@@ -21,9 +21,9 @@ int UdpClient::Send(const char* buf, size_t len)
     return conn_->Send(buf, len);
 }
 
-int UdpClient::Send(const std::string& data)
+int UdpClient::SendString(const std::string& data)
 {
-    return conn_->Send(data);
+    return conn_->SendString(data);
 }
 
 void UdpClient::eventHandle()

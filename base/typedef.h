@@ -86,13 +86,13 @@ private:
 
 #endif // BOOST
 
+} //endof namespace simex
+
 #define SharedPtr simex::shared_ptr
 #define WeakPtr simex::weak_ptr
 #define SimBind simex::bind
 #define SimFunction simex::function
 #define SimThread simex::thread
-
-}
 
 //#define SharedPtr boost::shared_ptr
 typedef SharedPtr<SimThread> SimThreadPtr;
@@ -130,5 +130,7 @@ protected:
 };
 
 }
+
+#define simex simcode::simex
 
 #endif

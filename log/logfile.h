@@ -2,6 +2,11 @@
 #define SIMCODE_LOGGER_LOGFILE_H
 #include <string>
 #include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <sys/time.h>
 #include <simcode/base/typedef.h>
 
 namespace simcode

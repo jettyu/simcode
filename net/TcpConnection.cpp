@@ -157,7 +157,7 @@ void TcpConnection::send(const char* data, size_t len)
     //handleWrite();
 }
 
-void TcpConnection::send(const std::string& data)
+void TcpConnection::sendString(const std::string& data)
 {
     if (!isClosed_)
     {

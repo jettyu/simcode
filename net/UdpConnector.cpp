@@ -21,7 +21,7 @@ int UdpConnector::Recv(std::string* buf)
     return n;
 }
 
-int UdpConnector::Send(const std::string& buf)
+int UdpConnector::SendString(const std::string& buf)
 {
     return Send(buf.data(), buf.size());
 }
