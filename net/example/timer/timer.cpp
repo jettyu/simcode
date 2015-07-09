@@ -24,17 +24,17 @@ void printTime(int i)
 int main(void)
 {
 
-    EventLoopThreadPool loopPool;
-    loopPool.setThreadNum(1);
-    loopPool.start();
-    EventLoop* ioLoop = loopPool.getNextLoop();
-    if (ioLoop) ioLoop->runAfter(0, simex::bind(printTime, 1));
-    getchar();
-    return 1;
+    //EventLoopThreadPool loopPool;
+    //loopPool.setThreadNum(1);
+    //loopPool.start();
+    //EventLoop* ioLoop = loopPool.getNextLoop();
+    //if (ioLoop) ioLoop->runEvery(1.0, simex::bind(printTime, 1));
+    //getchar();
+    //return 1;
 
     EventLoop loop;
     loop.runAfter(0, simex::bind(printTime, 1));
-    loop.runEvery(1, simex::bind(printTime, 2));
+    loop.runEvery(2, simex::bind(printTime, 2));
     loop.loop();
     //EPollPoller poller;
     //Timer timer(simex::bind(&EPollPoller::removeEvent, &poller, _1));

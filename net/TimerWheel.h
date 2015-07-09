@@ -29,14 +29,15 @@ public:
     typedef simex::weak_ptr<Node> WeakNodePtr;
 public:
     TimerWheel(EventLoop* loop, int len, double intervalTime=double(1.0)) :
-        loop_(loop), node_buckets_(len), intervalTime_(intervalTime_)
+        loop_(loop), node_buckets_(len), intervalTime_(intervalTime)
     {
+        node_buckets_.resize(len);
     }
     void start()
     {
         loop_->runEvery(intervalTime_, simex::bind(&TimerWheel::onTimer, this));
     }
-    WeakNodePtr AddTimer(int duration, const TimerCallback& c)
+    WeakNodePtr AddTimer(const TimerCallback& c)
     {
         NodePtr ptr(new Node(c));
         ScopeLock lock(mutex_);
@@ -96,7 +97,7 @@ public:
                 wheels_[duration] = wheel;
             }
         }
-        return wheel->AddTimer(duration, c);
+        return wheel->AddTimer(c);
     }
     void Active(int duration, const simcode::net::TimerWheel::WeakNodePtr& c)
     {
