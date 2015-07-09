@@ -4,7 +4,7 @@
 #include <simcode/base/typedef.h>
 #include <simcode/net/EventLoopThreadPool.h>
 #include <boost/circular_buffer.hpp>
-#include <boost/unordered_set.hpp>
+
 namespace simcode
 {
 namespace net
@@ -47,6 +47,7 @@ public:
     void Active(const WeakNodePtr& c)
     {
         NodePtr ptr = c.lock();
+        ScopeLock lock(Mutex);
         if (ptr) node_buckets_.back().insert(ptr);
     }
 private:
@@ -56,7 +57,7 @@ private:
         node_buckets_.push_back(Bucket());
     }
 private:
-    typedef boost::unordered_set<NodePtr> Bucket;
+    typedef simex::unordered_set<NodePtr> Bucket;
     typedef boost::circular_buffer<Bucket> WeakNodeList;
     EventLoop* loop_;
     WeakNodeList node_buckets_;

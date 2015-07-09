@@ -24,7 +24,7 @@
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
-
+#include <boost/unordered_set.hpp>
 inline std::string NewUuid()
 {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
@@ -41,6 +41,7 @@ inline std::string NewUuid()
 #include <condition_variable>
 #include <mutex>
 #include <simcode/base/any.h>
+#include <unordered_set>
 using namespace std::placeholders;
 #define get_pointer(shared_pointer) shared_pointer.get()
 #endif // BOOST
