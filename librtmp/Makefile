@@ -14,6 +14,9 @@ CPP=g++
 CPPFLAGS= -std=c++11 $(INC_DIR)
 LDFLAGS += -static
 
+ifeq (y, $(BOOST))
+     CPPFLAGS += -DBOOST
+endif
 
 ifeq (y,$(DEBUG))
      CPPFLAGS += -g -O0
