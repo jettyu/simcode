@@ -3,7 +3,6 @@
 
 #include <simcode/base/typedef.h>
 #include <simcode/net/EventLoopThreadPool.h>
-#include <boost/circular_buffer.hpp>
 
 namespace simcode
 {
@@ -58,7 +57,7 @@ private:
     }
 private:
     typedef simex::unordered_set<NodePtr> Bucket;
-    typedef boost::circular_buffer<Bucket> WeakNodeList;
+    typedef simex::circular_buffer<Bucket> WeakNodeList;
     EventLoop* loop_;
     WeakNodeList node_buckets_;
     double intervalTime_;

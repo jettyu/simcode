@@ -25,6 +25,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/circular_buffer.hpp>
 inline std::string NewUuid()
 {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
@@ -42,8 +43,10 @@ inline std::string NewUuid()
 #include <mutex>
 #include <simcode/base/any.h>
 #include <unordered_set>
+#include <vector>
 using namespace std::placeholders;
 #define get_pointer(shared_pointer) shared_pointer.get()
+
 #endif // BOOST
 
 namespace simcode
@@ -57,6 +60,30 @@ using namespace boost;
 #else
 using namespace std;
 #define PLACEHOLDERS(_N) std::placeholders::_N
+
+template<typename T>
+class circular_buffer
+{
+public:
+        circular_buffer(size_t n) : buffer_(n), write_index_(0){}
+        ~circular_buffer(){std::vector<T>().swap(buffer_);}
+        void push_back(const T& t)
+        {
+                buffer_[write_index_++%buffer_.size()] = t;
+        }
+        T& back()
+        {
+                return buffer_[write_index_];
+        }
+        void resize(size_t n)
+        {
+                buffer_.resize(n);
+        }
+private:
+        std::vector<T> buffer_;
+        size_t write_index_;
+};
+
 #endif // BOOST
 
 #define SharedPtr simex::shared_ptr
