@@ -16,8 +16,13 @@ public:
     TcpClient(EventLoop* loop, const SockAddr& addr, const std::string& name);
     ~TcpClient();
     void active();
+    bool isActive() const
+    {
+        return isActive_;
+    }
     void send(const char* data, size_t len);
     void sendString(const std::string& data);
+    void Close();
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;
@@ -35,6 +40,7 @@ public:
     {
         return loop_;
     }
+
     void setRetry(bool retry)
     {
         retry_ = retry;
@@ -48,8 +54,8 @@ private:
     MessageCallback messageCallback_;
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;
-    Mutex mutex_;
     bool retry_;
+    bool isActive_;
 };
 }
 }

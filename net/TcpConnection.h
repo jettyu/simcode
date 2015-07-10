@@ -43,6 +43,11 @@ public:
     {
         return loop_;
     }
+    void Close()
+    {
+        onClose();
+        socket_.Close();
+    }
     void setCloseCallback(const CloseCallback& b)
     {
         closeCallback_ = b;
