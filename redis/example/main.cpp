@@ -19,12 +19,6 @@ static void commandCallback(AsyncRedis* ar, redisReply* rp)
 
 #if TEST_LIBEVENT
 
-static void Attach(struct event_base* base, redisAsyncContext* c)
-{
-        redisLibeventAttach(c, base);
-}
-
-
 static void test_libevent()
 {
     AsyncRedis ar;
@@ -34,7 +28,7 @@ static void test_libevent()
     info.port = 6379;
     info.time_out={1, 1500};
     ar.set_redisinfo(info);
-    ar.set_attachCallback(simex::bind(Attach, base, _1));
+    ar.set_attachCallback(simex::bind(redisLibeventAttach, _1, base));
     ar.Connect();
     sleep(1);
     ar.Command(NULL, "SET %s %s", "async", "test");
@@ -43,11 +37,6 @@ static void test_libevent()
 }
 
 #else
-
-static void SimcodeAttach(net::EventLoop* loop, redisAsyncContext* c)
-{
-        redisLibSimcodeAttach(c, loop);
-}
 
 static void test_libsimcode()
 {
@@ -58,7 +47,7 @@ static void test_libsimcode()
     info.time_out={1, 1500};
     ar.set_redisinfo(info);
     net::EventLoop loop;
-    ar.set_attachCallback(simex::bind(SimcodeAttach, &loop, _1));
+    ar.set_attachCallback(simex::bind(redisLibSimcodeAttach, _1, &loop));
     ar.Connect();
     sleep(1);
     ar.Command(NULL, "SET %s %s", "async", "test");
