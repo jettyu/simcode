@@ -48,6 +48,14 @@ int AsyncRedis::Command(const CommandCallback& b, const char* format, ...)
     return ret;
 }
 
+int AsyncRedis::CommandArgvPrev(const CommandCallback& b, int argc, const char **argv, const size_t *argvlen)
+{
+    if (!isConnected()) return REDIS_DISCONNECTING;
+    CallbackData* data = new CallbackData(this, b);
+    return redisAsyncCommandArgv(ctx_, commandCallback, data,
+                                          argc, argv, argvlen);
+}
+
 int AsyncRedis::CommandArgv(const CommandCallback& b, const std::vector<std::string>& argvec)
 {
     if (!isConnected()) return REDIS_DISCONNECTING;

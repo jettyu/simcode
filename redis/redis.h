@@ -185,13 +185,16 @@ public:
         return Connect();
     }
 
+    redisReply* vCommand(const char* format, va_list argptr);
     redisReply* Command(const char* format, ...);
+    redisReply* CommandArgvPrev(int argc, const char **argv, const size_t *argvlen);
     redisReply* CommandArgv(const std::vector<std::string>& argvec);
+
     int AppendCommand(const char* format, ...);
     redisReply* GetReply(void);
     int GetAllReply(size_t num, std::vector<redisReply*>&);
 
-    redisReply* vCommand(const char* format, va_list argptr);
+
     int AppendCommandArgv(const std::vector<std::string>& argvec);
     std::vector<redisReply*> AppendArgvs(const std::vector<
                                          std::vector<std::string> >& argvs);

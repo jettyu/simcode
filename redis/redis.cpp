@@ -218,6 +218,13 @@ redisReply* Redis::CommandArgv(const std::vector<std::string>& argvec)
                                           argc, argv.data(), argvlen.data());
 }
 
+redisReply *Redis::CommandArgvPrev(int argc, const char **argv, const size_t *argvlen)
+{
+    if ((!ctx_ || ctx_->err) && Update()) return NULL;
+    return (redisReply *)redisCommandArgv(ctx_,
+                                          argc, argv, argvlen);
+}
+
 int Redis::AppendCommandArgv(const std::vector<std::string>& argvec)
 {
     if ((!ctx_ || ctx_->err) && Update()) return 0;

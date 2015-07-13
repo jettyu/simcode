@@ -49,6 +49,7 @@ public:
     }
     int vCommand(const CommandCallback& b, const char* format, va_list argptr);
     int Command(const CommandCallback& b, const char* format, ...);
+    int CommandArgvPrev(const CommandCallback& b, int argc, const char **argv, const size_t *argvlen);
     int CommandArgv(const CommandCallback& b, const std::vector<std::string>& argvec);
 
 private:
