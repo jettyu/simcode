@@ -1,15 +1,14 @@
 #include <simcode/redis/async_redis.h>
-
+#include <unistd.h>
 using namespace simcode;
 using namespace redis;
 
-redisConnectCallback* AsyncRedis::connectCallback_ = NULL;
-redisDisconnectCallback* AsyncRedis::disconnectCallback_ = NULL;
 
 AsyncRedis::AsyncRedis() :
-    ctx_(NULL)
+    ctx_(NULL),
+    retry_(false),
+    retryTime_(0)
 {
-
 }
 AsyncRedis::~AsyncRedis()
 {
@@ -25,6 +24,7 @@ int AsyncRedis::Connect()
     }
     else
     {
+        c->data = this;
         ctx_ = c;
         if (attachCallback_) attachCallback_(ctx_);
         redisAsyncSetConnectCallback(ctx_, connectCallback);
@@ -76,34 +76,50 @@ int AsyncRedis::CommandArgv(const CommandCallback& b, const std::vector<std::str
 }
 
 /*static*/
-void AsyncRedis::connectCallback(const struct redisAsyncContext* c, int status)
+void AsyncRedis::connectCallback(const struct redisAsyncContext* ac, int status)
 {
-    if (connectCallback_)
+    if (ac)
     {
-        connectCallback_(c, status);
+        AsyncRedis* ar = static_cast<AsyncRedis*>(ac->data);
+        if (ar->connectCallback_) 
+        {
+            ar->connectCallback_(ar, status);
+            return;
+        }
+    }
+    if (status == REDIS_OK)
+    {
+        printf("redis connect success!\n");
     }
     else
     {
-        if (status == REDIS_OK)
+        printf("redis connect failed\n");
+        if (ac != NULL)
         {
-            printf("redis connect success!\n");
-        }
-        else
-        {
-            printf("redis connect failed\n");
-            if (c != NULL)
-            {
-                printf("errmsg=%s\n", c->errstr);
-            }
+            printf("errmsg=%s\n", ac->errstr);
         }
     }
 }
 
 /*static*/
-void AsyncRedis::disconnectCallback(const redisAsyncContext *c, int status)
+void AsyncRedis::disconnectCallback(const redisAsyncContext *ac, int status)
 {
-    if (disconnectCallback_) disconnectCallback_(c, status);
-    printf("redis disconnected!\n");
+    if (!ac) return;
+    AsyncRedis* ar = static_cast<AsyncRedis*>(ac->data);
+    if (ar->disconnectCallback_) 
+    {
+        ar->disconnectCallback_(ar, status);
+    }
+    else
+    {
+        printf("redis disconnected!\n");
+    }
+    if (ar->retry_)
+    {
+        printf("redis disconnected, now retrying!\n");
+        sleep(ar->retryTime_++);
+        ar->Connect();
+    }
 }
 
 /*static*/
