@@ -7,6 +7,7 @@
 #include <hiredis/async.h>
 #include <vector>
 #include <string>
+#include <list>
 namespace simcode
 {
 namespace redis
@@ -58,18 +59,23 @@ public:
     int CommandArgvPrev(const CommandCallback& b, int argc, const char **argv, const size_t *argvlen);
     int CommandArgv(const CommandCallback& b, const std::vector<std::string>& argvec);
 
+    //总是执行的，例如subcribe
+    int CommandAlway(const CommandCallback& b, const char* format, ...);
+    int CommandArgvAlway(const CommandCallback& b, const std::vector<std::string>& argvec);
 private:
+    void freeAll();
     static void connectCallback(const redisAsyncContext* c, int status);
     static void disconnectCallback(const redisAsyncContext *c, int status);
     static void commandCallback(redisAsyncContext* c, void* r, void* privdata);
 private:
     struct CallbackData {
-        CallbackData(AsyncRedis* r, const CommandCallback& b):
-            async_redis(r), cb(b)
+        CallbackData(AsyncRedis* r, const CommandCallback& b, bool a=false):
+            async_redis(r), cb(b), is_alway(a)
         {
         }
         AsyncRedis* async_redis;
         CommandCallback cb;
+        bool is_alway;
     };
 private:
     RedisInfo info_;
@@ -77,6 +83,7 @@ private:
     AttachCallback attachCallback_;
     ConnectCallback connectCallback_;
     DisconnectCallback disconnectCallback_;
+    std::list<CallbackData*> alway_data_;
     bool retry_;
     int retryTime_;
 };
