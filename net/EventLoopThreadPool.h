@@ -25,7 +25,7 @@ private:
     std::vector<EventLoopThreadPtr> loopThreadPool_;
     std::vector<EventLoop*> loopPool_;
     int threadNum_;
-    std::atomic_int next_;
+    std::atomic_uint next_;
 };
 }
 }
