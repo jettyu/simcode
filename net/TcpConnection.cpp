@@ -144,14 +144,22 @@ void TcpConnection::send(const char* data, size_t len)
     if (!isClosed_)
     {
         ScopeLock lock(mutex_);
+		writeBuf_.append(data, len);
 		//HighWater
-		/*if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
+		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
 		{
-			if (!highWaterCallback_) writeBuf_.clear();
-			else if (!highWaterCallback_(shared_from_this(), &writeBuf_)) return;
+			if (!highWaterCallback_)
+			{	
+		        writeBuf_.mutableWriteBuf()->clear();
+				return;
+			}
+			else 
+			{
+				highWaterCallback_(shared_from_this(), &writeBuf_);
+				return;
+			}
 		}
-		 */
-        writeBuf_.append(data, len);
+        
         enableWriting();
     }
     //handleWrite();
@@ -163,6 +171,19 @@ void TcpConnection::sendString(const std::string& data)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
+		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
+		{
+			if (!highWaterCallback_)
+			{	
+		        writeBuf_.mutableWriteBuf()->clear();
+				return;
+			}
+			else 
+			{
+				highWaterCallback_(shared_from_this(), &writeBuf_);
+				return;
+			}
+		}
         enableWriting();
     }
 }
