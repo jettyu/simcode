@@ -55,7 +55,6 @@ void TcpClient::onClose(const TcpConnectionPtr& conn)
 {
     LOG_DEBUG("close connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
     if (closeCallback_) closeCallback_(conn);
-	conn_->Close();
 	conn_.reset();
     if (retry_) connector_.Connect();
 }

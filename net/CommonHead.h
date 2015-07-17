@@ -16,6 +16,7 @@
 #include <sys/epoll.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
+#include <sys/eventfd.h>
 #include <assert.h>
 #include <string.h>
 #endif // COMHEAD_H_INCLUDED

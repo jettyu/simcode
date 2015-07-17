@@ -20,6 +20,11 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     //writeBuf_.mutableWriteBuf()->reserve(10240);
 }
 
+TcpConnection::~TcpConnection()
+{
+    onClose();
+}
+
 void TcpConnection::run()
 {
     loop_->runInLoop(socket_.sockfd(), simex::bind(&TcpConnection::eventHandle, this, _1), events_);
@@ -195,9 +200,9 @@ void TcpConnection::update()
 
 void TcpConnection::onClose()
 {
+    if (isClosed_) return;
     isClosed_ = true;
     //shutdown();
-
     loop_->removeInLoop(socket_.sockfd());
     if (closeCallback_) closeCallback_(shared_from_this());
 }

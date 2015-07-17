@@ -8,8 +8,7 @@ CPP=g++
 FLAGS=-o 
 CPPFLAGS= -g -O0 -std=c++11 $(INC_DIR)
 LIBS=  -lpthread \
-       -lboost_system -lboost_thread \
-       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode
+       -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode -lpthread
 
 SOURCES=$(shell echo *.cpp $(ADD_SRC))
 HEADERS=$(shell echo *.h)

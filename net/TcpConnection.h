@@ -24,6 +24,7 @@ public:
 	typedef void(TcpConnection::*send_buf_t)(const char*, size_t);
 	typedef void(TcpConnection::*send_str_t)(const std::string&);
     TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
+    ~TcpConnection();
     void run();
     void send(const char* data, size_t len);
     void sendString(const std::string& data);
@@ -46,7 +47,6 @@ public:
     void Close()
     {
         onClose();
-        socket_.Close();
     }
     void setCloseCallback(const CloseCallback& b)
     {
