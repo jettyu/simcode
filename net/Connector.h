@@ -50,7 +50,7 @@ private:
     void handleWrite();
     SocketPtr socket_;
     SockAddr connAddr_;
-    int retryTime_;
+    uint8_t retryTime_;
     States state_;
 };
 
