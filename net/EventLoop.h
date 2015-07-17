@@ -35,6 +35,7 @@ private:
     TaskList tasks_;
     simex::mutex mutex_;
     int wakeupfd_;
+    bool isWakeuped_;
 };
 }
 }

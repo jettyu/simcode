@@ -4,7 +4,8 @@ using namespace simcode;
 using namespace simcode::net;
 
 EventLoop::EventLoop() :
-    wakeupfd_(::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC))
+    wakeupfd_(::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)),
+    isWakeuped_(false)
 {
     poller_.addEvent(wakeupfd_, simex::bind(&EventLoop::wakeupHandler, this, _1));
 }
@@ -74,7 +75,7 @@ void EventLoop::addTask(const TaskCallback& b)
 {
     ScopeLock lock(mutex_);
     tasks_.push_back(b);
-    wakeup();
+    if (!isWakeuped_) wakeup();
 }
 
 void EventLoop::doTask()
@@ -83,6 +84,7 @@ void EventLoop::doTask()
     {
         ScopeLock lock(mutex_);
         tmpTasks.swap(tasks_);
+        isWakeuped_ = false;
     }
     for (TaskList::iterator it=tmpTasks.begin(); it!=tmpTasks.end(); ++it)
         (*it)();
@@ -90,6 +92,7 @@ void EventLoop::doTask()
 
 void EventLoop::wakeup()
 {
+    isWakeuped_ = true;
     uint64_t i = 1;
     int n = ::write(wakeupfd_, &i, sizeof(i));
     if (n != sizeof(i)) LOG_ERROR("n=%d\n", n);
