@@ -52,7 +52,7 @@ public:
 private:
     void onTimer()
     {
-        ScopeLock lock(mutex_);
+        //ScopeLock lock(mutex_);
         node_buckets_.push_back(Bucket());
     }
 private:

@@ -31,7 +31,6 @@ private:
     typedef std::vector<epoll_event_t> EventList;
     typedef std::map<int, EventCallback> EventCallbackMap;
     int epollfd_;
-    int wakeupfd_;
     EventCallbackMap eventCallbackMap_;
     EventList events_;
 };

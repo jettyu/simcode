@@ -44,6 +44,7 @@ inline std::string NewUuid()
 #include <simcode/base/any.h>
 #include <unordered_set>
 #include <vector>
+#include <atomic>
 using namespace std::placeholders;
 #define get_pointer(shared_pointer) shared_pointer.get()
 
@@ -85,7 +86,7 @@ public:
         }
 private:
         std::vector<T> buffer_;
-        size_t write_index_;
+        atomic_uint write_index_;
 };
 
 #endif // BOOST
