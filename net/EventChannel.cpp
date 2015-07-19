@@ -27,7 +27,7 @@ void EventChannel::runInLoop()
     loop_->runInLoop(fd_, simex::bind(&EventChannel::handleEvent, this, _1), events_);
 }
 
-void EventChannel::Close()
+void EventChannel::close()
 {
     loop_->removeInLoop(fd_);
 }

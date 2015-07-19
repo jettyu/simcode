@@ -31,15 +31,10 @@ public:
         return loop_;
     }
     void runInLoop();
-    void Close();
+    void close();
     void setEventCallback(const EventCallback& c)
     {
         eventCallback_ = c;
-    }
-
-    bool isNoneEvent() const
-    {
-        return events_ == POLL::ZERO;
     }
 
     void enableReading()
@@ -67,13 +62,17 @@ public:
         events_ = POLL::ZERO;
         update();
     }
+    bool isNoneEvent() const
+    {
+        return revents_ == POLL::ZERO;
+    }
     bool isWriting() const
     {
-        return events_ & POLL::OUT;
+        return revents_ & POLL::OUT;
     }
     bool isReading() const
     {
-        return events_ & POLL::IN;
+        return revents_ & POLL::IN;
     }
 private:
     void handleEvent(int revents__);

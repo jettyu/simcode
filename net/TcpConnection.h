@@ -74,7 +74,7 @@ public:
     }
     bool isWriting() const
     {
-        return events_ & EPOLLOUT;
+        return revents_ & EPOLLOUT;
     }
     bool isReading() const
     {

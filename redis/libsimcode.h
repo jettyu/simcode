@@ -41,7 +41,7 @@ static void delWrite(void *privdata)
 static void cleanup(void *privdata)
 {
     redisLibSimcode *e = (redisLibSimcode*)privdata;
-    e->channel->Close();
+    e->channel->close();
     delete e->channel;
     free(e);
 }
