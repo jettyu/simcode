@@ -14,10 +14,13 @@ int Selector::poll(int sec, int usec)
     int ret;
     timeout_.tv_sec = sec;
     timeout_.tv_usec = usec;
-    ret = select(0, &readfds_, &writefds, &exceptfds, &timeout_);
-    if (SOCKET_ERROR == ret) return ret;
+    ret = select(0, &readfds, &writefds, &exceptfds, &timeout_);
+    if (SOCKET_ERROR == ret)
+	{
+		return ret;
+	}
 	int validn = 0;
-    for (u_int i=0; i<allfds_.fd_count; i++)
+	for (u_int i=0; i<allfds_.fd_count && validn < ret; i++)
     {
 		simex::shared_ptr<EventChannel> ch = channels_[i].lock();
 		if (!ch) continue;
@@ -52,9 +55,7 @@ void Selector::addChannel(const simex::shared_ptr<EventChannel>& c)
     channels_[allfds_.fd_count-1] = c;
 
 	if (c->isEnableReading()) FD_SET(c->fd(), &readfds_);
-	else FD_CLR(c->fd(), &readfds_);
 	if (c->isEnableWriting()) FD_SET(c->fd(), &writefds_);
-	else FD_CLR(c->fd(), &writefds_);
 }
 void Selector::removeChannel(int fd)
 {
@@ -64,8 +65,12 @@ void Selector::removeChannel(int fd)
 void Selector::modifyChannel(const simex::shared_ptr<EventChannel>& c)
 {
 	if (!FD_ISSET(c->fd(), &allfds_)) return;
-	if (c->isEnableReading()) FD_SET(c->fd(), &readfds_);
-	else FD_CLR(c->fd(), &readfds_);
-	if (c->isEnableWriting()) FD_SET(c->fd(), &writefds_);
-	else FD_CLR(c->fd(), &writefds_);
+	if (c->isEnableReading())
+		FD_SET(c->fd(), &readfds_);
+	else if (FD_ISSET(c->fd(), &readfds_))
+		FD_CLR(c->fd(), &readfds_);
+	if (c->isEnableWriting()) 
+		FD_SET(c->fd(), &writefds_);
+	else if (FD_ISSET(c->fd(), &writefds_))
+		FD_CLR(c->fd(), &writefds_);
 }

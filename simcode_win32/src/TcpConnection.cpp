@@ -11,12 +11,14 @@ TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
     highWaterSize_(DEF_HIGHWATERSIZE)
 {
 	socket_.setTcpNoDelay(true);
+	channel_->enableReading();
 }
 
 void TcpConnection::send(const char* data, size_t len)
 {
     if (!isClosed_)
     {
+		{
         ScopeLock lock(mutex_);
         writeBuf_.append(data, len);
         //HighWater
@@ -33,7 +35,9 @@ void TcpConnection::send(const char* data, size_t len)
                 return;
             }
         }
-
+		}
+		
+		loop_->addTask(simex::bind(&TcpConnection::handleWrite, this));
     }
 }
 
@@ -41,6 +45,7 @@ void TcpConnection::sendString(const std::string& data)
 {
     if (!isClosed_)
     {
+		{
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
         if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
@@ -56,6 +61,8 @@ void TcpConnection::sendString(const std::string& data)
                 return;
             }
         }
+		}
+		loop_->addTask(simex::bind(&TcpConnection::handleWrite, this));
     }
 }
 
@@ -102,7 +109,7 @@ void TcpConnection::handleWrite()
         {
             if (n < writeBuf_.readableBytes())
             {
-
+				channel_->enableWriting();
             }
             else
             {
@@ -133,6 +140,7 @@ void TcpConnection::handleWrite()
 			
             if (writeBuf_.mutableWriteBuf()->empty())
             {
+				channel_->disableWriting();
             }
             else
             {

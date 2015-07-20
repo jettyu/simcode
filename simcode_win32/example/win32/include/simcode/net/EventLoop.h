@@ -1,6 +1,5 @@
 #pragma once
 
-#include <simcode/net/Socket.h>
 #include <simcode/net/Selector.h>
 #include <simcode/base/typedef.h>
 #include <vector>
@@ -19,11 +18,8 @@ public:
 	void modifyChannel(const simex::shared_ptr<EventChannel>& c);
 	void addTask(const TaskCallback& b);
 	void loop();
-	
 private:
 	void doTask();
-	void wakeup();
-	void wakeupHandle(EventChannel*);
 private:
 	Selector selector_;
 	Mutex mutex_;
