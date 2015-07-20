@@ -12,6 +12,7 @@ TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
 {
 	socket_.setTcpNoDelay(true);
 	channel_->enableReading();
+	channel_->enableWriting();
 }
 
 void TcpConnection::send(const char* data, size_t len)
@@ -95,6 +96,17 @@ void TcpConnection::handleRead()
 
 void TcpConnection::handleWrite()
 {
+	if (!isConnected_)
+	{
+		int error=-1, len; 
+		len = sizeof(int);
+		getsockopt(socket_.sockfd(), SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&error), &len); 
+		if (error == 0) 
+		{
+			setConnected();
+		}
+		return;
+	}
     if (writeBuf_.readableBytes() == 0)
     {
         ScopeLock lock(mutex_);
@@ -160,6 +172,7 @@ void TcpConnection::onClose()
 {
 	if (isClosed_) return;
 	isClosed_ = true;
+	isConnected_ = false;
 	stop();
 	if (closeCallback_) closeCallback_(shared_from_this());
 }

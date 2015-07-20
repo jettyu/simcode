@@ -21,6 +21,7 @@ void TcpClient::active()
 void TcpClient::close()
 {
 	isClosed_ = true;
+	//retry_ = false;
 	conn_.reset();
 }
 
@@ -40,25 +41,34 @@ void TcpClient::Connect()
 {
 	conn_.reset();
 	socketPtr_.reset(new Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
+	socketPtr_->setReuseAddr();
+	socketPtr_->setReusePort();
+	socketPtr_->setTcpNoDelay(true);
+	TcpConnection::Ptr conn(new TcpConnection(loop_, socketPtr_->sockfd()));
+	conn->setMessageCallback(onMessageCallback_);
+	conn->setConnectCallback(simex::bind(&TcpClient::onConnect, this, _1));
+	conn->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
+	conn->setErrorCallback(onErrorCallback_);
+	conn->run();
+	 
 	if (0 == socketPtr_->Connect(peerAddr_))
 	{
-		retryTime_ = 0;
-		TcpConnection::Ptr conn(new TcpConnection(loop_, socketPtr_->sockfd()));
-		conn->setMessageCallback(onMessageCallback_);
-		conn->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
-		conn->setErrorCallback(onErrorCallback_);
-		if (onConnectCallback_) onConnectCallback_(conn);
-		conn->run();
-		conn_ = conn;
+		conn->setConnected();
 	}
 	else
 	{
-		if (retry_)
-		{
-			Sleep(retryTime_++);
-			Connect();
-		}
+	//	if (retry_)
+	//	{
+	//		Sleep(retryTime_++);
+	//		Connect();
+	//	}
 	}
+}
+
+void TcpClient::onConnect(const TcpConnection::Ptr& conn)
+{
+	if (onConnectCallback_) onConnectCallback_(conn);
+	retryTime_ = 0;
 }
 
 void TcpClient::onClose(const TcpConnection::Ptr& conn)

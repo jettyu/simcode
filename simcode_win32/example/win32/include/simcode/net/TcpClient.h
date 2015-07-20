@@ -63,7 +63,9 @@ public:
 	void sendString(const std::string& data);
 private:
 	void Connect();
+	void onConnect(const TcpConnection::Ptr& conn);
 	void onClose(const TcpConnection::Ptr& conn);
+	void onMessage(const TcpConnection::Ptr& conn, Buffer* msg);
 private:
 	TcpConnection::Ptr conn_;
 	EventLoop* loop_;

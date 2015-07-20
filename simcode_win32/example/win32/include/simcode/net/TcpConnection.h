@@ -19,6 +19,7 @@ class TcpConnection : noncopyable,
 {
 public:
     typedef simex::shared_ptr<TcpConnection> Ptr;
+	typedef simex::function<void(const Ptr&)> ConnectCallback;
     typedef simex::function<void(const Ptr&)> CloseCallback;
     typedef simex::function<void(const Ptr&, Buffer* msg)> MessageCallback;
     typedef simex::function<bool(const Ptr&, OutBuffer* buf)> HighWaterCallback;
@@ -44,6 +45,19 @@ public:
 	EventLoop* getLoop()
 	{
 		return loop_;
+	}
+	bool isConnected() const
+	{
+		return isConnected_;
+	}
+	void setConnected()
+	{
+		isConnected_ = true;
+		if (connectCallback_) connectCallback_(shared_from_this());
+	}
+	void setConnectCallback(const ConnectCallback& b)
+	{
+		connectCallback_ = b;
 	}
     void setCloseCallback(const CloseCallback& b)
     {
@@ -86,10 +100,12 @@ private:
 	EventLoop* loop_;
     Socket socket_;
     bool isClosed_;
+	bool isConnected_;
 	simex::shared_ptr<EventChannel> channel_;
     Buffer readBuf_;
     OutBuffer writeBuf_;
     Mutex mutex_;
+	ConnectCallback connectCallback_;
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
     HighWaterCallback highWaterCallback_;
