@@ -12,7 +12,7 @@ EventLoop::~EventLoop(void)
 {
 }
 
-void EventLoop::addChannel(const simex::shared_ptr<Channel>& c)
+void EventLoop::addChannel(const simex::shared_ptr<EventChannel>& c)
 {
 	addTask(simex::bind(&Selector::addChannel, &selector_, c));
 }
@@ -20,6 +20,11 @@ void EventLoop::addChannel(const simex::shared_ptr<Channel>& c)
 void EventLoop::removeChannel(int fd)
 {
 	addTask(simex::bind(&Selector::removeChannel, &selector_, fd));
+}
+
+void EventLoop::modifyChannel(const simex::shared_ptr<EventChannel>& c)
+{
+	addTask(simex::bind(&Selector::modifyChannel, &selector_, c));
 }
 
 void EventLoop::addTask(const TaskCallback& b)

@@ -1,46 +1,71 @@
 #include <simcode/net/Selector.h>
+#include <simcode/net/EventChannel.h>
 using namespace simcode;
 using namespace net;
 int Selector::poll(int sec, int usec)
 {
-        FD_ZERO(&readfds_);
-        FD_ZERO(&writefds_);
-        FD_ZERO(&exceptfds_);
-        readfds_ = allfds_;
-        writefds_ = allfds_;
-        int ret;
-        timeout_.tv_sec = sec;
-        timeout_.tv_usec = usec;
-        ret = select(0, &readfds_, &writefds_, &exceptfds_, &timeout_);
-        if (SOCKET_ERROR == ret) return ret;
-		int validn = 0;
-        for (u_int i=0; i<allfds_.fd_count; i++)
+	fd_set readfds, writefds, exceptfds;
+    FD_ZERO(&readfds);
+    FD_ZERO(&writefds);
+    FD_ZERO(&exceptfds);
+	readfds = readfds_;
+	writefds = writefds;
+	exceptfds = allfds_;
+    int ret;
+    timeout_.tv_sec = sec;
+    timeout_.tv_usec = usec;
+    ret = select(0, &readfds_, &writefds, &exceptfds, &timeout_);
+    if (SOCKET_ERROR == ret) return ret;
+	int validn = 0;
+    for (u_int i=0; i<allfds_.fd_count; i++)
+    {
+		simex::shared_ptr<EventChannel> ch = channels_[i].lock();
+		if (!ch) continue;
+        if (FD_ISSET(allfds_.fd_array[i], &readfds))
         {
-			int validflag = 0;
-			simex::shared_ptr<Channel> ch = channels_[i].lock();
-			if (!ch) continue;
-            if (FD_ISSET(allfds_.fd_array[i], &readfds_))
-            {
-				validflag = 1;
-                //recv
-                
-                if (ch) ch->handleRead();
-            }
-            if (FD_ISSET(allfds_.fd_array[i], &writefds_))
-            {
-				validflag = 1;
-                //send
-                simex::shared_ptr<Channel> ch = channels_[i].lock();
-                if (ch) ch->handleWrite();
-            }
-            if (FD_ISSET(allfds_.fd_array[i], &exceptfds_))
-            {
-				validflag = 1;
-                //handle error
-                simex::shared_ptr<Channel> ch = channels_[i].lock();
-                if (ch) ch->handleError();
-            }
-			validn += validflag;
+            //recv
+			ch->setReventReading();
         }
-        return ret;
+        if (FD_ISSET(allfds_.fd_array[i], &writefds))
+        {
+            //send
+			ch->setReventWriting();
+        }
+        if (FD_ISSET(allfds_.fd_array[i], &exceptfds))
+        {
+            //handle error
+			ch->setReventError();
+        }
+		if (!ch->isNoneEvent()) 
+		{
+			validn++;
+			ch->handleEvent(ch->revents());
+		}
     }
+    return ret;
+}
+
+
+void Selector::addChannel(const simex::shared_ptr<EventChannel>& c)
+{
+    FD_SET(c->fd(), &allfds_);
+    channels_[allfds_.fd_count-1] = c;
+
+	if (c->isEnableReading()) FD_SET(c->fd(), &readfds_);
+	else FD_CLR(c->fd(), &readfds_);
+	if (c->isEnableWriting()) FD_SET(c->fd(), &writefds_);
+	else FD_CLR(c->fd(), &writefds_);
+}
+void Selector::removeChannel(int fd)
+{
+    FD_CLR(fd, &allfds_);
+	channels_.erase(fd);
+}
+void Selector::modifyChannel(const simex::shared_ptr<EventChannel>& c)
+{
+	if (!FD_ISSET(c->fd(), &allfds_)) return;
+	if (c->isEnableReading()) FD_SET(c->fd(), &readfds_);
+	else FD_CLR(c->fd(), &readfds_);
+	if (c->isEnableWriting()) FD_SET(c->fd(), &writefds_);
+	else FD_CLR(c->fd(), &writefds_);
+}

@@ -33,9 +33,6 @@
     <ClInclude Include="..\include\simcode\net\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\simcode\net\Channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\simcode\net\EventLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,6 +72,9 @@
     <ClInclude Include="..\include\simcode\net\EventLoopThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\simcode\net\EventChannel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\EventLoop.cpp">
@@ -102,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EventLoopThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EventChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

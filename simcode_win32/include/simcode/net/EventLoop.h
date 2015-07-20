@@ -1,22 +1,21 @@
 #pragma once
 
 #include <simcode/net/Selector.h>
-#include <simcode/net/Channel.h>
 #include <simcode/base/typedef.h>
 #include <vector>
 namespace simcode
 {
 namespace net
 {
-
 class EventLoop
 {
 public:
 	typedef simex::function<void()> TaskCallback;
 	EventLoop(void);
 	~EventLoop(void);
-	void addChannel(const simex::shared_ptr<Channel>& c);
+	void addChannel(const simex::shared_ptr<EventChannel>& c);
 	void removeChannel(int fd);
+	void modifyChannel(const simex::shared_ptr<EventChannel>& c);
 	void addTask(const TaskCallback& b);
 	void loop();
 private:

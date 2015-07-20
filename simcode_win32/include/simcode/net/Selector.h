@@ -4,9 +4,9 @@
 #ifdef WIN32
 #include <winsock2.h>
 #endif
-#include <simcode/net/Channel.h>
+#include <simcode/base/typedef.h>
 #include <simcode/base/noncopyable.h>
-#include <vector>
+#include <map>
 
 #define MAX_SELECT_NUM 1024
 
@@ -14,27 +14,23 @@ namespace simcode
 {
 namespace net
 {
-
+class EventChannel;
 class Selector : noncopyable
 {
 public:
-    Selector() : channels_(MAX_SELECT_NUM)
+    Selector()
     {
         FD_ZERO(&allfds_);
+		FD_ZERO(&readfds_);
+		FD_ZERO(&writefds_);
+		FD_ZERO(&exceptfds_);
     }
     ~Selector()
     {
     }
-    void addChannel(const simex::shared_ptr<Channel>& c)
-    {
-        FD_SET(c->fd(), &allfds_);
-        channels_[allfds_.fd_count-1] = c;
-    }
-    void removeChannel(int fd)
-    {
-        FD_CLR(fd, &allfds_);
-    }
-
+    void addChannel(const simex::shared_ptr<EventChannel>& c);
+	void removeChannel(int fd);
+	void modifyChannel(const simex::shared_ptr<EventChannel>& c);
     int poll(int sec, int usec);
 
 private:
@@ -43,7 +39,7 @@ private:
     fd_set exceptfds_;
     fd_set allfds_;
     timeval timeout_;
-    std::vector<simex::weak_ptr<Channel> > channels_;
+    std::map<int, simex::weak_ptr<EventChannel> > channels_;
 };
 
 }

@@ -1,4 +1,5 @@
 #include <simcode/net/TcpConnection.h>
+#include <simcode/net/EventChannel.h>
 static const size_t DEF_HIGHWATERSIZE = 64*1024*1024;
 using namespace simcode;
 using namespace net;
@@ -6,13 +7,10 @@ TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
 	loop_(loop__),
     socket_(fd__),
     isClosed_(false),
-    channel_(new Channel(fd__)),
+	channel_(new EventChannel(loop__, fd__, simex::bind(&TcpConnection::handle, this, _1))),
     highWaterSize_(DEF_HIGHWATERSIZE)
 {
 	socket_.setTcpNoDelay(true);
-    channel_->set_readCallback(simex::bind(&TcpConnection::handleRead, this));
-    channel_->set_writeCallback(simex::bind(&TcpConnection::handleWrite, this));
-    channel_->set_errorCallback(simex::bind(&TcpConnection::handleError, this));
 }
 
 void TcpConnection::send(const char* data, size_t len)
@@ -59,6 +57,13 @@ void TcpConnection::sendString(const std::string& data)
             }
         }
     }
+}
+
+void TcpConnection::handle(EventChannel* ec)
+{
+	if (ec->isReading()) handleRead();
+	if (ec->isWriting()) handleWrite();
+	if (ec->isError()) handleError();
 }
 
 void TcpConnection::handleRead()

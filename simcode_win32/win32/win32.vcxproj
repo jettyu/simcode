@@ -81,7 +81,7 @@
     <ClInclude Include="..\include\simcode\base\noncopyable.h" />
     <ClInclude Include="..\include\simcode\base\typedef.h" />
     <ClInclude Include="..\include\simcode\net\Buffer.h" />
-    <ClInclude Include="..\include\simcode\net\Channel.h" />
+    <ClInclude Include="..\include\simcode\net\EventChannel.h" />
     <ClInclude Include="..\include\simcode\net\EventLoop.h" />
     <ClInclude Include="..\include\simcode\net\EventLoopThread.h" />
     <ClInclude Include="..\include\simcode\net\EventLoopThreadPool.h" />
@@ -97,6 +97,7 @@
     <ClInclude Include="..\include\simcode\thread\thread_safe_queue.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\EventChannel.cpp" />
     <ClCompile Include="..\src\EventLoop.cpp" />
     <ClCompile Include="..\src\EventLoopThread.cpp" />
     <ClCompile Include="..\src\EventLoopThreadPool.cpp" />

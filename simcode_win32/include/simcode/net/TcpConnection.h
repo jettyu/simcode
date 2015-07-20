@@ -9,6 +9,7 @@
 #include <simcode/net/Selector.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/EventLoop.h>
+
 namespace simcode
 {
 namespace net
@@ -76,6 +77,7 @@ public:
     void sendString(const std::string& data);
 
 private:
+	void handle(EventChannel*);
     void handleRead();
     void handleWrite();
     void handleError();
@@ -84,7 +86,7 @@ private:
 	EventLoop* loop_;
     Socket socket_;
     bool isClosed_;
-    simex::shared_ptr<Channel> channel_;
+	simex::shared_ptr<EventChannel> channel_;
     Buffer readBuf_;
     OutBuffer writeBuf_;
     Mutex mutex_;
