@@ -90,6 +90,7 @@ private:
     int fd_;
     int events_;
     int revents_;
+    bool isClosed_;
 
     EventCallback eventCallback_;
 };

@@ -44,10 +44,7 @@ public:
     {
         return loop_;
     }
-    void Close()
-    {
-        onClose();
-    }
+    void close();
     void setCloseCallback(const CloseCallback& b)
     {
         closeCallback_ = b;

@@ -22,7 +22,7 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
 
 TcpConnection::~TcpConnection()
 {
-    onClose();
+    this->close();
 }
 
 void TcpConnection::run()
@@ -63,12 +63,12 @@ void TcpConnection::handleRead()
     {
         errcode_ = errno;
         LOG_ERROR("read error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-        onClose();
+        this->close();
         return;
     }
     else if (n == 0)
     {
-        onClose();
+        this->close();
         return;
     }
     else if (static_cast<size_t>(n) <= writable)
@@ -120,7 +120,7 @@ void TcpConnection::handleWrite()
                 if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
                 {
                     //shutdown();
-                    onClose();
+                    this->close();
                     return;
                 }
             }
@@ -198,11 +198,16 @@ void TcpConnection::update()
     loop_->modifyEvent(socket_.sockfd(), events_);
 }
 
-void TcpConnection::onClose()
+void TcpConnection::close()
 {
     if (isClosed_) return;
     isClosed_ = true;
     //shutdown();
     loop_->removeInLoop(socket_.sockfd());
-    if (closeCallback_) closeCallback_(shared_from_this());
+    if (closeCallback_) loop_->addTask(simex::bind(&TcpConnection::onClose, this));
+}
+
+void TcpConnection::onClose()
+{
+    closeCallback_(shared_from_this());
 }

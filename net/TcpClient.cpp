@@ -38,7 +38,7 @@ void TcpClient::Close()
 {
     TcpConnectionPtr conn = conn_;
     retry_ = false;
-    if (conn) conn->Close();
+    if (conn) conn->close();
 }
 void TcpClient::onConnect()
 {

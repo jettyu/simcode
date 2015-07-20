@@ -13,13 +13,14 @@ EventChannel::EventChannel(EventLoop* loop__, int fd__):
     loop_(loop__),
     fd_(fd__),
     events_(0),
-    revents_(0)
+    revents_(0),
+    isClosed_(false)
 {
 }
 
 EventChannel::~EventChannel()
 {
-    Close();
+    close();
 }
 
 void EventChannel::runInLoop()
@@ -29,6 +30,7 @@ void EventChannel::runInLoop()
 
 void EventChannel::close()
 {
+    if (isClosed_) return;
     loop_->removeInLoop(fd_);
 }
 
