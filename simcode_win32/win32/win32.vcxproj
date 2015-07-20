@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C35423FA-EBCD-4CD9-869A-95368631A91B}</ProjectGuid>
+    <ProjectGuid>{4FB282E1-C4FF-47AF-B4A4-836FB3E2241B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>simcode_win32</RootNamespace>
+    <RootNamespace>win32</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -47,8 +47,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\vsproj\simcode_win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalUsingDirectories>D:\vsproj\simcode_win32;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories>D:\share\centos_go\jettyu\simcode\simcode_win32\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>D:\share\centos_go\jettyu\simcode\simcode_win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,28 +76,36 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\simcode\base\any.h" />
-    <ClInclude Include="..\simcode\base\copyable.h" />
-    <ClInclude Include="..\simcode\base\noncopyable.h" />
-    <ClInclude Include="..\simcode\base\typedef.h" />
-    <ClInclude Include="..\simcode\net\Buffer.h" />
-    <ClInclude Include="..\simcode\net\Channel.h" />
-    <ClInclude Include="..\simcode\net\EventLoop.h" />
-    <ClInclude Include="..\simcode\net\OutBuffer.h" />
-    <ClInclude Include="..\simcode\net\Selector.h" />
-    <ClInclude Include="..\simcode\net\SockAddr.h" />
-    <ClInclude Include="..\simcode\net\Socket.h" />
-    <ClInclude Include="..\simcode\net\TcpClient.h" />
-    <ClInclude Include="..\simcode\net\TcpConnection.h" />
-    <ClInclude Include="..\simcode\stdafx.h" />
-    <ClInclude Include="..\simcode\targetver.h" />
+    <ClInclude Include="..\include\simcode\base\any.h" />
+    <ClInclude Include="..\include\simcode\base\copyable.h" />
+    <ClInclude Include="..\include\simcode\base\noncopyable.h" />
+    <ClInclude Include="..\include\simcode\base\typedef.h" />
+    <ClInclude Include="..\include\simcode\net\Buffer.h" />
+    <ClInclude Include="..\include\simcode\net\Channel.h" />
+    <ClInclude Include="..\include\simcode\net\EventLoop.h" />
+    <ClInclude Include="..\include\simcode\net\EventLoopThread.h" />
+    <ClInclude Include="..\include\simcode\net\EventLoopThreadPool.h" />
+    <ClInclude Include="..\include\simcode\net\OutBuffer.h" />
+    <ClInclude Include="..\include\simcode\net\Selector.h" />
+    <ClInclude Include="..\include\simcode\net\SockAddr.h" />
+    <ClInclude Include="..\include\simcode\net\Socket.h" />
+    <ClInclude Include="..\include\simcode\net\TcpClient.h" />
+    <ClInclude Include="..\include\simcode\net\TcpConnection.h" />
+    <ClInclude Include="..\include\simcode\stdafx.h" />
+    <ClInclude Include="..\include\simcode\targetver.h" />
+    <ClInclude Include="..\include\simcode\thread\thread_queue.h" />
+    <ClInclude Include="..\include\simcode\thread\thread_safe_queue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\EventLoop.cpp" />
+    <ClCompile Include="..\src\EventLoopThread.cpp" />
+    <ClCompile Include="..\src\EventLoopThreadPool.cpp" />
     <ClCompile Include="..\src\Selector.cpp" />
     <ClCompile Include="..\src\Socket.cpp" />
     <ClCompile Include="..\src\TcpClient.cpp" />
     <ClCompile Include="..\src\TcpConnection.cpp" />
+    <ClCompile Include="..\src\thread_queue.cpp" />
+    <ClCompile Include="..\src\thread_safe_queue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

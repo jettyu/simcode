@@ -9,7 +9,7 @@ class EventLoopThread : noncopyable
 {
 public:
     typedef simex::function<void(EventLoop*)> ThreadInitCallback;
-    EventLoopThread(const ThreadInitCallback& cb =ThreadInitCallback());
+	EventLoopThread(const ThreadInitCallback& cb =ThreadInitCallback());
     EventLoop *startLoop();
 private:
     SharedPtr<EventLoop> loop_;

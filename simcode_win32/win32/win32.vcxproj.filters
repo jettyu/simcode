@@ -18,49 +18,61 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\simcode\base\any.h">
+    <ClInclude Include="..\include\simcode\base\any.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\base\copyable.h">
+    <ClInclude Include="..\include\simcode\base\copyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\base\noncopyable.h">
+    <ClInclude Include="..\include\simcode\base\noncopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\base\typedef.h">
+    <ClInclude Include="..\include\simcode\base\typedef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\Buffer.h">
+    <ClInclude Include="..\include\simcode\net\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\Channel.h">
+    <ClInclude Include="..\include\simcode\net\Channel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\EventLoop.h">
+    <ClInclude Include="..\include\simcode\net\EventLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\OutBuffer.h">
+    <ClInclude Include="..\include\simcode\net\OutBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\Selector.h">
+    <ClInclude Include="..\include\simcode\net\Selector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\SockAddr.h">
+    <ClInclude Include="..\include\simcode\net\SockAddr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\Socket.h">
+    <ClInclude Include="..\include\simcode\net\Socket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\TcpClient.h">
+    <ClInclude Include="..\include\simcode\net\TcpClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\net\TcpConnection.h">
+    <ClInclude Include="..\include\simcode\net\TcpConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\stdafx.h">
+    <ClInclude Include="..\include\simcode\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\simcode\targetver.h">
+    <ClInclude Include="..\include\simcode\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simcode\thread\thread_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simcode\thread\thread_safe_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simcode\net\EventLoopThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\simcode\net\EventLoopThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,6 +90,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\TcpConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\thread_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\thread_safe_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EventLoopThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EventLoopThreadPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
