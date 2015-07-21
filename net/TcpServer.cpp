@@ -3,9 +3,9 @@
 using namespace simcode;
 using namespace net;
 
-TcpServer::TcpServer(EventLoop* loop, const SockAddr& addr, const std::string&name):
+TcpServer::TcpServer(EventLoop* loop, const SockAddr& addr, const std::string&name, bool reuseport):
     loop_(loop),
-    acceptor_(addr, true),
+    acceptor_(addr, reuseport),
     conntectionList_(new TcpConnMap),
     threadNum_(0)
 {
