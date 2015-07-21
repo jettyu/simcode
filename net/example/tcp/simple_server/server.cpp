@@ -3,10 +3,7 @@
 #include <assert.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/SockAddr.h>
-#include <simcode/net/EPollPoller.h>
 #include <simcode/net/EventLoop.h>
-#include <simcode/net/Acceptor.h>
-#include <simcode/net/TcpConnection.h>
 #include <simcode/net/TcpServer.h>
 #include <iostream>
 using namespace std;

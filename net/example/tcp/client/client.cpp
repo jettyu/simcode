@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/SockAddr.h>
-#include <simcode/net/EPollPoller.h>
 #include <simcode/net/EventLoopThread.h>
 #include <simcode/net/TcpClient.h>
 #include <iostream>

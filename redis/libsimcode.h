@@ -41,8 +41,8 @@ static void delWrite(void *privdata)
 static void cleanup(void *privdata)
 {
     redisLibSimcode *e = (redisLibSimcode*)privdata;
-    e->channel->close();
-    delete e->channel;
+    e->channel->getLoop()->removeInLoop(e->channel->fd());
+    //delete e->channel;
     free(e);
 }
 
@@ -60,9 +60,10 @@ static int redisLibSimcodeAttach(redisAsyncContext* ac, simcode::net::EventLoop*
         return REDIS_ERR;
     e = (redisLibSimcode*)malloc(sizeof(*e));
     e->context = ac;
-    e->channel = new simcode::net::EventChannel(loop, c->fd);
-    e->channel->setEventCallback(simex::bind(eventCallback,_1, ac));
-    e->channel->runInLoop();
+    e->channel = new simcode::net::EventChannel(loop, c->fd, simex::bind(eventCallback, _1, ac));
+    simcode::net::EventChannelPtr ec(e->channel);
+    loop->runInLoop(ec);
+
     ac->ev.addRead = addRead;
     ac->ev.delRead = delRead;
     ac->ev.addWrite = addWrite;

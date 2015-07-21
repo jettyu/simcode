@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <simcode/net/EPollPoller.h>
-#include <simcode/net/Socket.h>
 #include <simcode/net/Timer.h>
 #include <simcode/net/EventLoop.h>
 #include <simcode/net/EventLoopThreadPool.h>

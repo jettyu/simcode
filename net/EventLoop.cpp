@@ -47,6 +47,7 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
                                                                             get_pointer(timer)
                                                                             )));
     ec->tie(timer);
+    ec->enableReading();
     runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
 }
@@ -61,6 +62,7 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
                                                                             get_pointer(timer)
                                                                             )));
     ec->tie(timer);
+    ec->enableReading();
     runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
 }

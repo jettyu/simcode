@@ -14,6 +14,7 @@ using namespace std;
 
 static void commandCallback(AsyncRedis* ar, redisReply* rp)
 {
+	if (!rp) return;
         cout<<"get:"<<rp->str<<endl;
 }
 

@@ -31,11 +31,7 @@ public:
     typedef simex::function<void (const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> ConnectionCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> CloseCallback;
-<<<<<<< HEAD
     TcpServer(EventLoop* loop, const SockAddr& addr, const std::string& name, bool reuseport = false);
-=======
-    TcpServer(EventLoop* loop, const SockAddr& addr, const std::string& name, bool reuseport=false);
->>>>>>> e10c59fe5b3cfe1e711122f487077daf595a37c1
     void start();
     void setThreadNum(int n)
     {
