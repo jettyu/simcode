@@ -53,7 +53,8 @@ public:
 	void setConnected()
 	{
 		isConnected_ = true;
-		if (connectCallback_) connectCallback_(shared_from_this());
+		if (connectCallback_) 
+			connectCallback_(shared_from_this());
 	}
 	void setConnectCallback(const ConnectCallback& b)
 	{

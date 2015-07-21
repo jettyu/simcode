@@ -8,7 +8,8 @@ TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
     socket_(fd__),
     isClosed_(false),
 	channel_(new EventChannel(loop__, fd__, simex::bind(&TcpConnection::handle, this, _1))),
-    highWaterSize_(DEF_HIGHWATERSIZE)
+    highWaterSize_(DEF_HIGHWATERSIZE),
+	isConnected_(false)
 {
 	socket_.setTcpNoDelay(true);
 	channel_->enableReading();
@@ -164,7 +165,8 @@ void TcpConnection::handleWrite()
 
 void TcpConnection::handleError()
 {
-	if (errorCallback_) errorCallback_(shared_from_this());
+	if (errorCallback_) 
+		errorCallback_(shared_from_this());
 	onClose();
 }
 
@@ -174,5 +176,6 @@ void TcpConnection::onClose()
 	isClosed_ = true;
 	isConnected_ = false;
 	stop();
-	if (closeCallback_) closeCallback_(shared_from_this());
+	if (closeCallback_) 
+		closeCallback_(shared_from_this());
 }

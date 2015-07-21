@@ -39,21 +39,20 @@ void TcpClient::sendString(const std::string& data)
 
 void TcpClient::Connect()
 {
-	conn_.reset();
 	socketPtr_.reset(new Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
 	socketPtr_->setReuseAddr();
 	socketPtr_->setReusePort();
 	socketPtr_->setTcpNoDelay(true);
-	TcpConnection::Ptr conn(new TcpConnection(loop_, socketPtr_->sockfd()));
-	conn->setMessageCallback(onMessageCallback_);
-	conn->setConnectCallback(simex::bind(&TcpClient::onConnect, this, _1));
-	conn->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
-	conn->setErrorCallback(onErrorCallback_);
-	conn->run();
+	conn_.reset(new TcpConnection(loop_, socketPtr_->sockfd()));
+	conn_->setMessageCallback(onMessageCallback_);
+	conn_->setConnectCallback(simex::bind(&TcpClient::onConnect, this, _1));
+	conn_->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
+	conn_->setErrorCallback(onErrorCallback_);
+	conn_->run();
 	 
 	if (0 == socketPtr_->Connect(peerAddr_))
 	{
-		conn->setConnected();
+		//conn_->setConnected();
 	}
 	else
 	{
@@ -67,16 +66,18 @@ void TcpClient::Connect()
 
 void TcpClient::onConnect(const TcpConnection::Ptr& conn)
 {
-	if (onConnectCallback_) onConnectCallback_(conn);
+	if (onConnectCallback_) 
+		onConnectCallback_(conn);
 	retryTime_ = 0;
 }
 
 void TcpClient::onClose(const TcpConnection::Ptr& conn)
 {
-	if(onCloseCallback_) onCloseCallback_(conn);
+	if(onCloseCallback_) 
+		onCloseCallback_(conn);
 	if (retry_)
 	{
-		Sleep(retryTime_++);
+		Sleep(retryTime_++*1000);
 		Connect();
 	}
 }

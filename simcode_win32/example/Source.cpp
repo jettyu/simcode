@@ -26,6 +26,14 @@ static void onMessage(const TcpConnection::Ptr& conn, Buffer* msg)
     msg->retrieveSeek();
 }
 
+static void onConnect(const TcpConnection::Ptr& conn)
+{
+	std::string sendData = "00hello!\n";
+	unsigned short size = htons(sendData.size()-2);
+	memcpy(&sendData[0], &size, sizeof(size));
+	conn->sendString(sendData);
+}
+
 static void onError(const TcpConnection::Ptr& conn)
 {
 	printf("errcode=%d\n", WSAGetLastError());
@@ -47,6 +55,7 @@ int main(int argc, char* argv[])
 	SockAddr svrAddr("127.0.0.1", 10010);
 
 	TcpClient client(&loop,svrAddr, "echo_client");
+	client.setConnectionCallback(simex::bind(onConnect, _1));
 	client.setMessageCallback(simex::bind(onMessage, _1, _2));
 	client.setErrorCallback(simex::bind(onError, _1));
 	client.setRetry(true);
