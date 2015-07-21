@@ -5,6 +5,7 @@
 #include <simcode/net/EventLoop.h>
 #include <simcode/base/noncopyable.h>
 #include <simcode/net/Socket.h>
+#include <simcode/net/EventChannel.h>
 namespace simcode
 {
 namespace net
@@ -26,12 +27,14 @@ public:
         return conn_;
     }
 private:
-    void eventHandle();
+    void eventHandle(EventChannel*);
     void onMessage(const UdpConnectionPtr& c, const std::string& msg);
 private:
     Socket socket_;
     UdpConnectionPtr conn_;
     MessageCallback messageCallback_;
+    EventChannelPtr channel_;
+
 };
 
 }

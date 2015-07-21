@@ -30,7 +30,7 @@ Timer::~Timer()
     close(timerfd_);
 }
 
-void Timer::handleEvent(int events)
+void Timer::handleEvent(uint32_t events)
 {
     handler_.eventCallback();
     uint64_t s;

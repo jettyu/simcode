@@ -40,7 +40,7 @@ public:
     }
 private:
     void onMessage(const UdpConnectionPtr& c, const std::string& msg);
-    void eventHandle(int events);
+    void eventHandle(EventChannel*);
     void hanleRead();
     void removeConnection(int64_t connId);
 private:
@@ -49,6 +49,7 @@ private:
     Socket socket_;
     MessageCallback messageCallback_;
     SharedPtr<BaseUdpConnManager> conntectionList_;
+    EventChannelPtr channel_;
     //std::map<uint64_t, UdpConnectionPtr> connManager_;
     //Mutex mutex_;
     int threadNum_;

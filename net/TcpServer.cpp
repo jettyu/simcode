@@ -9,6 +9,8 @@ TcpServer::TcpServer(EventLoop* loop, const SockAddr& addr, const std::string&na
     conntectionList_(new TcpConnMap),
     threadNum_(0)
 {
+    acceptChannel_.reset(new EventChannel(loop, acceptor_.sockfd(), simex::bind(&TcpServer::acceptHandler, this, _1)));
+    acceptChannel_->enableReading();
 }
 
 void TcpServer::start()
@@ -16,8 +18,11 @@ void TcpServer::start()
     loopThreadPool_.setThreadNum(threadNum_);
     loopThreadPool_.start();
     acceptor_.setCallback(simex::bind(&TcpServer::onConnection, this, _1,_2));
-    acceptor_.Listen();
-    loop_->runInLoop(acceptor_.sockfd(), simex::bind(&Acceptor::Accept, &acceptor_));
+    int ret = acceptor_.Listen();
+    LOG_DEBUG("ret=%d", ret);
+    assert(ret == 0);
+
+    loop_->runInLoop(acceptChannel_);
 }
 
 void TcpServer::onClose(const TcpConnectionPtr& conn)
@@ -27,10 +32,6 @@ void TcpServer::onClose(const TcpConnectionPtr& conn)
     ioLoop->removeInLoop(conn->connfd());
     LOG_DEBUG("client close|ip=%s|port=%u", conn->peerAddr().ip().c_str(), conn->peerAddr().port());
     conntectionList_->erase(conn->connfd());
-    //{
-    //ScopeLock lock(mutex_);
-    //conntectionList_.erase(conn->connfd());
-    //}
 }
 
 void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
@@ -43,9 +44,12 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
     if (connectionCallback_) connectionCallback_(conn);
     conntectionList_->add(conn->connfd(), conn);
-    //ScopeLock lock(mutex_);
-    //conntectionList_[conn->connfd()] = conn;
     conn->run();
+}
+
+void TcpServer::acceptHandler(EventChannel*)
+{
+    acceptor_.Accept();
 }
 
 void TcpConnMap::add(uint64_t id, const TcpConnectionPtr& conn)

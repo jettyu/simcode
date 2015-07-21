@@ -12,7 +12,9 @@ UdpClient::UdpClient(EventLoop* loop,
     UdpConnector c(socket_.sockfd());
     c.setPeerAddr(addr);
     conn_.reset(new UdpConnection(c));
-    loop->runInLoop(socket_.sockfd(), SimBind(&UdpClient::eventHandle, this));
+    channel_.reset(new EventChannel(loop, socket_.sockfd(), simex::bind(&UdpClient::eventHandle, this, _1)));
+    channel_->enableReading();
+    loop->runInLoop(channel_);
     //loop->runInBack();
 }
 
@@ -26,7 +28,7 @@ int UdpClient::SendString(const std::string& data)
     return conn_->SendString(data);
 }
 
-void UdpClient::eventHandle()
+void UdpClient::eventHandle(EventChannel*)
 {
     UdpConnector c(socket_.sockfd());
     int n = 0;

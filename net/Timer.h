@@ -22,7 +22,7 @@ private:
 public:
     Timer(const RemoveFdCallback& b=NULL);
     ~Timer();
-    void handleEvent(int events);
+    void handleEvent(uint32_t events);
     void setTimer(const EventCallback& b,
                   double afterTime,              //多少时间后开始执行
                   double intervalTime = 0,       //每隔多久时间执行1次

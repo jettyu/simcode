@@ -3,10 +3,12 @@
 #include <simcode/net/SockAddr.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/EventLoop.h>
-#include <simcode/base/typedef.h>
-#include <simcode/base/noncopyable.h>
 #include <simcode/net/Buffer.h>
 #include <simcode/net/OutBuffer.h>
+#include <simcode/net/EventChannel.h>
+#include <simcode/base/typedef.h>
+#include <simcode/base/noncopyable.h>
+
 namespace simcode
 {
 namespace net
@@ -69,18 +71,6 @@ public:
     {
         return errcode_;
     }
-    bool isWriting() const
-    {
-        return revents_ & EPOLLOUT;
-    }
-    bool isReading() const
-    {
-        return revents_ & EPOLLIN;
-    }
-    void setEvenst(int events)
-    {
-        revents_ = events;
-    }
     void shutdown()
     {
         isClosed_ = true;
@@ -99,21 +89,10 @@ public:
 		writeCompleteCallback_ = c;
 	}
 private:
-    void eventHandle(int events);
+    void eventHandle(EventChannel*);
     void onClose();
-    void enableWriting()
-    {
-        events_ |= EPOLLOUT;
-        update();
-    }
-    void disableWriting()
-    {
-        events_ &= ~EPOLLOUT;
-        update();
-    }
     void handleRead();
     void handleWrite();
-    void update();
 private:
     EventLoop* loop_;
     Socket socket_;
@@ -125,9 +104,8 @@ private:
 	WriteCompleteCallback writeCompleteCallback_;
     Buffer readBuf_;
     OutBuffer writeBuf_;
+    EventChannelPtr channel_;
     int errcode_; //use to save errno
-    int events_;
-    int revents_;
 	int highWaterSize_;
     bool isClosed_;
     Mutex mutex_;

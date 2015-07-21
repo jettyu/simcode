@@ -9,6 +9,7 @@
 #include <simcode/net/EventLoopThreadPool.h>
 #include <simcode/net/Acceptor.h>
 #include <simcode/net/ConnManager.h>
+#include <simcode/net/EventChannel.h>
 namespace simcode
 {
 namespace net
@@ -30,7 +31,11 @@ public:
     typedef simex::function<void (const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> ConnectionCallback;
     typedef simex::function<void (const TcpConnectionPtr&)> CloseCallback;
+<<<<<<< HEAD
+    TcpServer(EventLoop* loop, const SockAddr& addr, const std::string& name, bool reuseport = false);
+=======
     TcpServer(EventLoop* loop, const SockAddr& addr, const std::string& name, bool reuseport=false);
+>>>>>>> e10c59fe5b3cfe1e711122f487077daf595a37c1
     void start();
     void setThreadNum(int n)
     {
@@ -55,8 +60,7 @@ public:
 private:
     void onConnection(int connfd, const SockAddr& peerAddr);
     void onClose(const TcpConnectionPtr&);
-    void eventHandle(int events);
-    void hanleRead();
+    void acceptHandler(EventChannel*);
 private:
     simcode::net::EventLoop* loop_;
     simcode::thread::ThreadSafeQueue queue_;
@@ -64,6 +68,7 @@ private:
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;
     Acceptor acceptor_;
+    EventChannelPtr acceptChannel_;
     SharedPtr<BaseTcpConnManager> conntectionList_;
     //std::map<uint64_t, TcpConnectionPtr> conntectionList_;
     //Mutex mutex_;

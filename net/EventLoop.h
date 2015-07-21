@@ -1,9 +1,10 @@
 #ifndef SIMCODE_EVENT_LOOP_H
 #define SIMCODE_EVENT_LOOP_H
-#include <simcode/net/EPollPoller.h>
+
 #include <simcode/base/noncopyable.h>
 #include <simcode/thread/thread_queue.h>
 #include <simcode/net/Timer.h>
+#include <simcode/net/ChannelPoll.h>
 namespace simcode
 {
 namespace net
@@ -14,28 +15,36 @@ public:
     typedef simex::function<void()> TaskCallback;
     EventLoop();
     ~EventLoop();
-    void runInLoop(int id, const EPollPoller::EventCallback& c, int events=EPOLLIN|EPOLLPRI);
+    void runInLoop(const EventChannelPtr& c);
+    void removeInLoop(int id);
+    void modifyChannel(const EventChannelPtr& c);
+
     void loop();
     void runAfter(double afterTime, const Timer::EventCallback& c);
     void runEvery(double intervalTime, const Timer::EventCallback& c);
-    void modifyEvent(int id, int events);
-    void removeInLoop(int id);
+
     void addTask(const TaskCallback& b);
+    bool inOneThread() const
+    {
+        return curThreadId_ == simex::this_thread::get_id();
+    }
 private:
     void doTask();
     void wakeup();
-    void wakeupHandler(int events);
+    void wakeupHandler(EventChannel*);
+    void timerHandler(EventChannel*, Timer*);
 private:
     void removeTimer(int id);
-    simcode::net::EPollPoller poller_;
+    ChannelPoll poller_;
     typedef SharedPtr<Timer> TimerPtr;
     typedef std::map<int, TimerPtr> TimerList;
     TimerList timerList_;
     typedef std::vector<TaskCallback> TaskList;
     TaskList tasks_;
     simex::mutex mutex_;
-    int wakeupfd_;
+    EventChannelPtr wakeupChannel_;
     bool isWakeuped_;
+    simex::thread::id curThreadId_;
 };
 }
 }

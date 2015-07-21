@@ -8,16 +8,11 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     socket_(connfd),
     peerAddr_(peerAddr),
     localAddr_(SockAddr(socket_.getLocalAddr())),
-    errcode_(0),
-    events_(EPOLLIN|EPOLLPRI),
-    revents_(0),
+
 	highWaterSize_(DEF_HIGHWATERSIZE),
     isClosed_(false)
 {
     socket_.setKeepAlive(true);
-    //readBuf_.reserve(10240);
-    //writeBuf_.mutableReadBuf()->reserve(10240);
-    //writeBuf_.mutableWriteBuf()->reserve(10240);
 }
 
 TcpConnection::~TcpConnection()
@@ -27,19 +22,25 @@ TcpConnection::~TcpConnection()
 
 void TcpConnection::run()
 {
-    loop_->runInLoop(socket_.sockfd(), simex::bind(&TcpConnection::eventHandle, this, _1), events_);
+    channel_.reset(new EventChannel(loop_, socket_.sockfd(), simex::bind(&TcpConnection::eventHandle, this, _1)));
+    channel_->tie(shared_from_this());
+    channel_->enableReading();
+    loop_->runInLoop(channel_);
 }
 
-void TcpConnection::eventHandle(int events)
+void TcpConnection::eventHandle(EventChannel* ec)
 {
-    revents_ = events;
-    if (isReading())
+    if (channel_->isReading())
     {
         handleRead();
     }
-    if (isWriting())
+    if (channel_->isWriting())
     {
         handleWrite();
+    }
+    else
+    {
+        //handle error
     }
 }
 
@@ -113,7 +114,7 @@ void TcpConnection::handleWrite()
             int e = errno;
             errcode_ = e;
 
-            disableWriting();
+            channel_->disableWriting();
             if (errno != EWOULDBLOCK)
             {
                 LOG_DEBUG("write error|errmsg=%s|port=%d", strerror(errno), peerAddr().port());
@@ -133,7 +134,7 @@ void TcpConnection::handleWrite()
             writeBuf_.resetSeek();
             if (writeBuf_.mutableWriteBuf()->empty())
             {
-                disableWriting();
+                channel_->disableWriting();
             }
             else
             {
@@ -154,18 +155,18 @@ void TcpConnection::send(const char* data, size_t len)
 		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
 		{
 			if (!highWaterCallback_)
-			{	
+			{
 		        writeBuf_.mutableWriteBuf()->clear();
 				return;
 			}
-			else 
+			else
 			{
 				highWaterCallback_(shared_from_this(), &writeBuf_);
 				return;
 			}
 		}
-        
-        enableWriting();
+
+        channel_->enableWriting();
     }
     //handleWrite();
 }
@@ -179,23 +180,18 @@ void TcpConnection::sendString(const std::string& data)
 		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
 		{
 			if (!highWaterCallback_)
-			{	
+			{
 		        writeBuf_.mutableWriteBuf()->clear();
 				return;
 			}
-			else 
+			else
 			{
 				highWaterCallback_(shared_from_this(), &writeBuf_);
 				return;
 			}
 		}
-        enableWriting();
+        channel_->enableWriting();
     }
-}
-
-void TcpConnection::update()
-{
-    loop_->modifyEvent(socket_.sockfd(), events_);
 }
 
 void TcpConnection::close()
@@ -204,10 +200,12 @@ void TcpConnection::close()
     isClosed_ = true;
     //shutdown();
     loop_->removeInLoop(socket_.sockfd());
-    if (closeCallback_) loop_->addTask(simex::bind(&TcpConnection::onClose, this));
+    onClose();
+    //if (closeCallback_) loop_->addTask(simex::bind(&TcpConnection::onClose, this));
 }
 
 void TcpConnection::onClose()
 {
-    closeCallback_(shared_from_this());
+    if (closeCallback_)
+        closeCallback_(shared_from_this());
 }

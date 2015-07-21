@@ -1,5 +1,5 @@
 #include <simcode/net/Acceptor.h>
-
+#include <simcode/base/logger.h>
 using namespace simcode;
 using namespace simcode::net;
 Acceptor::Acceptor(const SockAddr& listenAddr, bool reuseport):
@@ -9,8 +9,10 @@ Acceptor::Acceptor(const SockAddr& listenAddr, bool reuseport):
 {
     socket_.setReuseAddr(true);
     socket_.setReusePort(reuseport);
-    socket_.setNonBlockAndCloseOnExec();
-    socket_.Bind(listenAddr);
+    int ret = socket_.Bind(listenAddr);
+    LOG_DEBUG("ret=%d", ret);
+    assert(ret == 0);
+    //socket_.setNonBlockAndCloseOnExec();
 }
 
 Acceptor::~Acceptor()

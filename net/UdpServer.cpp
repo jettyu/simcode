@@ -1,4 +1,5 @@
 #include <simcode/net/UdpServer.h>
+#include <simcode/net/EventChannel.h>
 #include <simcode/base/logger.h>
 using namespace simcode;
 using namespace net;
@@ -15,13 +16,15 @@ UdpServer::UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& n
     socket_.setReusePort();
     socket_.setNonBlockAndCloseOnExec();
     assert(socket_.Bind(addr) != -1);
+    channel_.reset(new EventChannel(loop, socket_.sockfd(), simex::bind(&UdpServer::eventHandle, this, _1)));
+    channel_->enableReading();
 }
 
 void UdpServer::start()
 {
     queue_.setThreadNum(threadNum_+1);
     queue_.start();
-    loop_->runInLoop(socket_.sockfd(), SimBind(&UdpServer::eventHandle, this, _1));
+    loop_->runInLoop(channel_);
 }
 
 void UdpServer::setThreadNum(int n)
@@ -29,7 +32,7 @@ void UdpServer::setThreadNum(int n)
     threadNum_ = n;
 }
 
-void UdpServer::eventHandle(int events)
+void UdpServer::eventHandle(EventChannel*)
 {
     queue_.push_back(threadNum_+1, SimBind(&UdpServer::hanleRead, this));
 }

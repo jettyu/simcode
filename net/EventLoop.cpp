@@ -1,23 +1,30 @@
 #include <simcode/net/EventLoop.h>
 #include <simcode/base/logger.h>
+#include <simcode/net/EventChannel.h>
 using namespace simcode;
 using namespace simcode::net;
 
 EventLoop::EventLoop() :
-    wakeupfd_(::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)),
     isWakeuped_(false)
 {
-    poller_.addEvent(wakeupfd_, simex::bind(&EventLoop::wakeupHandler, this, _1));
+    curThreadId_ = simex::this_thread::get_id();
+    int wakeupfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    wakeupChannel_.reset(new EventChannel(this, wakeupfd, simex::bind(&EventLoop::wakeupHandler, this, _1)));
+    wakeupChannel_->enableReading();
+    poller_.addChannel(wakeupChannel_);
 }
 
 EventLoop::~EventLoop()
 {
-    ::close(wakeupfd_);
+    ::close(wakeupChannel_->fd());
 }
 
-void EventLoop::runInLoop(int id, const EPollPoller::EventCallback& b, int events)
+void EventLoop::runInLoop(const EventChannelPtr& c)
 {
-    addTask(simex::bind(&EPollPoller::addEvent, &poller_, id, b, events));
+    if (inOneThread())
+        poller_.addChannel(c);
+    else
+        addTask(simex::bind(&ChannelPoll::addChannel, &poller_, c));
     //assert( 0 == poller_.addEvent(id, b, events));
 }
 
@@ -34,10 +41,13 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
 {
     TimerPtr timer(new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, afterTime);
-//    ScopeLock lock(mutex_);
-//    poller_.addEvent(timer->timerfd(),
-//                     simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
-    runInLoop(timer->timerfd(), simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
+    EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
+                                                                            this,
+                                                                            _1,
+                                                                            get_pointer(timer)
+                                                                            )));
+    ec->tie(timer);
+    runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
 }
 
@@ -45,21 +55,30 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
 {
     TimerPtr timer (new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, intervalTime, intervalTime, 0);
-//    ScopeLock lock(mutex_);
-//    poller_.addEvent(timer->timerfd(),
-//                     simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
-    runInLoop(timer->timerfd(), simex::bind(&Timer::handleEvent, get_pointer(timer), _1));
+    EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
+                                                                            this,
+                                                                            _1,
+                                                                            get_pointer(timer)
+                                                                            )));
+    ec->tie(timer);
+    runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
 }
 
-void EventLoop::modifyEvent(int id, int events)
+void EventLoop::modifyChannel(const EventChannelPtr& ec)
 {
-    addTask(simex::bind(&EPollPoller::modifyEvent, &poller_, id, events));
+    if (inOneThread())
+        poller_.modifyChannel(ec);
+    else
+        addTask(simex::bind(&ChannelPoll::modifyChannel, &poller_, ec));
 }
 
 void EventLoop::removeInLoop(int id)
 {
-    addTask(simex::bind(&EPollPoller::removeEvent, &poller_, id));
+    if (inOneThread())
+        poller_.removeChannel(id);
+    else
+        addTask(simex::bind(&ChannelPoll::removeChannel, &poller_, id));
 }
 
 void EventLoop::removeTimer(int id)
@@ -94,15 +113,20 @@ void EventLoop::wakeup()
 {
     isWakeuped_ = true;
     uint64_t i = 1;
-    int n = ::write(wakeupfd_, &i, sizeof(i));
+    int n = ::write(wakeupChannel_->fd(), &i, sizeof(i));
     if (n != sizeof(i)) LOG_ERROR("n=%d\n", n);
 }
 
-void EventLoop::wakeupHandler(int events)
+void EventLoop::wakeupHandler(EventChannel*)
 {
     uint64_t i = 0;
-    int n =::read(wakeupfd_, &i, sizeof(i));
+    int n =::read(wakeupChannel_->fd(), &i, sizeof(i));
     if (n != sizeof(i)) LOG_ERROR("n=%d\n", n);
+}
+
+void EventLoop::timerHandler(EventChannel* ec, Timer* timer)
+{
+    timer->handleEvent(ec->revents());
 }
 
 
