@@ -41,7 +41,6 @@ void TcpClient::Connect()
 {
 	socketPtr_.reset(new Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
 	socketPtr_->setReuseAddr();
-	socketPtr_->setReusePort();
 	socketPtr_->setTcpNoDelay(true);
 	conn_.reset(new TcpConnection(loop_, socketPtr_->sockfd()));
 	conn_->setMessageCallback(onMessageCallback_);

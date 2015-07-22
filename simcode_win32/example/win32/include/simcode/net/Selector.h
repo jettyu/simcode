@@ -23,7 +23,6 @@ public:
         FD_ZERO(&allfds_);
 		FD_ZERO(&readfds_);
 		FD_ZERO(&writefds_);
-		FD_ZERO(&exceptfds_);
     }
     ~Selector()
     {
@@ -36,7 +35,6 @@ public:
 private:
     fd_set readfds_;
     fd_set writefds_;
-    fd_set exceptfds_;
     fd_set allfds_;
     timeval timeout_;
     std::map<int, simex::weak_ptr<EventChannel> > channels_;

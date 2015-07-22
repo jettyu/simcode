@@ -9,7 +9,7 @@
 #include <simcode/net/Selector.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/EventLoop.h>
-
+#include <simcode/net/EventChannel.h>
 namespace simcode
 {
 namespace net
@@ -36,6 +36,7 @@ public:
 	}
     void run()
     {
+		channel_->tie(shared_from_this());
         loop_->addChannel(channel_);
     }
     void stop()
@@ -53,7 +54,8 @@ public:
 	void setConnected()
 	{
 		isConnected_ = true;
-		if (connectCallback_) connectCallback_(shared_from_this());
+		if (connectCallback_) 
+			connectCallback_(shared_from_this());
 	}
 	void setConnectCallback(const ConnectCallback& b)
 	{

@@ -27,13 +27,13 @@ EventChannel::EventChannel(EventLoop* loop__, int fd__, const EventCallback& b):
     events_(POLL::ZERO),
     revents_(POLL::ZERO),
 	eventCallback_(b),
-	tieFlag_(false)
+	tieFlag_(false),
+	isRemoved_(false)
 {
 }
 
 EventChannel::~EventChannel()
 {
-
 }
 
 void EventChannel::update()
@@ -49,7 +49,11 @@ void EventChannel::handleEvent(uint32_t revents__)
     {
         tieObj = tie_.lock();
         if (!tieObj)
+        {
+            removeInLoop();
             return;
+        }
+
     }
 	eventCallback_(this);
 	clearRevent();

@@ -11,7 +11,7 @@ TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
     highWaterSize_(DEF_HIGHWATERSIZE),
 	isConnected_(false)
 {
-	socket_.setTcpNoDelay(true);
+	socket_.setKeepAlive(true);
 	channel_->enableReading();
 	channel_->enableWriting();
 }

@@ -19,7 +19,10 @@ public:
 	void modifyChannel(const simex::shared_ptr<EventChannel>& c);
 	void addTask(const TaskCallback& b);
 	void loop();
-	
+	bool inOneThread() const
+	{
+		return curThreadId_ == simex::this_thread::get_id();
+	}
 private:
 	void doTask();
 	void wakeup();
@@ -29,6 +32,7 @@ private:
 	Mutex mutex_;
 	typedef std::vector<TaskCallback> TaskList;
 	TaskList tasks_;
+	simex::thread::id curThreadId_;
 };
 
 }

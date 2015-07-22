@@ -8,10 +8,11 @@ namespace simcode
 namespace net
 {
 
-class EventChannel : noncopyable, 
+class EventChannel : noncopyable,
 	public simex::enable_shared_from_this<EventChannel>
 {
 public:
+    typedef::simex::shared_ptr<EventChannel> Ptr;
 	typedef simex::function<void(EventChannel*)> EventCallback;
 	EventChannel(EventLoop* loop__, int fd__, const EventCallback& b);
     ~EventChannel();
@@ -20,17 +21,22 @@ public:
     {
         return fd_;
     }
-    int events() const
+    uint32_t events() const
     {
         return events_;
     }
-    void set_revents(int re)
+    void set_revents(uint32_t re)
     {
         revents_ = re;
     }
-	int revents() const
+	uint32_t revents() const
 	{
 		return revents_;
+	}
+	void tie(const simex::shared_ptr<void> tie__)
+	{
+	    tie_ = tie__;
+	    tieFlag_ = true;
 	}
     EventLoop* getLoop()
     {
@@ -104,26 +110,28 @@ public:
 	{
 		return (revents_ & POLL::ERR) != 0;
 	}
-	void handleEvent(int revents__);
+	void handleEvent(uint32_t revents__);
 private:
-    
+
     void update();
-	
+
 private:
     struct POLL
     {
-        static int ZERO;
-        static int READ;
-        static int WRITE;
-        static int PRI;
-		static int ERR;
+        static uint32_t ZERO;
+        static uint32_t READ;
+        static uint32_t WRITE;
+        static uint32_t PRI;
+		static uint32_t ERR;
     };
 private:
     EventLoop* loop_;
     int fd_;
-    int events_;
-    int revents_;
+    uint32_t events_;
+    uint32_t revents_;
 	EventCallback eventCallback_;
+	simex::weak_ptr<void> tie_; //∑¿÷πeventCallback ß–ß
+	bool tieFlag_;
 };
 
 }

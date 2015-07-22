@@ -30,6 +30,7 @@ void EventLoop::runInLoop(const EventChannelPtr& c)
 
 void EventLoop::loop()
 {
+    curThreadId_ = simex::this_thread::get_id();
     while (1)
     {
         poller_.poll(10000);
@@ -44,7 +45,7 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
     EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
                                                                             this,
                                                                             _1,
-                                                                            get_pointer(timer)
+                                                                            timer
                                                                             )));
     ec->tie(timer);
     ec->enableReading();
@@ -59,7 +60,7 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
     EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
                                                                             this,
                                                                             _1,
-                                                                            get_pointer(timer)
+                                                                            timer
                                                                             )));
     ec->tie(timer);
     ec->enableReading();
@@ -126,7 +127,7 @@ void EventLoop::wakeupHandler(EventChannel*)
     if (n != sizeof(i)) LOG_ERROR("n=%d\n", n);
 }
 
-void EventLoop::timerHandler(EventChannel* ec, Timer* timer)
+void EventLoop::timerHandler(EventChannel* ec, const simex::shared_ptr<Timer>& timer)
 {
     timer->handleEvent(ec->revents());
 }

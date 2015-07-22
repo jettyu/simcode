@@ -32,7 +32,7 @@ private:
     void doTask();
     void wakeup();
     void wakeupHandler(EventChannel*);
-    void timerHandler(EventChannel*, Timer*);
+    void timerHandler(EventChannel*, const simex::shared_ptr<Timer>& timer);
 private:
     void removeTimer(int id);
     ChannelPoll poller_;

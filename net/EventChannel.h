@@ -42,7 +42,18 @@ public:
     {
         return loop_;
     }
-
+    void runInLoop()
+    {
+        loop_->runInLoop(shared_from_this());
+    }
+    void removeInLoop()
+    {
+        if (isRemoved_)
+        {
+            isRemoved_ = true;
+            loop_->removeInLoop(fd_);
+        }
+    }
     void enableReading()
     {
         events_ |= POLL::READ | POLL::PRI;
@@ -132,6 +143,7 @@ private:
 	EventCallback eventCallback_;
 	simex::weak_ptr<void> tie_; //∑¿÷πeventCallback ß–ß
 	bool tieFlag_;
+	bool isRemoved_;
 };
 
 }
