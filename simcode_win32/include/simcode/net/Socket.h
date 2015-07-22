@@ -38,7 +38,9 @@ public:
 
     int Connect(const SockAddr& addr);
     int ConnectRetry(const SockAddr& addr, int retryNum=1);
-
+    int Bind(const SockAddr& addr);
+    int Listen(int backlog = 1024);
+	int Accept(SockAddr* addr);
     void Close()
     {
 #ifdef WIN32

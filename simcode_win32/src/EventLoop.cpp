@@ -40,6 +40,11 @@ void EventLoop::modifyChannel(const simex::shared_ptr<EventChannel>& c)
 
 void EventLoop::addTask(const TaskCallback& b)
 {
+	if (inOneThread())
+	{
+		b();
+		return;
+	}
 	ScopeLock lock(mutex_);
 	if (tasks_.empty()) wakeup();
 	tasks_.push_back(b);

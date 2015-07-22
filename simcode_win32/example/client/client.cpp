@@ -1,5 +1,5 @@
 #include <simcode/net/TcpClient.h>
-#pragma  comment(lib,"win32\\lib\\debug\\win32.lib")
+#pragma  comment(lib,"..\\win32\\lib\\debug\\win32.lib")
 #pragma  comment(lib,"ws2_32.lib")
 
 using namespace std;

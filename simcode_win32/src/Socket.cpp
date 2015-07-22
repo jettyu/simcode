@@ -20,6 +20,31 @@ int Socket::ConnectRetry(const SockAddr& addr, int retryNum)
     return ret;
 }
 
+int Socket::Bind(const SockAddr& addr)
+{
+    return ::bind(sockfd_, addr.addr(), sizeof(*addr.addr()));
+}
+
+int Socket::Listen(int backlog)
+{
+    return ::listen(sockfd_, backlog);
+}
+
+int Socket::Accept(SockAddr* peeraddr)
+{
+    struct sockaddr_in addr;
+    bzero(&addr, sizeof(addr));
+
+    int addrlen = sizeof addr;
+    int connfd = ::accept(sockfd_, (struct sockaddr*)(&addr), &addrlen);
+    setNonBlockAndCloseOnExec(connfd);
+    if (connfd >= 0)
+    {
+        peeraddr->set_addr_in(addr);
+    }
+    return connfd;
+}
+
 int Socket::ShutdownWrite()
 {
     return ::shutdown(sockfd_, SD_SEND);

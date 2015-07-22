@@ -16,6 +16,7 @@ class SockAddr : copyable
 {
 public:
     /** Default constructor */
+	SockAddr(){}
     SockAddr(const std::string& ip, uint16_t port)
     {
         Init(ip, port);

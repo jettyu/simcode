@@ -25,7 +25,7 @@ public:
     typedef simex::function<bool(const Ptr&, OutBuffer* buf)> HighWaterCallback;
     typedef simex::function<void(const Ptr&)> WriteCompleteCallback;
 	typedef simex::function<void(const Ptr&)> ErrorCallback;
-    TcpConnection(EventLoop* loop__, int fd__);
+    TcpConnection(EventLoop* loop__, int fd__, uint64_t id__);
     ~TcpConnection()
     {
 		onClose();
@@ -33,6 +33,10 @@ public:
 	int fd() const
 	{
 		return socket_.sockfd();
+	}
+	uint64_t id() const
+	{
+		return id_;
 	}
     void run()
     {
@@ -101,6 +105,7 @@ private:
 private:
 	EventLoop* loop_;
     Socket socket_;
+	uint64_t id_;
     bool isClosed_;
 	bool isConnected_;
 	simex::shared_ptr<EventChannel> channel_;

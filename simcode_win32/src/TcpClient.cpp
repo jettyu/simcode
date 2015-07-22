@@ -42,7 +42,7 @@ void TcpClient::Connect()
 	socketPtr_.reset(new Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
 	socketPtr_->setReuseAddr();
 	socketPtr_->setTcpNoDelay(true);
-	conn_.reset(new TcpConnection(loop_, socketPtr_->sockfd()));
+	conn_.reset(new TcpConnection(loop_, socketPtr_->sockfd(), 0));
 	conn_->setMessageCallback(onMessageCallback_);
 	conn_->setConnectCallback(simex::bind(&TcpClient::onConnect, this, _1));
 	conn_->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));

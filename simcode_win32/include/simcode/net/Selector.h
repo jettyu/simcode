@@ -15,6 +15,7 @@ namespace simcode
 namespace net
 {
 class EventChannel;
+typedef simex::shared_ptr<EventChannel> EventChannelPtr;
 class Selector : noncopyable
 {
 public:

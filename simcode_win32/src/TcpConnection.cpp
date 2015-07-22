@@ -3,9 +3,10 @@
 static const size_t DEF_HIGHWATERSIZE = 64*1024*1024;
 using namespace simcode;
 using namespace net;
-TcpConnection::TcpConnection(EventLoop* loop__, int fd__) :
+TcpConnection::TcpConnection(EventLoop* loop__, int fd__, uint64_t id__) :
 	loop_(loop__),
     socket_(fd__),
+	id_(id__),
     isClosed_(false),
 	channel_(new EventChannel(loop__, fd__, simex::bind(&TcpConnection::handle, this, _1))),
     highWaterSize_(DEF_HIGHWATERSIZE),
