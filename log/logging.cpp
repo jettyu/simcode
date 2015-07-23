@@ -3,7 +3,8 @@
 using namespace simcode;
 using namespace log;
 
-static const char* LogLevelName[]={
+static const char* LogLevelName[]=
+{
     "[TRACE]",
     "[DEBUG]",
     "[INFO]",
@@ -27,21 +28,21 @@ int Logging::Init(const std::string& filename, uint64_t rotate_size)
 }
 
 void Logging::log_out(int level,
-                 const char* filename,
-                 int linenum,
-                 const char* funcname,
-                 const char* msg)
+                      const char* filename,
+                      int linenum,
+                      const char* funcname,
+                      const char* msg)
 {
     char data[LogFile::LOG_BUF_LEN];
     char buf[LogFile::LOG_BUF_LEN];
     int len;
     len = snprintf(data, sizeof(data), "%s|%d|%s|%s",
-             filename, linenum, funcname, msg);
+                   filename, linenum, funcname, msg);
     len = logFile_.logData(data, len,
                            get_level_name(level), buf);
     {
-    ScopeLock lock(mutex_);
-    logFile_.logWrite(buf, len);
+        ScopeLock lock(mutex_);
+        logFile_.logWrite(buf, len);
     }
 }
 

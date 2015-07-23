@@ -66,7 +66,8 @@ void UdpServer::hanleRead()
             queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, buf));
         else
             onMessage(conn, buf);
-    }while (n > 0);
+    }
+    while (n > 0);
 }
 
 void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
@@ -87,8 +88,8 @@ void UdpServer::removeConnection(int64_t connId)
 void UdpConnMap::add(uint64_t id, const UdpConnectionPtr& conn)
 {
     {
-    ScopeLock lock(mutex_);
-    connMap_[id] = conn;
+        ScopeLock lock(mutex_);
+        connMap_[id] = conn;
     }
 }
 
@@ -96,12 +97,12 @@ UdpConnectionPtr UdpConnMap::get(uint64_t id)
 {
     UdpConnectionPtr ptr;
     {
-    ScopeLock lock(mutex_);
-    std::map<uint64_t, UdpConnectionPtr>::iterator it;
-    if ((it=connMap_.find(id)) != connMap_.end())
-    {
-        ptr = it->second;
-    }
+        ScopeLock lock(mutex_);
+        std::map<uint64_t, UdpConnectionPtr>::iterator it;
+        if ((it=connMap_.find(id)) != connMap_.end())
+        {
+            ptr = it->second;
+        }
     }
     return ptr;
 }

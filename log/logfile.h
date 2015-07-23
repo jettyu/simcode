@@ -19,7 +19,8 @@ class LogFile
 public:
     LogFile();
     ~LogFile();
-    enum{
+    enum
+    {
         LOG_BUF_LEN	 = 4096
     };
     int open(FILE *fp);
@@ -34,10 +35,11 @@ private:
     std::string filename_;
     uint64_t rotate_size_;
 
-    struct{
+    struct
+    {
         uint64_t w_curr;
         uint64_t w_total;
-    }stats_;
+    } stats_;
 };
 
 }

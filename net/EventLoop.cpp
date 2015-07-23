@@ -43,10 +43,10 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
     TimerPtr timer(new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, afterTime);
     EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
-                                                                            this,
-                                                                            _1,
-                                                                            timer
-                                                                            )));
+                                        this,
+                                        _1,
+                                        timer
+                                                                           )));
     ec->tie(timer);
     ec->enableReading();
     runInLoop(ec);
@@ -58,10 +58,10 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
     TimerPtr timer (new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, intervalTime, intervalTime, 0);
     EventChannelPtr ec(new EventChannel(this, timer->timerfd(), simex::bind(&EventLoop::timerHandler,
-                                                                            this,
-                                                                            _1,
-                                                                            timer
-                                                                            )));
+                                        this,
+                                        _1,
+                                        timer
+                                                                           )));
     ec->tie(timer);
     ec->enableReading();
     runInLoop(ec);

@@ -68,7 +68,8 @@ private:
     static void disconnectCallback(const redisAsyncContext *c, int status);
     static void commandCallback(redisAsyncContext* c, void* r, void* privdata);
 private:
-    struct CallbackData {
+    struct CallbackData
+    {
         CallbackData(AsyncRedis* r, const CommandCallback& b, bool a=false):
             async_redis(r), cb(b), is_alway(a)
         {

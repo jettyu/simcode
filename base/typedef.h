@@ -66,27 +66,30 @@ template<typename T>
 class circular_buffer
 {
 public:
-        circular_buffer(size_t n) : buffer_(n), write_index_(0){}
-        ~circular_buffer(){std::vector<T>().swap(buffer_);}
-        void push_back(const T& t)
-        {
-                buffer_[++write_index_%buffer_.size()] = t;
-        }
-        T& back()
-        {
-                return buffer_[write_index_%buffer_.size()];
-        }
-        void resize(size_t n)
-        {
-                buffer_.resize(n);
-        }
-        size_t size() const
-        {
-            return buffer_.size();
-        }
+    circular_buffer(size_t n) : buffer_(n), write_index_(0) {}
+    ~circular_buffer()
+    {
+        std::vector<T>().swap(buffer_);
+    }
+    void push_back(const T& t)
+    {
+        buffer_[++write_index_%buffer_.size()] = t;
+    }
+    T& back()
+    {
+        return buffer_[write_index_%buffer_.size()];
+    }
+    void resize(size_t n)
+    {
+        buffer_.resize(n);
+    }
+    size_t size() const
+    {
+        return buffer_.size();
+    }
 private:
-        std::vector<T> buffer_;
-        atomic_uint write_index_;
+    std::vector<T> buffer_;
+    atomic_uint write_index_;
 };
 
 #endif // BOOST

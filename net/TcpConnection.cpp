@@ -3,14 +3,14 @@
 using namespace simcode;
 using namespace net;
 static const int DEF_HIGHWATERSIZE = 64*1024*1024;
-TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr):
+TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr, uint64_t id__):
     loop_(loop),
     socket_(connfd),
     peerAddr_(peerAddr),
     localAddr_(SockAddr(socket_.getLocalAddr())),
-
-	highWaterSize_(DEF_HIGHWATERSIZE),
-    isClosed_(false)
+    highWaterSize_(DEF_HIGHWATERSIZE),
+    isClosed_(false),
+    id_(id__)
 {
     socket_.setKeepAlive(true);
 }
@@ -87,7 +87,7 @@ void TcpConnection::handleRead()
 
 void TcpConnection::handleWrite()
 {
-   // if (isClosed_) return;
+    // if (isClosed_) return;
     if (writeBuf_.readableBytes() == 0)
     {
         ScopeLock lock(mutex_);
@@ -106,7 +106,7 @@ void TcpConnection::handleWrite()
             }
             else
             {
-				if (writeCompleteCallback_) writeCompleteCallback_(shared_from_this());
+                if (writeCompleteCallback_) writeCompleteCallback_(shared_from_this());
             }
         }
         else
@@ -151,21 +151,21 @@ void TcpConnection::send(const char* data, size_t len)
     if (!isClosed_)
     {
         ScopeLock lock(mutex_);
-		writeBuf_.append(data, len);
-		//HighWater
-		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
-		{
-			if (!highWaterCallback_)
-			{
-		        writeBuf_.mutableWriteBuf()->clear();
-				return;
-			}
-			else
-			{
-				highWaterCallback_(shared_from_this(), &writeBuf_);
-				return;
-			}
-		}
+        writeBuf_.append(data, len);
+        //HighWater
+        if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
+        {
+            if (!highWaterCallback_)
+            {
+                writeBuf_.mutableWriteBuf()->clear();
+                return;
+            }
+            else
+            {
+                highWaterCallback_(shared_from_this(), &writeBuf_);
+                return;
+            }
+        }
 
         channel_->enableWriting();
     }
@@ -178,19 +178,19 @@ void TcpConnection::sendString(const std::string& data)
     {
         ScopeLock lock(mutex_);
         writeBuf_.append(data);
-		if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
-		{
-			if (!highWaterCallback_)
-			{
-		        writeBuf_.mutableWriteBuf()->clear();
-				return;
-			}
-			else
-			{
-				highWaterCallback_(shared_from_this(), &writeBuf_);
-				return;
-			}
-		}
+        if (writeBuf_.mutableWriteBuf()->size() > highWaterSize_)
+        {
+            if (!highWaterCallback_)
+            {
+                writeBuf_.mutableWriteBuf()->clear();
+                return;
+            }
+            else
+            {
+                highWaterCallback_(shared_from_this(), &writeBuf_);
+                return;
+            }
+        }
         channel_->enableWriting();
     }
 }

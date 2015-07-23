@@ -9,10 +9,11 @@ namespace simcode
 namespace redis
 {
 
-typedef struct redisLibSimcode {
+typedef struct redisLibSimcode
+{
     redisAsyncContext* context;
     simcode::net::EventChannel* channel;
-}redisLibSimcode;
+} redisLibSimcode;
 
 static void addRead(void *privdata)
 {

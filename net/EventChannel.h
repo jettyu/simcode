@@ -9,12 +9,12 @@ namespace net
 {
 
 class EventChannel : noncopyable,
-	public simex::enable_shared_from_this<EventChannel>
+    public simex::enable_shared_from_this<EventChannel>
 {
 public:
     typedef::simex::shared_ptr<EventChannel> Ptr;
-	typedef simex::function<void(EventChannel*)> EventCallback;
-	EventChannel(EventLoop* loop__, int fd__, const EventCallback& b);
+    typedef simex::function<void(EventChannel*)> EventCallback;
+    EventChannel(EventLoop* loop__, int fd__, const EventCallback& b);
     ~EventChannel();
 
     int fd() const
@@ -29,15 +29,15 @@ public:
     {
         revents_ = re;
     }
-	uint32_t revents() const
-	{
-		return revents_;
-	}
-	void tie(const simex::shared_ptr<void> tie__)
-	{
-	    tie_ = tie__;
-	    tieFlag_ = true;
-	}
+    uint32_t revents() const
+    {
+        return revents_;
+    }
+    void tie(const simex::shared_ptr<void> tie__)
+    {
+        tie_ = tie__;
+        tieFlag_ = true;
+    }
     EventLoop* getLoop()
     {
         return loop_;
@@ -64,10 +64,10 @@ public:
         events_ &= ~POLL::READ;
         update();
     }
-	bool isEnableReading() const
-	{
-		return (events_ & POLL::READ) != 0;
-	}
+    bool isEnableReading() const
+    {
+        return (events_ & POLL::READ) != 0;
+    }
     void enableWriting()
     {
         events_ |= POLL::WRITE;
@@ -78,10 +78,10 @@ public:
         events_ &= ~POLL::WRITE;
         update();
     }
-	bool isEnableWriting() const
-	{
-		return (events_ & POLL::WRITE) != 0;
-	}
+    bool isEnableWriting() const
+    {
+        return (events_ & POLL::WRITE) != 0;
+    }
     void disableAll()
     {
         events_ = POLL::ZERO;
@@ -89,22 +89,22 @@ public:
     }
 
 
-	void clearRevent()
-	{
-		revents_ = POLL::ZERO;
-	}
-	void setReventReading()
-	{
-		revents_ |= POLL::READ;
-	}
-	void setReventWriting()
-	{
-		revents_ |= POLL::WRITE;
-	}
-	void setReventError()
-	{
-		revents_ |= POLL::ERR;
-	}
+    void clearRevent()
+    {
+        revents_ = POLL::ZERO;
+    }
+    void setReventReading()
+    {
+        revents_ |= POLL::READ;
+    }
+    void setReventWriting()
+    {
+        revents_ |= POLL::WRITE;
+    }
+    void setReventError()
+    {
+        revents_ |= POLL::ERR;
+    }
     bool isNoneEvent() const
     {
         return revents_ == POLL::ZERO;
@@ -117,11 +117,11 @@ public:
     {
         return (revents_ & POLL::READ) != 0;
     }
-	bool isError() const
-	{
-		return (revents_ & POLL::ERR) != 0;
-	}
-	void handleEvent(uint32_t revents__);
+    bool isError() const
+    {
+        return (revents_ & POLL::ERR) != 0;
+    }
+    void handleEvent(uint32_t revents__);
 private:
 
     void update();
@@ -133,17 +133,17 @@ private:
         static uint32_t READ;
         static uint32_t WRITE;
         static uint32_t PRI;
-		static uint32_t ERR;
+        static uint32_t ERR;
     };
 private:
     EventLoop* loop_;
     int fd_;
     uint32_t events_;
     uint32_t revents_;
-	EventCallback eventCallback_;
-	simex::weak_ptr<void> tie_; //∑¿÷πeventCallback ß–ß
-	bool tieFlag_;
-	bool isRemoved_;
+    EventCallback eventCallback_;
+    simex::weak_ptr<void> tie_; //∑¿÷πeventCallback ß–ß
+    bool tieFlag_;
+    bool isRemoved_;
 };
 
 }

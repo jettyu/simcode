@@ -11,7 +11,7 @@ namespace net
 class OutBuffer
 {
 public:
-    OutBuffer():readIndex_(false),writeIndex_(true),seek_(0){}
+    OutBuffer():readIndex_(false),writeIndex_(true),seek_(0) {}
     std::string* mutableWriteBuf()
     {
         return &bufs_[writeIndex_];
@@ -28,7 +28,7 @@ public:
     {
         return bufs_[readIndex_].size() - seek_;
     }
-    const void *peek() const
+    const char *peek() const
     {
         return bufs_[readIndex_].data() + seek_;
     }

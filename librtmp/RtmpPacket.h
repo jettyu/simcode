@@ -12,7 +12,8 @@ class CRtmpPacket
 {
 public:
     CRtmpPacket()
-    {        //RTMPPacket_Alloc(packet_,size);
+    {
+        //RTMPPacket_Alloc(packet_,size);
         Reset();
     }
     ~CRtmpPacket()
@@ -37,10 +38,10 @@ public:
 //        Reset();
         packet_.m_nInfoField2 = infoFiled2;
         packet_.m_headerType = headerType;
-		packet_.m_nTimeStamp = timeStamp;
-		packet_.m_packetType = packetType;
-		packet_.m_nBodySize  = bodySize;
-		packet_.m_body = body;
+        packet_.m_nTimeStamp = timeStamp;
+        packet_.m_packetType = packetType;
+        packet_.m_nBodySize  = bodySize;
+        packet_.m_body = body;
     }
 
     RTMPPacket* getPacket()

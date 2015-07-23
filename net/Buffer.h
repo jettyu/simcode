@@ -10,7 +10,7 @@ class Buffer
 {
 public:
     Buffer():seek_(0) {}
-    const void* peek() const;
+    const char* peek() const;
     size_t size() const;
     size_t readableBytes() const;
     void seek(size_t n);
@@ -29,7 +29,7 @@ private:
     size_t seek_;
 };
 
-inline const void* Buffer::peek() const
+inline const char* Buffer::peek() const
 {
     return buf_.data()+seek_;
 }

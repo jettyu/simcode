@@ -21,11 +21,11 @@ class TcpConnection : noncopyable,
 public:
     typedef simex::function<void(const TcpConnectionPtr&)> CloseCallback;
     typedef simex::function<void(const TcpConnectionPtr&, Buffer* msg)> MessageCallback;
-	typedef simex::function<bool(const TcpConnectionPtr&, OutBuffer* buf)> HighWaterCallback;
-	typedef simex::function<void(const TcpConnectionPtr&)> WriteCompleteCallback;
-	typedef void(TcpConnection::*send_buf_t)(const char*, size_t);
-	typedef void(TcpConnection::*send_str_t)(const std::string&);
-    TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr);
+    typedef simex::function<bool(const TcpConnectionPtr&, OutBuffer* buf)> HighWaterCallback;
+    typedef simex::function<void(const TcpConnectionPtr&)> WriteCompleteCallback;
+    typedef void(TcpConnection::*send_buf_t)(const char*, size_t);
+    typedef void(TcpConnection::*send_str_t)(const std::string&);
+    TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAddr, uint64_t id__);
     ~TcpConnection();
     void run();
     void send(const char* data, size_t len);
@@ -33,6 +33,10 @@ public:
     int connfd() const
     {
         return socket_.sockfd();
+    }
+    uint32_t id() const
+    {
+        return id_;
     }
     const SockAddr& peerAddr() const
     {
@@ -76,18 +80,18 @@ public:
         isClosed_ = true;
         socket_.ShutdownWrite();
     }
-	void setHighWaterCallback(const HighWaterCallback& c)
-	{
-		highWaterCallback_ = c;
-	}
-	void setHighWaterSize(int n)
-	{
-		highWaterSize_ = n;
-	}
-	void setWriteCompleteCallback(const WriteCompleteCallback& c)
-	{
-		writeCompleteCallback_ = c;
-	}
+    void setHighWaterCallback(const HighWaterCallback& c)
+    {
+        highWaterCallback_ = c;
+    }
+    void setHighWaterSize(int n)
+    {
+        highWaterSize_ = n;
+    }
+    void setWriteCompleteCallback(const WriteCompleteCallback& c)
+    {
+        writeCompleteCallback_ = c;
+    }
 private:
     void eventHandle(EventChannel*);
     void onClose();
@@ -100,16 +104,18 @@ private:
     const SockAddr localAddr_;
     CloseCallback closeCallback_;
     MessageCallback messageCallback_;
-	HighWaterCallback highWaterCallback_;
-	WriteCompleteCallback writeCompleteCallback_;
+    HighWaterCallback highWaterCallback_;
+    WriteCompleteCallback writeCompleteCallback_;
     Buffer readBuf_;
     OutBuffer writeBuf_;
     EventChannelPtr channel_;
     int errcode_; //use to save errno
-	int highWaterSize_;
-    bool isClosed_;
+    int highWaterSize_;
+
     Mutex mutex_;
     simex::any context_;
+    bool isClosed_;
+    uint64_t id_;
 };
 
 typedef simex::shared_ptr<TcpConnection> TcpConnectionPtr;

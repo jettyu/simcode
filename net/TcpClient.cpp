@@ -42,7 +42,7 @@ void TcpClient::Close()
 }
 void TcpClient::onConnect()
 {
-    TcpConnectionPtr newConn(new TcpConnection(loop_, connector_.getSocket()->sockfd(), connector_.connAddr()));
+    TcpConnectionPtr newConn(new TcpConnection(loop_, connector_.getSocket()->sockfd(), connector_.connAddr(), 0));
     newConn->setCloseCallback(simex::bind(&TcpClient::onClose, this, _1));
     newConn->setMessageCallback(messageCallback_);
     conn_ = newConn;
@@ -55,6 +55,6 @@ void TcpClient::onClose(const TcpConnectionPtr& conn)
 {
     LOG_DEBUG("close connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
     if (closeCallback_) closeCallback_(conn);
-	conn_.reset();
+    conn_.reset();
     if (retry_) connector_.Connect();
 }

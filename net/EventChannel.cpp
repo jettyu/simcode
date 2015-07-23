@@ -26,9 +26,9 @@ EventChannel::EventChannel(EventLoop* loop__, int fd__, const EventCallback& b):
     fd_(fd__),
     events_(POLL::ZERO),
     revents_(POLL::ZERO),
-	eventCallback_(b),
-	tieFlag_(false),
-	isRemoved_(false)
+    eventCallback_(b),
+    tieFlag_(false),
+    isRemoved_(false)
 {
 }
 
@@ -38,14 +38,14 @@ EventChannel::~EventChannel()
 
 void EventChannel::update()
 {
-	loop_->modifyChannel(shared_from_this());
+    loop_->modifyChannel(shared_from_this());
 }
 
 void EventChannel::handleEvent(uint32_t revents__)
 {
-	revents_ = revents__;
-	simex::shared_ptr<void> tieObj;
-	if (tieFlag_)
+    revents_ = revents__;
+    simex::shared_ptr<void> tieObj;
+    if (tieFlag_)
     {
         tieObj = tie_.lock();
         if (!tieObj)
@@ -55,7 +55,7 @@ void EventChannel::handleEvent(uint32_t revents__)
         }
 
     }
-	eventCallback_(this);
-	clearRevent();
+    eventCallback_(this);
+    clearRevent();
 }
 

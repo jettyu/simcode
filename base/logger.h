@@ -33,12 +33,12 @@ public:
 class BaseLogger
 {
 public:
-     //日志级别，文件名，文件行号，日志内容
+    //日志级别，文件名，文件行号，日志内容
     virtual void log_out(int level,
-                        const char* filename,
-                        int linenum,
-                        const char* funcname,
-                        const char* msg)
+                         const char* filename,
+                         int linenum,
+                         const char* funcname,
+                         const char* msg)
     {
         printf("log_level=%d|%s|%d|%s|%s\n", level, filename, linenum, funcname, msg);
     }

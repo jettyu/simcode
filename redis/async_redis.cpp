@@ -55,7 +55,7 @@ int AsyncRedis::CommandArgvPrev(const CommandCallback& b, int argc, const char *
     if (!isConnected()) return REDIS_DISCONNECTING;
     CallbackData* data = new CallbackData(this, b);
     return redisAsyncCommandArgv(ctx_, commandCallback, data,
-                                          argc, argv, argvlen);
+                                 argc, argv, argvlen);
 }
 
 int AsyncRedis::CommandArgv(const CommandCallback& b, const std::vector<std::string>& argvec)
@@ -74,7 +74,7 @@ int AsyncRedis::CommandArgv(const CommandCallback& b, const std::vector<std::str
     }
     CallbackData* data = new CallbackData(this, b);
     return redisAsyncCommandArgv(ctx_, commandCallback, data,
-                                          argc, argv.data(), argvlen.data());
+                                 argc, argv.data(), argvlen.data());
 }
 
 int AsyncRedis::CommandAlway(const CommandCallback& b, const char* format, ...)
@@ -104,7 +104,7 @@ int AsyncRedis::CommandArgvAlway(const CommandCallback& b, const std::vector<std
     }
     CallbackData* data = new CallbackData(this, b, true);
     return redisAsyncCommandArgv(ctx_, commandCallback, data,
-                                          argc, argv.data(), argvlen.data());
+                                 argc, argv.data(), argvlen.data());
 }
 
 void AsyncRedis::freeAll()
