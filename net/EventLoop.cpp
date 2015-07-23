@@ -95,6 +95,11 @@ void EventLoop::removeTimer(int id)
 
 void EventLoop::addTask(const TaskCallback& b)
 {
+    if (inOneThread())
+    {
+        b();
+        return;
+    }
     ScopeLock lock(mutex_);
     tasks_.push_back(b);
     if (!isWakeuped_) wakeup();

@@ -17,7 +17,8 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
 
 TcpConnection::~TcpConnection()
 {
-    this->close();
+    if (!isClosed_)
+        loop_->removeInLoop(socket_.sockfd());
 }
 
 void TcpConnection::run()
