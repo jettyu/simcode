@@ -28,7 +28,7 @@ public:
     TcpConnection(EventLoop* loop__, int fd__, uint64_t id__);
     ~TcpConnection()
     {
-		onClose();
+		if (!isClosed_) stop();
     }
 	int fd() const
 	{
