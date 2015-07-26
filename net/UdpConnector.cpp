@@ -9,7 +9,7 @@ UdpConnector::UdpConnector(int sockfd__):
 {
 }
 #define MAX_BUF_LEN 65535
-int UdpConnector::Recv(std::string* buf)
+int UdpConnector::recv(std::string* buf)
 {
     struct sockaddr_in addr;
     int n = 0;
@@ -21,12 +21,12 @@ int UdpConnector::Recv(std::string* buf)
     return n;
 }
 
-int UdpConnector::SendString(const std::string& buf)
+int UdpConnector::sendString(const std::string& buf)
 {
-    return Send(buf.data(), buf.size());
+    return send(buf.data(), buf.size());
 }
 
-int UdpConnector::Send(const char* buf, size_t len)
+int UdpConnector::send(const char* buf, size_t len)
 {
     int ret = sendto(sockfd_, buf, len, 0, peerAddr_.addr(), addrLen_);
     errcode_ = errno;

@@ -16,10 +16,10 @@ public:
     {
         return errcode_;
     }
-    int Recv(std::string* buf);
-    int SendString(const std::string&);
-    int Send(const char* buf, size_t len);
-    void Close()
+    int recv(std::string* buf);
+    int sendString(const std::string&);
+    int send(const char* buf, size_t len);
+    void close()
     {
         ::close(sockfd_);
     }

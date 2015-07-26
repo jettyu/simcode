@@ -5,16 +5,15 @@
 #include <simcode/net/SockAddr.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/TcpConnection.h>
-#include <simcode/net/VecMap.h>
 #include <simcode/net/EventLoopThreadPool.h>
 #include <simcode/net/Acceptor.h>
-#include <simcode/net/ConnectionManager.h>
+#include <simcode/net/ConnManager.h>
 #include <simcode/net/EventChannel.h>
 namespace simcode
 {
 namespace net
 {
-typedef ConnectionManager<uint64_t, TcpConnectionPtr> TcpConnectionManager;
+typedef ConnManager<uint64_t, TcpConnectionPtr> TcpConnectionManager;
 typedef simex::shared_ptr<TcpConnectionManager> TcpConnectionManagerPtr;
 class TcpServer : noncopyable
 {
@@ -25,12 +24,16 @@ public:
     TcpServer(EventLoop* loop,
               const SockAddr& addr,
               const std::string& name,
-              bool reuseport = false,
-              const TcpConnectionManagerPtr& cm=TcpConnectionManagerPtr());
+              bool reuseport = false);
     void start();
     void setThreadNum(int n)
     {
         threadNum_ = n;
+    }
+    //default accept loop
+    void setSendLoop(EventLoop* loop)
+    {
+        sendLoop_ = loop;
     }
     void setMessageCallback(const MessageCallback& c)
     {
@@ -52,6 +55,7 @@ private:
     void onConnection(int connfd, const SockAddr& peerAddr);
     void onClose(const TcpConnectionPtr&);
     void acceptHandler(EventChannel*);
+    void send(const TcpConnectionPtr& conn, const std::string& data);
 private:
     simcode::net::EventLoop* loop_;
     simcode::thread::ThreadSafeQueue queue_;
@@ -60,12 +64,11 @@ private:
     CloseCallback closeCallback_;
     Acceptor acceptor_;
     EventChannelPtr acceptChannel_;
-    TcpConnectionManagerPtr connectionManager_;
-    //std::map<uint64_t, TcpConnectionPtr> conntectionList_;
-    //Mutex mutex_;
     int threadNum_;
     EventLoopThreadPool loopThreadPool_;
     simex::atomic_uint connectionId_;
+    TcpConnectionManagerPtr connectionManager_;
+    EventLoop* sendLoop_;
 };
 }
 }

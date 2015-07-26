@@ -5,24 +5,14 @@
 #include <simcode/net/SockAddr.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/UdpConnection.h>
-#include <simcode/net/VecMap.h>
 #include <simcode/net/ConnManager.h>
 namespace simcode
 {
 namespace net
 {
-typedef BaseConnManager<UdpConnectionPtr> BaseUdpConnManager;
-class UdpConnMap : public BaseUdpConnManager
-{
-public:
-    void add(uint64_t id, const UdpConnectionPtr& conn);
-    UdpConnectionPtr get(uint64_t id);
-    void erase(uint64_t);
-private:
-    Mutex mutex_;
-    std::map<uint64_t, UdpConnectionPtr> connMap_;
-};
 
+typedef ConnManager<uint64_t, UdpConnectionPtr> UdpConnectionManager;
+typedef simex::shared_ptr<UdpConnectionManager> UdpConnectionManagerPtr;
 class UdpServer : noncopyable
 {
 public:
@@ -30,29 +20,33 @@ public:
     UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name);
     void start();
     void setThreadNum(int n);
-    void setConnManager(const SharedPtr<BaseUdpConnManager>& m)
+    void setSendLoop(EventLoop* loop)
     {
-        conntectionList_ = m;
+        sendLoop_ = loop;
     }
     void setMessageCallback(const MessageCallback& c)
     {
         messageCallback_ = c;
     }
+    const UdpConnectionManagerPtr& getConnectionManager() const
+    {
+        return connectionManager_;
+    }
 private:
-    void onMessage(const UdpConnectionPtr& c, const std::string& msg);
+    void onMessage(const simex::any& connStore);
     void eventHandle(EventChannel*);
     void hanleRead();
-    void removeConnection(int64_t connId);
+    void onClose(uint64_t connId);
+    void send(const UdpConnectionPtr& conn, const std::string& data);
 private:
     simcode::net::EventLoop* loop_;
     simcode::thread::ThreadSafeQueue queue_;
     Socket socket_;
     MessageCallback messageCallback_;
-    SharedPtr<BaseUdpConnManager> conntectionList_;
     EventChannelPtr channel_;
-    //std::map<uint64_t, UdpConnectionPtr> connManager_;
-    //Mutex mutex_;
     int threadNum_;
+    UdpConnectionManagerPtr connectionManager_;
+    EventLoop* sendLoop_;
 };
 }
 }

@@ -24,9 +24,9 @@ public:
     {
     }
     int errcode() const;
-    int Send(const char* buf, size_t len);
-    int SendString(const std::string& data);
-    void Close();
+    int send(const char* buf, size_t len);
+    int sendString(const std::string& data);
+    void close();
     const SockAddr& peerAddr() const;
     uint64_t id() const;
 
@@ -45,17 +45,17 @@ private:
 
 typedef SharedPtr<UdpConnection> UdpConnectionPtr;
 
-inline int UdpConnection::Send(const char* buf, size_t len)
+inline int UdpConnection::send(const char* buf, size_t len)
 {
-    return connector_.Send(buf, len);
+    return connector_.send(buf, len);
 }
 
-inline int UdpConnection::SendString(const std::string& data)
+inline int UdpConnection::sendString(const std::string& data)
 {
-    return connector_.SendString(data);
+    return connector_.sendString(data);
 }
 
-inline void UdpConnection::Close()
+inline void UdpConnection::close()
 {
     //connector_.Close();
     if (closeCallback_) closeCallback_(id());

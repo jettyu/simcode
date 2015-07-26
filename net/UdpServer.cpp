@@ -8,8 +8,8 @@ using namespace thread;
 UdpServer::UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name):
     loop_(loop),
     socket_(PF_INET, SOCK_DGRAM, 0),
-    conntectionList_(new UdpConnMap),
-    threadNum_(0)
+    threadNum_(0),
+    sendLoop_(loop)
 {
     assert(socket_.sockfd() != -1);
     socket_.setReuseAddr();
@@ -24,6 +24,7 @@ void UdpServer::start()
 {
     queue_.setThreadNum(threadNum_+1);
     queue_.start();
+    connectionManager_.reset(new UdpConnectionManager(sendLoop_, simex::bind(&UdpServer::send, this, _1,_2)));
     loop_->runInLoop(channel_);
 }
 
@@ -39,79 +40,51 @@ void UdpServer::eventHandle(EventChannel*)
 
 void UdpServer::hanleRead()
 {
+    connectionManager_->AddTask(simex::bind(&UdpServer::onMessage, this, _1));
+}
+
+void UdpServer::onMessage(const simex::any& connStore)
+{
+    std::map<uint64_t, UdpConnectionPtr>* connMap = simex::any_cast<std::map<uint64_t, UdpConnectionPtr>*>(connStore);
+    std::map<uint64_t, UdpConnectionPtr>::iterator it;
     int n = 0;
     do
     {
         UdpConnector c(socket_.sockfd());
         std::string buf;
 
-        if ((n=c.Recv(&buf)) < 0)
+        if ((n=c.recv(&buf)) < 0)
         {
-            //log error
-            //LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
+            LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
         }
+        UdpConnectionPtr conn;
         uint64_t id = c.peerAddr().id();
-        //UdpConnectionPtr conn = conntectionList_.get(id);
-        UdpConnectionPtr conn = conntectionList_->get(id);
-        if (!conn)
+        it = connMap->find(id);
+        if (it == connMap->end())
         {
-            LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu", c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
+            LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu",
+                      c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
             conn.reset(new UdpConnection(c));
-            conn->setCloseCallback(SimBind(&UdpServer::removeConnection, this, _1));
-            conntectionList_->add(id, conn);
+            conn->setCloseCallback(SimBind(&UdpServer::onClose, this, _1));
+            connectionManager_->Add(id, conn);
         }
-        //onMessage(conn, buf);
         if (threadNum_)
-            queue_.push_back(conn->id()%threadNum_, SimBind(&UdpServer::onMessage, this, conn, buf));
+            queue_.push_back(conn->id()%threadNum_, SimBind(messageCallback_, conn, buf));
         else
-            onMessage(conn, buf);
+            messageCallback_(conn, buf);
     }
     while (n > 0);
 }
 
-void UdpServer::onMessage(const UdpConnectionPtr& c, const std::string& msg)
-{
-    messageCallback_(c, msg);
-}
-
-void UdpServer::removeConnection(int64_t connId)
+void UdpServer::onClose(uint64_t connId)
 {
     LOG_DEBUG("client remove|id=%ld", connId);
-    conntectionList_->erase(connId);
-    //{
-    //ScopeLock lock(mutex_);
-    //conntectionList_.erase(connId);
-    //}
+    connectionManager_->Remove(connId);
 }
 
-void UdpConnMap::add(uint64_t id, const UdpConnectionPtr& conn)
+void UdpServer::send(const UdpConnectionPtr& conn, const std::string& data)
 {
-    {
-        ScopeLock lock(mutex_);
-        connMap_[id] = conn;
-    }
-}
-
-UdpConnectionPtr UdpConnMap::get(uint64_t id)
-{
-    UdpConnectionPtr ptr;
-    {
-        ScopeLock lock(mutex_);
-        std::map<uint64_t, UdpConnectionPtr>::iterator it;
-        if ((it=connMap_.find(id)) != connMap_.end())
-        {
-            ptr = it->second;
-        }
-    }
-    return ptr;
-}
-
-void UdpConnMap::erase(uint64_t id)
-{
-    {
-        ScopeLock lock(mutex_);
-        connMap_.erase(id);
-    }
+    conn->sendString(data);
 }
 

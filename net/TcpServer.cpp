@@ -6,17 +6,15 @@ using namespace net;
 TcpServer::TcpServer(EventLoop* loop,
                      const SockAddr& addr,
                      const std::string&name,
-                     bool reuseport,
-                     const TcpConnectionManagerPtr& cm):
+                     bool reuseport):
     loop_(loop),
     acceptor_(addr, reuseport),
-    connectionManager_(cm),
     threadNum_(0),
-    connectionId_(0)
+    connectionId_(0),
+    sendLoop_(loop)
 {
     acceptChannel_.reset(new EventChannel(loop, acceptor_.sockfd(), simex::bind(&TcpServer::acceptHandler, this, _1)));
     acceptChannel_->enableReading();
-    if (!connectionManager_) connectionManager_.reset(new TcpConnectionManager(loop));
 }
 
 void TcpServer::start()
@@ -27,6 +25,8 @@ void TcpServer::start()
     int ret = acceptor_.Listen();
     LOG_DEBUG("ret=%d", ret);
     assert(ret == 0);
+
+    connectionManager_.reset(new TcpConnectionManager(sendLoop_, simex::bind(&TcpServer::send, this, _1,_2)));
 
     loop_->runInLoop(acceptChannel_);
 }
@@ -56,5 +56,10 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
 void TcpServer::acceptHandler(EventChannel*)
 {
     acceptor_.Accept();
+}
+
+void TcpServer::send(const TcpConnectionPtr& conn, const std::string& data)
+{
+    conn->sendString(data);
 }
 

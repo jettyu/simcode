@@ -18,14 +18,14 @@ UdpClient::UdpClient(EventLoop* loop,
     //loop->runInBack();
 }
 
-int UdpClient::Send(const char* buf, size_t len)
+int UdpClient::send(const char* buf, size_t len)
 {
-    return conn_->Send(buf, len);
+    return conn_->send(buf, len);
 }
 
-int UdpClient::SendString(const std::string& data)
+int UdpClient::sendString(const std::string& data)
 {
-    return conn_->SendString(data);
+    return conn_->sendString(data);
 }
 
 void UdpClient::eventHandle(EventChannel*)
@@ -35,7 +35,7 @@ void UdpClient::eventHandle(EventChannel*)
     do
     {
         std::string buf;
-        if ( (n=c.Recv(&buf)) < 0)
+        if ( (n=c.recv(&buf)) < 0)
         {
             return;
         }
