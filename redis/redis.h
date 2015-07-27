@@ -120,7 +120,7 @@ public:
     }
 private:
     RedisReplyList( const RedisReplyList& ) {}
-    const RedisReplyList& operator=( const RedisReplyList& ) {}
+    const RedisReplyList& operator=( const RedisReplyList& ) {return *this;}
 private:
     std::vector<redisReply*> redisReplys_;
     std::vector<redisReply*>::iterator it_;
@@ -210,7 +210,7 @@ public:
 
 private:
     Redis( const Redis& ) {}
-    const Redis& operator=( const Redis& ) {}
+    const Redis& operator=( const Redis& ) {return *this;}
 
 private:
     int errcode_;
