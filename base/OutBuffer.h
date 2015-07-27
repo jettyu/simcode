@@ -5,8 +5,6 @@
 
 namespace simcode
 {
-namespace net
-{
 
 class OutBuffer
 {
@@ -61,6 +59,5 @@ private:
     int seek_;
 };
 
-}
 }
 #endif

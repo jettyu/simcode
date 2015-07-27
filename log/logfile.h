@@ -26,8 +26,11 @@ public:
     int open(FILE *fp);
     int open(const std::string& filename,  uint64_t rotate_size=0);
     void close();
-    int logWrite(const char*data, int size);
+    int logWrite(const char*data, int size);//write and flush and rotate
     int logData(const char* data, int size, const char* levelName, char buf[LOG_BUF_LEN]);
+    int logWriteOnly(const char* data, int size);//just write
+    int logFflush();
+
 private:
     void rotate();
 private:

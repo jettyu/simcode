@@ -3,11 +3,13 @@
 #include <simcode/net/SockAddr.h>
 #include <simcode/net/Socket.h>
 #include <simcode/net/EventLoop.h>
-#include <simcode/net/Buffer.h>
-#include <simcode/net/OutBuffer.h>
+
 #include <simcode/net/EventChannel.h>
 #include <simcode/base/typedef.h>
 #include <simcode/base/noncopyable.h>
+#include <simcode/base/Buffer.h>
+#include <simcode/base/OutBuffer.h>
+
 
 namespace simcode
 {

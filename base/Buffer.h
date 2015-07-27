@@ -4,8 +4,7 @@
 #include <string.h>
 namespace simcode
 {
-namespace net
-{
+
 class Buffer
 {
 public:
@@ -95,7 +94,6 @@ inline void Buffer::append(const char* data, int len)
     buf_.append(data, len);
 }
 
-} //endof namespace net
 } //endof namespace simcode
 
 #endif // SIMCODE_NET_BUFFER_H

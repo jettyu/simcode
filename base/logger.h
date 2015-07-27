@@ -33,6 +33,7 @@ public:
 class BaseLogger
 {
 public:
+    virtual ~BaseLogger(){}
     //日志级别，文件名，文件行号，日志内容
     virtual void log_out(int level,
                          const char* filename,

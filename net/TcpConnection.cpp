@@ -130,9 +130,9 @@ void TcpConnection::handleWrite()
         writeBuf_.seek(n);
         if (writeBuf_.readableBytes() == 0)
         {
-            ScopeLock lock(mutex_);
             writeBuf_.mutableReadBuf()->clear();
             writeBuf_.resetSeek();
+            ScopeLock lock(mutex_);
             if (writeBuf_.mutableWriteBuf()->empty())
             {
                 channel_->disableWriting();

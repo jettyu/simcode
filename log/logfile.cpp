@@ -89,8 +89,8 @@ void LogFile::rotate()
 
 int LogFile::logWrite(const char* data, int size)
 {
-    fwrite(data, size, 1, fp_);
-    fflush(fp_);
+    ::fwrite(data, size, 1, fp_);
+    ::fflush(fp_);
     stats_.w_curr += size;
     stats_.w_total += size;
     if(rotate_size_ > 0 && stats_.w_curr > rotate_size_)
@@ -99,6 +99,31 @@ int LogFile::logWrite(const char* data, int size)
     }
     return 0;
 }
+
+int LogFile::logWriteOnly(const char* data, int size)
+{
+    int n = ::fwrite(data, size, 1, fp_);
+    if (n > 0)
+    {
+        stats_.w_curr += n;
+        stats_.w_total += n;
+    }
+    return n;
+}
+
+int LogFile::logFflush()
+{
+    int ret = ::fflush(fp_);
+    if (ret == 0)
+    {
+        if(rotate_size_ > 0 && stats_.w_curr > rotate_size_)
+        {
+            rotate();
+        }
+    }
+    return ret;
+}
+
 #define LEVEL_NAME_LEN	8
 int LogFile::logData(const char* data, int size, const char* levelName, char buf[LOG_BUF_LEN])
 {
