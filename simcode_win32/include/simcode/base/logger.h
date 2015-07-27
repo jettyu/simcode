@@ -97,7 +97,6 @@ private:
 #define _MSC_VER 1600 
 #endif 
 
-#ifdef WIN32
 #define LOG_TRACE(fmt,...)    \
         simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_TRACE, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 #define LOG_DEBUG(fmt,...)    \
@@ -110,19 +109,5 @@ private:
         simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_ERROR, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 #define LOG_FATAL(fmt,...)    \
         simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_FATAL, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
-#else
-#define LOG_TRACE(fmt,...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_TRACE, __FILE__, __LINE__, __func__, fmt, ##args)
-#define LOG_DEBUG(fmt, args...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_DEBUG, __FILE__, __LINE__, __func__, fmt, ##args)
-#define LOG_INFO(fmt, args...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_INFO,  __FILE__, __LINE__, __func__, fmt, ##args)
-#define LOG_WARN(fmt, args...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_WARN,  __FILE__, __LINE__, __func__, fmt, ##args)
-#define LOG_ERROR(fmt, args...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_ERROR, __FILE__, __LINE__, __func__, fmt, ##args)
-#define LOG_FATAL(fmt, args...)    \
-        simcode::GlobalLogger::logger().log_write(simcode::LogLevel::LEVEL_FATAL, __FILE__, __LINE__, __func__, fmt, ##args)
-#endif
 
 #endif
