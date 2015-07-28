@@ -24,6 +24,7 @@ public:
     void runEvery(double intervalTime, const Timer::EventCallback& c);
 
     void addTask(const TaskCallback& b);
+	void execInLoop(const TaskCallback& b); //no relation of time seq, if inOneThread, do at soon, else addTask
     bool inOneThread() const
     {
         return curThreadId_ == simex::this_thread::get_id();

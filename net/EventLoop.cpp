@@ -105,6 +105,14 @@ void EventLoop::addTask(const TaskCallback& b)
     if (!isWakeuped_) wakeup();
 }
 
+void EventLoop::execInLoop(const TaskCallback& b)
+{
+	if (inOneThread())
+        b();
+	else
+		addTask(b);
+}
+
 void EventLoop::doTask()
 {
     TaskList tmpTasks;
