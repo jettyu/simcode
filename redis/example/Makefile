@@ -8,7 +8,7 @@ CPPFLAGS= -DDEBUGSTR -g -O0 -std=c++11 $(INC_DIR)
 LIBS=  -L$(NETSVR_DIR)/lib \
        -L$(SIMCODE_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode \
        -lsimcode_redis -lhiredis \
-       -levent -lpthread
+       -lpthread #-levent
 
 SOURCES=$(shell echo *.cpp $(ADD_SRC))
 HEADERS=$(shell echo *.h)

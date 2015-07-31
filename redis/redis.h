@@ -31,6 +31,7 @@ struct RedisInfo
 class RedisReply
 {
 public:
+    RedisReply():reply_(NULL) {}
     RedisReply(redisReply* r):reply_(r) {}
     ~RedisReply()
     {
@@ -44,9 +45,19 @@ public:
     {
         return reply_;
     }
+    RedisReply& operator=(redisReply* r)
+    {
+        Free();
+        reply_ = r;
+    }
     operator const bool () const
     {
         return reply_!=NULL;
+    }
+    void reset(redisReply* r)
+    {
+        Free();
+        reply_ = r;
     }
     void Free(void)
     {
@@ -71,10 +82,11 @@ public:
         return reply_;
     }
 
-    operator const bool ()
+    operator const bool () const
     {
         return reply_!=NULL;
     }
+
 private:
     redisReply* reply_;
 };
@@ -120,7 +132,10 @@ public:
     }
 private:
     RedisReplyList( const RedisReplyList& ) {}
-    const RedisReplyList& operator=( const RedisReplyList& ) {return *this;}
+    const RedisReplyList& operator=( const RedisReplyList& )
+    {
+        return *this;
+    }
 private:
     std::vector<redisReply*> redisReplys_;
     std::vector<redisReply*>::iterator it_;
@@ -129,15 +144,15 @@ private:
 class Redis
 {
 public:
-    Redis():errcode_(0),ctx_(NULL) {}
-    Redis(const RedisInfo& _info):errcode_(0),ctx_(NULL)
+    Redis():errcode_(1),ctx_(NULL) {}
+    Redis(const RedisInfo& _info):errcode_(1),ctx_(NULL)
     {
         Reset(_info);
     }
     Redis(const std::string& host,
           const int port,
           const struct timeval& time_out)
-        :errcode_(0), ctx_(NULL)
+        :errcode_(1), ctx_(NULL)
     {
         Reset(host, port, time_out);
     }
@@ -210,7 +225,10 @@ public:
 
 private:
     Redis( const Redis& ) {}
-    const Redis& operator=( const Redis& ) {return *this;}
+    const Redis& operator=( const Redis& )
+    {
+        return *this;
+    }
 
 private:
     int errcode_;

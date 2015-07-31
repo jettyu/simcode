@@ -37,6 +37,7 @@ static void subscribeCallback(AsyncRedis* ar, redisReply* reply, const std::stri
 
 static void test_libevent()
 {
+    printf("test_libevent\n");
     AsyncRedis ar;
     RedisInfo info;
     struct event_base *base = event_base_new();
@@ -58,6 +59,7 @@ static void test_libevent()
 
 static void test_libsimcode()
 {
+    printf("test_libsimcode\n");
     AsyncRedis ar;
     RedisInfo info;
     info.host = "127.0.0.1";
@@ -77,8 +79,32 @@ static void test_libsimcode()
 
 #endif
 
+void test_sync()
+{
+    printf("test_sync\n");
+    RedisInfo info;
+    info.host = "127.0.0.1";
+    info.port = 6379;
+    info.time_out= {1, 1500};
+    Redis redis(info); 
+    RedisReply reply;
+    std::string key = "sync_test";
+    //redis.Connect();
+    //reply = redis.Command("SET %s %s", 
+    //                       key.c_str(), "test");
+    //reply = redis.Command("GET %s", key.c_str());
+    reply = redis.TryCommand("SET %s %s", 
+                           key.c_str(), "test");
+    reply = redis.TryCommand("GET %s", key.c_str());
+    if (reply && reply->type != REDIS_REPLY_ERROR)
+    {
+        printf("get sync_test = %s\n", reply->str);
+    }
+}
+
 int main()
 {
+    test_sync();
 #if TEST_LIBEVENT
     test_libevent();
 #else

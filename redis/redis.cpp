@@ -52,18 +52,17 @@ redisReply* Redis::Command(const char* format, ...)
 
 int Redis::AppendCommand(const char* format, ...)
 {
-    if (NULL == ctx_)
-    {
-        if (Connect())
-            return errcode_;
-    }
-    if (ctx_->err)
-    {
-        errcode_ = ctx_->err;
-        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
-        return errcode_;
-    }
-
+//    if (NULL == ctx_)
+//    {
+//        //if (Connect())
+//        return errcode_;
+//    }
+//    if (ctx_->err)
+//    {
+//        errcode_ = ctx_->err;
+//        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
+//        return errcode_;
+//    }
     va_list argptr;
     va_start(argptr,format);
     int ret = ::redisvAppendCommand(ctx_, format, argptr);
@@ -74,16 +73,16 @@ int Redis::AppendCommand(const char* format, ...)
 
 redisReply* Redis::GetReply()
 {
-    if (NULL == ctx_)
-    {
-        return NULL;
-    }
-    if (ctx_->err)
-    {
-        errcode_ = ctx_->err;
-        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
-        return NULL;
-    }
+//    if (NULL == ctx_)
+//    {
+//        return NULL;
+//    }
+//    if (ctx_->err)
+//    {
+//        errcode_ = ctx_->err;
+//        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
+//        return NULL;
+//    }
     redisReply* r;
     int ret = ::redisGetReply(ctx_, (void**)&r);
     if (ret)
@@ -105,14 +104,14 @@ redisReply* Redis::GetReply()
 
 int Redis::GetAllReply(size_t num, std::vector<redisReply* >& rp_vec)
 {
-    if (NULL == ctx_)
-        return 1;
-    if (ctx_->err)
-    {
-        errcode_ = ctx_->err;
-        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
-        return 2;
-    }
+//    if (NULL == ctx_)
+//        return 1;
+//    if (ctx_->err)
+//    {
+//        errcode_ = ctx_->err;
+//        errmsg_ = "ctxt:" + std::string(ctx_->errstr);
+//        return 2;
+//    }
     for (size_t i=0; i<num; ++i)
     {
         redisReply *r = NULL;
@@ -129,8 +128,100 @@ int Redis::GetAllReply(size_t num, std::vector<redisReply* >& rp_vec)
     return 0;
 }
 
+redisReply* Redis::vCommand(const char* format, va_list argptr)
+{
+    //如果没有连接或连接错误 并且重连失败，则直接返回
+    //if ((!ctx_ || ctx_->err) && Update()) return NULL;
+    return static_cast<redisReply*>(redisvCommand(ctx_, format, argptr));
+}
+
+redisReply* Redis::CommandArgv(const std::vector<std::string>& argvec)
+{
+    //if ((!ctx_ || ctx_->err) && Update()) return NULL;
+    int argc = argvec.size();
+    vector<const char *> argv;
+    vector<size_t> argvlen;
+    argv.reserve(argc);
+    argvlen.reserve(argc);
+    vector<string>::const_iterator it;
+    for (it=argvec.begin(); it!=argvec.end(); ++it)
+    {
+        argv.push_back(it->c_str());
+        argvlen.push_back(it->length());
+    }
+    return static_cast<redisReply *>(redisCommandArgv(ctx_,
+                                          argc, argv.data(), argvlen.data()));
+}
+
+redisReply *Redis::CommandArgvPrev(int argc, const char **argv, const size_t *argvlen)
+{
+    //if ((!ctx_ || ctx_->err) && Update()) return NULL;
+    return static_cast<redisReply *>(redisCommandArgv(ctx_,argc, argv, argvlen));
+}
+
+int Redis::AppendCommandArgv(const std::vector<std::string>& argvec)
+{
+    //if ((!ctx_ || ctx_->err) && Update()) return 0;
+    int argc = argvec.size();
+    vector<const char *> argv;
+    vector<size_t> argvlen;
+    argv.reserve(argc);
+    argvlen.reserve(argc);
+    vector<string>::const_iterator it;
+    for (it=argvec.begin(); it!=argvec.end(); ++it)
+    {
+        argv.push_back(it->c_str());
+        argvlen.push_back(it->length());
+    }
+    return redisAppendCommandArgv(ctx_, argc, argv.data(), argvlen.data());
+}
+
+std::vector<redisReply*>
+Redis::AppendArgvs(const std::vector<std::vector<std::string> >& argvs)
+{
+    vector<redisReply*> rs;
+    //if ((!ctx_ || ctx_->err) && Update()) return rs;
+    vector<vector<string> >::const_iterator it;
+    for (it=argvs.begin(); it!=argvs.end(); ++it)
+    {
+        int ret = 0;
+        ret=AppendCommandArgv(*it);
+        if(ret)
+        {
+            if (ctx_->err)
+            {
+                errcode_ = ctx_->err;
+                errmsg_ = "ctxt:" + std::string(ctx_->errstr);
+                continue;
+            }
+            errcode_ = ret;
+            errmsg_ = "append failed";
+        }
+    }
+    for (size_t j=0; j<argvs.size(); ++j)
+    {
+        int ret = 0;
+        redisReply *r = NULL;
+        ret=redisGetReply(ctx_, (void **)&r);
+        if(ret)
+        {
+            if (ctx_->err)
+            {
+                errcode_ = ctx_->err;
+                errmsg_ = "ctxt:" + std::string(ctx_->errstr);
+                continue;
+            }
+            errcode_ = ret;
+            errmsg_ = "getreply failed";
+        }
+        rs.push_back(r);
+    }
+    return rs;
+}
+
 redisReply* Redis::TryCommand(const char* format, ...)
 {
+    if ((!ctx_ || ctx_->err) && Update()) return NULL;
     redisReply* r = NULL;
     va_list argptr;
     va_start(argptr,format);
@@ -142,22 +233,38 @@ redisReply* Redis::TryCommand(const char* format, ...)
 
 redisReply* Redis::vTryCommand(const char* format, va_list argptr)
 {
+    if ((!ctx_ || ctx_->err) && Update()) return NULL;
     redisReply* r = NULL;
     for (int i=0; i<2; i++)
     {
-        if (r=vCommand(format,argptr), r&&r->type!=REDIS_REPLY_ERROR) break;
-        if (0==i) Update();
+        r = vCommand(format,argptr);
+        if (r&&r->type!=REDIS_REPLY_ERROR) break;
+        if (0==i && Update()) break;
     }
     return r;
 }
 
 redisReply* Redis::TryCommandArgv(const std::vector<std::string>& argvec)
 {
+    if ((!ctx_ || ctx_->err) && Update()) return NULL;
     redisReply* r=NULL;
+    int argc = argvec.size();
+    vector<const char *> argv;
+    vector<size_t> argvlen;
+    argv.reserve(argc);
+    argvlen.reserve(argc);
+    vector<string>::const_iterator it;
+    for (it=argvec.begin(); it!=argvec.end(); ++it)
+    {
+        argv.push_back(it->c_str());
+        argvlen.push_back(it->length());
+    }
+
     for (int i=0; i<2; i++)
     {
-        if (r=CommandArgv(argvec), r&&r->type!=REDIS_REPLY_ERROR) break;
-        if (0==i) Update();
+        r = static_cast<redisReply*>(redisCommandArgv(ctx_,argc, argv.data(), argvlen.data()));
+        if (r&&r->type!=REDIS_REPLY_ERROR) break;
+        if (0==i && Update()) break;
     }
     return r;
 }
@@ -165,11 +272,13 @@ redisReply* Redis::TryCommandArgv(const std::vector<std::string>& argvec)
 std::vector<redisReply*>
 Redis::TryAppendArgvs(const std::vector<std::vector<std::string> >& argvs)
 {
-    std::vector<redisReply*> rs;
+    vector<redisReply*> rs;
+    if ((!ctx_ || ctx_->err) && Update()) return rs;
     for (int i=0; i<2; i++)
     {
-        if (rs=AppendArgvs(argvs), !errcode_) break;
-        if (0==i) Update();
+        rs = AppendArgvs(argvs);
+        if (!errcode_) break;
+        if (0==i && Update()) break;
     }
     return rs;
 }
@@ -189,97 +298,6 @@ void Redis::DisConnect()
     if (ctx_)
         redisFree(ctx_);
     ctx_ = NULL;
-    errcode_ = 0;
+    errcode_ = 1;
     errmsg_.clear();
 }
-
-redisReply* Redis::vCommand(const char* format, va_list argptr)
-{
-    //如果没有连接或连接错误 并且重连失败，则直接返回
-    if ((!ctx_ || ctx_->err) && Update()) return NULL;
-    return (redisReply*)redisvCommand(ctx_, format, argptr);
-}
-
-redisReply* Redis::CommandArgv(const std::vector<std::string>& argvec)
-{
-    if ((!ctx_ || ctx_->err) && Update()) return NULL;
-    int argc = argvec.size();
-    vector<const char *> argv;
-    vector<size_t> argvlen;
-    argv.reserve(argc);
-    argvlen.reserve(argc);
-    vector<string>::const_iterator it;
-    for (it=argvec.begin(); it!=argvec.end(); ++it)
-    {
-        argv.push_back(it->c_str());
-        argvlen.push_back(it->length());
-    }
-    return (redisReply *)redisCommandArgv(ctx_,
-                                          argc, argv.data(), argvlen.data());
-}
-
-redisReply *Redis::CommandArgvPrev(int argc, const char **argv, const size_t *argvlen)
-{
-    if ((!ctx_ || ctx_->err) && Update()) return NULL;
-    return (redisReply *)redisCommandArgv(ctx_,
-                                          argc, argv, argvlen);
-}
-
-int Redis::AppendCommandArgv(const std::vector<std::string>& argvec)
-{
-    if ((!ctx_ || ctx_->err) && Update()) return 0;
-    int argc = argvec.size();
-    vector<const char *> argv;
-    vector<size_t> argvlen;
-    argv.reserve(argc);
-    argvlen.reserve(argc);
-    vector<string>::const_iterator it;
-    for (it=argvec.begin(); it!=argvec.end(); ++it)
-    {
-        argv.push_back(it->c_str());
-        argvlen.push_back(it->length());
-    }
-    return redisAppendCommandArgv(ctx_, argc, argv.data(), argvlen.data());
-}
-
-std::vector<redisReply*>
-Redis::AppendArgvs(const std::vector<std::vector<std::string> >& argvs)
-{
-    vector<redisReply*> rs;
-    if ((!ctx_ || ctx_->err) && Update()) return rs;
-    vector<vector<string> >::const_iterator it;
-    for (it=argvs.begin(); it!=argvs.end(); ++it)
-    {
-        int ret = 0;
-        if(ret=AppendCommandArgv(*it), ret)
-        {
-            if (ctx_->err)
-            {
-                errcode_ = ctx_->err;
-                errmsg_ = "ctxt:" + std::string(ctx_->errstr);
-                continue;
-            }
-            errcode_ = ret;
-            errmsg_ = "append failed";
-        }
-    }
-    for (size_t j=0; j<argvs.size(); ++j)
-    {
-        int ret = 0;
-        redisReply *r = NULL;
-        if(ret=redisGetReply(ctx_, (void **)&r), ret)
-        {
-            if (ctx_->err)
-            {
-                errcode_ = ctx_->err;
-                errmsg_ = "ctxt:" + std::string(ctx_->errstr);
-                continue;
-            }
-            errcode_ = ret;
-            errmsg_ = "getreply failed";
-        }
-        rs.push_back(r);
-    }
-    return rs;
-}
-
