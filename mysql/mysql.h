@@ -36,14 +36,7 @@ typedef std::vector<MysqlOption> MysqlOptionVec;
 class Mysql
 {
 public:
-    int errcode()
-    {
-        return mysql_errno(sql_);
-    }
-    std::string errmsg()
-    {
-        return mysql_error(sql_);
-    }
+
     Mysql():sql_(NULL),status_(0) {}
     Mysql(const MysqlInfo& in):sql_(NULL),status_(0)
     {
@@ -52,6 +45,19 @@ public:
     ~Mysql()
     {
         Destroy();
+    }
+    void Reset(const MysqlInfo& _info)
+    {
+        DisConnect();
+        info_=_info;
+    }
+    int errcode()
+    {
+        return mysql_errno(sql_);
+    }
+    std::string errmsg()
+    {
+        return mysql_error(sql_);
     }
     void Init(void)
     {
@@ -64,11 +70,7 @@ public:
     int SetConnectUtf8();
     int SetCharSet(const std::string& charset="utf8");
     int Update(void);
-    void Reset(const MysqlInfo& _info)
-    {
-        DisConnect();
-        info_=_info;
-    }
+
     int Query(const std::string& sql);
     MYSQL_RES* QueryRes(const std::string& sql);
     bool Ping();
