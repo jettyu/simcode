@@ -49,6 +49,7 @@ public:
     {
         Free();
         reply_ = r;
+        return *this;
     }
     operator const bool () const
     {
