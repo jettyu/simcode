@@ -33,7 +33,7 @@ public:
     {
         return ctx_;
     }
-    const bool isConnected() const
+    bool isConnected() const
     {
         return ctx_ != NULL;//&& (ctx_->c.flags & REDIS_CONNECTED);
     }

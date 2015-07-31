@@ -51,7 +51,7 @@ public:
         reply_ = r;
         return *this;
     }
-    operator const bool () const
+    operator bool () const
     {
         return reply_!=NULL;
     }
@@ -83,7 +83,7 @@ public:
         return reply_;
     }
 
-    operator const bool () const
+    operator bool () const
     {
         return reply_!=NULL;
     }
@@ -123,7 +123,7 @@ public:
     {
         it_ = redisReplys_.begin();
     }
-    operator const bool () const
+    operator bool () const
     {
         return !redisReplys_.empty();
     }
@@ -133,7 +133,7 @@ public:
     }
 private:
     RedisReplyList( const RedisReplyList& ) {}
-    const RedisReplyList& operator=( const RedisReplyList& )
+    RedisReplyList& operator=( const RedisReplyList& )
     {
         return *this;
     }
@@ -226,7 +226,7 @@ public:
 
 private:
     Redis( const Redis& ) {}
-    const Redis& operator=( const Redis& )
+    Redis& operator=( const Redis& )
     {
         return *this;
     }

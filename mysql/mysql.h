@@ -81,7 +81,12 @@ public:
 
     int TryQuery(const std::string& sql);
     MYSQL_RES* TryQueryRes(const std::string& sql);
-
+private:
+    Mysql( const Mysql& ) {}
+    Mysql& operator=( const Mysql& )
+    {
+        return *this;
+    }
 private:
     MYSQL *sql_;
     //status_ bitset 0,1,2,3,4,5,6,7

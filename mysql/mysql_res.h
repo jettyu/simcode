@@ -16,9 +16,19 @@ public:
     {
         Free();
     }
-    operator const bool () const
+    operator bool () const
     {
         return res_!=NULL;
+    }
+    void reset(MYSQL_RES* res)
+    {
+        Free();
+        res_ = res;
+    };
+    MysqlRes& operator=(MYSQL_RES* res)
+    {
+        Reset(res);
+        return *this;
     }
     int RowNum(void)
     {
@@ -45,14 +55,10 @@ public:
         if (res_) mysql_free_result(res_);
         res_=NULL;
     }
-    void Reset(MYSQL_RES* res)
+private:
+    MysqlRes( const MysqlRes& ) {}
+    MysqlRes& operator=( const MysqlRes& )
     {
-        Free();
-        res_ = res;
-    };
-    MysqlRes& operator=(MYSQL_RES* res)
-    {
-        Reset(res);
         return *this;
     }
 private:
