@@ -26,13 +26,13 @@ public:
     }
     inline int64_t msec()
     {
-        return (m_st.tv_sec*1000 + m_st.tv_usec/1000);
+        return (int64_t(m_st.tv_sec)*1000 + int64_t(m_st.tv_usec)/1000);
     }
     //时间差
     inline int  msec_interval()
     {
         gettimeofday(&m_et, NULL);
-        return (m_et.tv_sec*1000 + m_et.tv_usec/1000) - (m_st.tv_sec*1000 + m_st.tv_usec/1000);
+        return (int64_t(m_et.tv_sec)*1000 + int64_t(m_et.tv_usec)/1000) - (int64_t(m_st.tv_sec)*1000 + int64_t(m_st.tv_usec)/1000);
     }
     inline void reset()
     {
