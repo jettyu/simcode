@@ -43,7 +43,7 @@ struct Head
 
 const size_t Head::LENGTH = sizeof(Head);
 
-void codec(const TcpConnectionPtr& conn, simcode::net::Buffer *msg)
+void codec(const TcpConnectionPtr& conn, simcode::Buffer *msg)
 {
     while (msg->readableBytes() >= Head::LENGTH)
     {

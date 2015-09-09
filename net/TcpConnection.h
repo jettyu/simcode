@@ -120,7 +120,6 @@ private:
     uint64_t id_;
 };
 
-typedef simex::shared_ptr<TcpConnection> TcpConnectionPtr;
 }
 }
 

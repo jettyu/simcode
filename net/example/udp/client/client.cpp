@@ -17,7 +17,7 @@ void Recv(const UdpConnectionPtr& conn, const std::string& msg)
 {
     cout<<"recv:"<<msg<<endl;
     sleep(1);
-    conn->Send("ping", 4);
+    conn->send("ping", 4);
 }
 
 int main(int argc, char**argv)
@@ -26,7 +26,7 @@ int main(int argc, char**argv)
     SockAddr addr("127.0.0.1", 8088);
     UdpClient client(&loop, addr, "client");
     client.setMessageCallback(simex::bind(Recv, _1, _2));
-    if (-1 == client.Send("ping", 4))
+    if (-1 == client.send("ping", 4))
     {
         cout<<strerror(errno)<<endl;
     }

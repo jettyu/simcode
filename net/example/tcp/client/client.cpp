@@ -35,7 +35,7 @@ void eventHandle(const TcpConnectionPtr& conn, const void* msg, int size)
     cout<<"recv:"<<std::string((const char*)msg+Head::LENGTH, size - Head::LENGTH)<<endl;
 }
 
-void codec(const TcpConnectionPtr& conn, simcode::net::Buffer *msg)
+void codec(const TcpConnectionPtr& conn, simcode::Buffer *msg)
 {
     while (msg->readableBytes() >= Head::LENGTH)
     {

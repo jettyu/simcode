@@ -16,7 +16,7 @@ using namespace simcode::net;
 void eventHandle(const UdpConnectionPtr& conn, const std::string& msg)
 {
     cout<<"recv:"<<msg<<endl;
-    conn->Send("pong", 4);
+    conn->send("pong", 4);
 }
 
 int main(int argc, char **argv)
