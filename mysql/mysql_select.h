@@ -13,8 +13,8 @@ public:
     MysqlSelect(Mysql* s=NULL):SqlFilter<MysqlSelect>(*this, s),sql_(s)
     {
     }
-    MysqlRes Query();
-    MysqlRes TryQuery();
+    MYSQL_RES* Query();
+    MYSQL_RES* TryQuery();
     MysqlSelect& Select(const std::string& s);
     MysqlSelect& Table(const std::string& table)
     {
@@ -44,12 +44,12 @@ private:
     std::string query_;
 };
 
-inline MysqlRes MysqlSelect::Query()
+inline MYSQL_RES* MysqlSelect::Query()
 {
     return sql_->QueryRes(ToString());
 }
 
-inline MysqlRes MysqlSelect::TryQuery()
+inline MYSQL_RES* MysqlSelect::TryQuery()
 {
     return sql_->TryQueryRes(ToString());
 }

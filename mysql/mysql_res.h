@@ -27,7 +27,7 @@ public:
     };
     MysqlRes& operator=(MYSQL_RES* res)
     {
-        Reset(res);
+        reset(res);
         return *this;
     }
     int RowNum(void)
