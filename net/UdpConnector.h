@@ -16,7 +16,7 @@ public:
     {
         return errcode_;
     }
-    int recv(std::string* buf);
+    int recv(char* buf, size_t size);
     int sendString(const std::string&);
     int send(const char* buf, size_t len);
     void close()

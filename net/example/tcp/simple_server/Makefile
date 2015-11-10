@@ -7,7 +7,7 @@ ADD_SRC=
 CPP=g++
 FLAGS=-o 
 CPPFLAGS= -g -O0 -std=c++11 $(INC_DIR)
-LIBS=  -lpthread \
+LIBS=  -lpthread -lrt -L./ -lstdc++ \
        -L$(TOP_DIR)/lib -lsimcode_net -lsimcode_thread -lsimcode
 
 SOURCES=$(shell echo *.cpp $(ADD_SRC))

@@ -13,9 +13,9 @@ using namespace simcode::net;
 //#include "oci_api.h"
 
 
-void eventHandle(const UdpConnectionPtr& conn, const std::string& msg)
+void eventHandle(const UdpConnectionPtr& conn, const char*buf, size_t size)
 {
-    cout<<"recv:"<<msg<<endl;
+    cout<<"recv:"<<buf<<endl;
     conn->send("pong", 4);
 }
 
@@ -23,8 +23,7 @@ int main(int argc, char **argv)
 {
     EventLoop loop;
     UdpServer server(&loop, SockAddr("0.0.0.0", 8088), "server");
-    server.setThreadNum(1);
-    server.setMessageCallback(SimBind(eventHandle,_1,_2));
+    server.setMessageCallback(simex::bind(eventHandle,_1,_2,_3));
     server.start();
     loop.loop();
 

@@ -32,20 +32,12 @@ void UdpClient::eventHandle(EventChannel*)
 {
     UdpConnector c(socket_.sockfd());
     int n = 0;
-    do
+    char tmp[65535];
+    if ( (n=c.recv(tmp, 65535)) < 0)
     {
-        std::string buf;
-        if ( (n=c.recv(&buf)) < 0)
-        {
-            return;
-        }
-        onMessage(conn_, buf);
+        return;
     }
-    while (n > 0);
+    messageCallback_(conn_, tmp, n);
     //queue_.push_back(conn_->id(), SimBind(&UdpClient::onMessage, this, conn_, buf));
 }
 
-void UdpClient::onMessage(const UdpConnectionPtr& c, const std::string& msg)
-{
-    messageCallback_(c, msg);
-}

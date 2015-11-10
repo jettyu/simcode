@@ -16,7 +16,7 @@ typedef simex::shared_ptr<UdpConnectionManager> UdpConnectionManagerPtr;
 class UdpServer : noncopyable
 {
 public:
-    typedef simex::function<void (const UdpConnectionPtr&, const std::string& msg)> MessageCallback;
+    typedef simex::function<void (const UdpConnectionPtr&, const char* data, size_t size)> MessageCallback;
     UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& name);
     void start();
     void setThreadNum(int n);
@@ -34,6 +34,7 @@ public:
     }
 private:
     void onMessage(const simex::any& connStore);
+    void asyncMessage(const UdpConnectionPtr& conn, const std::string& data);
     void eventHandle(EventChannel*);
     void hanleRead();
     void onClose(uint64_t connId);

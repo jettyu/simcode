@@ -51,9 +51,8 @@ void UdpServer::onMessage(const simex::any& connStore)
     do
     {
         UdpConnector c(socket_.sockfd());
-        std::string buf;
-
-        if ((n=c.recv(&buf)) < 0)
+        char tmp[65535];
+        if ((n=c.recv(tmp, 65535)) < 0)
         {
             LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
@@ -70,9 +69,9 @@ void UdpServer::onMessage(const simex::any& connStore)
             connectionManager_->Add(id, conn);
         }
         if (threadNum_)
-            queue_.push_back(conn->id()%threadNum_, SimBind(messageCallback_, conn, buf));
+            queue_.push_back(conn->id()%threadNum_, simex::bind(&UdpServer::asyncMessage, this, conn, std::string(tmp, n)));
         else
-            messageCallback_(conn, buf);
+            messageCallback_(conn, tmp, n);
     }
     while (n > 0);
 }
@@ -86,5 +85,10 @@ void UdpServer::onClose(uint64_t connId)
 void UdpServer::send(const UdpConnectionPtr& conn, const std::string& data)
 {
     conn->sendString(data);
+}
+
+void UdpServer::asyncMessage(const UdpConnectionPtr& conn, const std::string& data)
+{
+    messageCallback_(conn, data.data(), data.size());
 }
 

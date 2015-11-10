@@ -9,13 +9,11 @@ UdpConnector::UdpConnector(int sockfd__):
 {
 }
 #define MAX_BUF_LEN 65535
-int UdpConnector::recv(std::string* buf)
+int UdpConnector::recv(char* buf, size_t size)
 {
     struct sockaddr_in addr;
     int n = 0;
-    char tmpbuf[MAX_BUF_LEN];
-    n = ::recvfrom(sockfd_, tmpbuf, MAX_BUF_LEN, 0, (struct sockaddr*)&addr, &addrLen_);
-    if (n > 0) buf->append(tmpbuf, n);
+    n = ::recvfrom(sockfd_, buf, size, 0, (struct sockaddr*)&addr, &addrLen_);
     errcode_ = errno;
     peerAddr_.set_addr_in(addr);
     return n;
