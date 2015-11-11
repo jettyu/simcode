@@ -23,12 +23,17 @@ void Recv(const UdpConnectionPtr& conn, const char* buf, size_t size)
 int main(int argc, char**argv)
 {
     EventLoop loop;
-    SockAddr addr("127.0.0.1", 8088);
+    SockAddr addr("127.0.0.1", 10080);
     UdpClient client(&loop, addr, "client");
     client.setMessageCallback(simex::bind(Recv, _1, _2, _3));
+    
+    while(1)
+    {
     if (-1 == client.send("ping", 4))
     {
         cout<<strerror(errno)<<endl;
+    }
+    sleep(1);
     }
     loop.loop();
     return 0;

@@ -33,7 +33,8 @@ public:
         return connectionManager_;
     }
 private:
-    void onMessage(const simex::any& connStore);
+    //void onMessage(const simex::any& connStore);
+    void onMessage();
     void asyncMessage(const UdpConnectionPtr& conn, const std::string& data);
     void eventHandle(EventChannel*);
     void hanleRead();

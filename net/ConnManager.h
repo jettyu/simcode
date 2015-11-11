@@ -14,6 +14,10 @@ class BaseConnManager : noncopyable
 public:
     typedef simex::shared_ptr<BaseConnManager> Ptr;
     virtual ~BaseConnManager(){}
+    virtual const CONN_TYPE Get(const ID_TYPE& id)
+    {
+        return (const CONN_TYPE)(0);
+    }
     virtual void Add(const ID_TYPE&id, const CONN_TYPE& conn)
     {
     }
@@ -48,7 +52,13 @@ public:
     {
     }
     virtual ~ConnManager() {}
-
+    const CONN_TYPE Get(const ID_TYPE& id)
+    {
+        typename ConnectionList::iterator it;
+        it = connectionList_.find(id);
+        if (it == connectionList_.end()) return (const CONN_TYPE)(0);
+        return it->second;
+    }
     void Add(const ID_TYPE&id, const CONN_TYPE& conn)
     {
         loop_->addTask(simex::bind(&ConnManager::add, this, id, conn));

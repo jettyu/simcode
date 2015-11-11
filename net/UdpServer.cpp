@@ -12,8 +12,8 @@ UdpServer::UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& n
     sendLoop_(loop)
 {
     assert(socket_.sockfd() != -1);
-    socket_.setReuseAddr();
-    socket_.setReusePort();
+  //  socket_.setReuseAddr();
+//    socket_.setReusePort();
     socket_.setNonBlockAndCloseOnExec();
     assert(socket_.Bind(addr) != -1);
     channel_.reset(new EventChannel(loop, socket_.sockfd(), simex::bind(&UdpServer::eventHandle, this, _1)));
@@ -35,21 +35,24 @@ void UdpServer::setThreadNum(int n)
 
 void UdpServer::eventHandle(EventChannel*)
 {
-    queue_.push_back(threadNum_+1, SimBind(&UdpServer::hanleRead, this));
+    onMessage();
+//    queue_.push_back(threadNum_+1, SimBind(&UdpServer::hanleRead, this));
 }
 
 void UdpServer::hanleRead()
 {
-    connectionManager_->AddTask(simex::bind(&UdpServer::onMessage, this, _1));
+    //connectionManager_->AddTask(simex::bind(&UdpServer::onMessage, this, _1));
 }
 
-void UdpServer::onMessage(const simex::any& connStore)
+//void UdpServer::onMessage(const simex::any& connStore)
+void UdpServer::onMessage()
 {
-    std::map<uint64_t, UdpConnectionPtr>* connMap = simex::any_cast<std::map<uint64_t, UdpConnectionPtr>*>(connStore);
-    std::map<uint64_t, UdpConnectionPtr>::iterator it;
+//    std::map<uint64_t, UdpConnectionPtr>* connMap = simex::any_cast<std::map<uint64_t, UdpConnectionPtr>*>(connStore);
+//    std::map<uint64_t, UdpConnectionPtr>::iterator it;
     int n = 0;
     do
     {
+        LOG_DEBUG("%s", "onMessage");
         UdpConnector c(socket_.sockfd());
         char tmp[65535];
         if ((n=c.recv(tmp, 65535)) < 0)
@@ -57,10 +60,9 @@ void UdpServer::onMessage(const simex::any& connStore)
             LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
         }
-        UdpConnectionPtr conn;
         uint64_t id = c.peerAddr().id();
-        it = connMap->find(id);
-        if (it == connMap->end())
+        UdpConnectionPtr conn = connectionManager_->Get(id);
+        if (!conn)
         {
             LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu",
                       c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
@@ -73,7 +75,7 @@ void UdpServer::onMessage(const simex::any& connStore)
         else
             messageCallback_(conn, tmp, n);
     }
-    while (n > 0);
+    while (0);
 }
 
 void UdpServer::onClose(uint64_t connId)

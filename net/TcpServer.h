@@ -58,7 +58,6 @@ private:
     void send(const TcpConnectionPtr& conn, const std::string& data);
 private:
     simcode::net::EventLoop* loop_;
-    simcode::thread::ThreadSafeQueue queue_;
     MessageCallback messageCallback_;
     ConnectionCallback connectionCallback_;
     CloseCallback closeCallback_;

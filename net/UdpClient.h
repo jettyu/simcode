@@ -10,7 +10,8 @@ namespace simcode
 {
 namespace net
 {
-
+class UdpClient;
+typedef simex::shared_ptr<UdpClient> UdpClientPtr;
 class UdpClient : noncopyable
 {
 public:
