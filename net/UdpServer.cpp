@@ -22,8 +22,11 @@ UdpServer::UdpServer(EventLoop* loop, const SockAddr& addr, const std::string& n
 
 void UdpServer::start()
 {
-    queue_.setThreadNum(threadNum_+1);
-    queue_.start();
+    if (threadNum_)
+    {
+        queue_.setThreadNum(threadNum_);
+        queue_.start();
+    }
     connectionManager_.reset(new UdpConnectionManager(sendLoop_, simex::bind(&UdpServer::send, this, _1,_2)));
     loop_->runInLoop(channel_);
 }

@@ -7,11 +7,11 @@ namespace simcode
 {
 class SimIni
 {
+public:
     /*key-val*/
     typedef std::map<std::string, std::string> key_val_map;
     /*session - (key-val)*/
     typedef std::map<std::string, key_val_map> sess_map;
-public:
     SimIni();
     ~SimIni();
     inline bool is_loaded()
@@ -40,6 +40,10 @@ public:
 
     std::map<std::string, std::string> GetSession(
         const std::string& sess) const;
+    const sess_map& GetAllSession() const
+    {
+        return sessMap_;
+    }
 
     void AddValue(const std::string& sess,
                   const std::string& key,
