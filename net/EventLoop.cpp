@@ -5,7 +5,8 @@ using namespace simcode;
 using namespace simcode::net;
 
 EventLoop::EventLoop() :
-    isWakeuped_(false)
+    isWakeuped_(false),
+    closed_(0)
 {
     curThreadId_ = simex::this_thread::get_id();
     int wakeupfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
@@ -31,7 +32,7 @@ void EventLoop::runInLoop(const EventChannelPtr& c)
 void EventLoop::loop()
 {
     curThreadId_ = simex::this_thread::get_id();
-    while (1)
+    while (!isClosed())
     {
         poller_.poll(10000);
         doTask();
@@ -111,6 +112,11 @@ void EventLoop::execInLoop(const TaskCallback& b)
         b();
 	else
 		addTask(b);
+}
+
+void EventLoop::close()
+{
+    addTask(simex::bind(&EventLoop::setClose, this));
 }
 
 void EventLoop::doTask()
