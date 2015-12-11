@@ -8,6 +8,10 @@ EventLoopThread::EventLoopThread(const ThreadInitCallback& cb) :
 {
 }
 
+EventLoopThread::~EventLoopThread()
+{
+}
+
 EventLoop *EventLoopThread::startLoop()
 {
     if (!loop_)

@@ -16,7 +16,7 @@ EventLoop::EventLoop() :
 }
 
 EventLoop::~EventLoop()
-{
+{    
     ::close(wakeupChannel_->fd());
 }
 

@@ -15,7 +15,7 @@ class EventLoop : noncopyable
 public:
     typedef simex::function<void()> TaskCallback;
     EventLoop();
-    ~EventLoop();
+    virtual ~EventLoop();
     const bool isClosed() const {return closed_.load() == 1;}
     void runInLoop(const EventChannelPtr& c);
     void removeInLoop(int id);

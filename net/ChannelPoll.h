@@ -61,6 +61,10 @@ public:
     {
         return epollfd_;
     }
+    int pollfd() const
+    {
+        return pollfd();
+    }
     int poll (int timeoutMs);
     int addEvent(int fd, const EventCallback& b, int events=EPOLLIN|EPOLLPRI);
     int removeEvent(int fd);
