@@ -1,6 +1,7 @@
 #ifndef SIMCODE_BASE_ANY_H
 #define SIMCODE_BASE_ANY_H
-
+#include <stdio.h>
+#include <algorithm>
 namespace simcode
 {
 namespace simex

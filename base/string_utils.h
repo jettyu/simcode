@@ -15,6 +15,27 @@ inline bool CheckMask(int mask, int off_set)
     return mask & (1<<(off_set-1));
 }
 
+template<typename T>
+std::string StringTrimLeft(const std::string& str, const T& op)
+{
+    int offset = str.find_first_not_of(op);
+    if (offset != std::string::npos)
+    {
+        return str.substr(offset);
+    }
+    return str;
+}
+template<typename T>
+std::string StringTrimRight(const std::string& str, const T& op)
+{
+    int offset = str.find_last_not_of(op);
+    if (offset != std::string::npos)
+    {
+        return str.substr(0, offset+1);
+    }
+    return str;
+}
+
 //读取文件所有内容，转为string
 std::string StrLoadFile(const std::string& file);
 //字符串批量替换,将s串中str替换成dst,替换count次
