@@ -11,6 +11,10 @@ public:
     typedef simex::function<void(EventLoop*)> ThreadInitCallback;
     EventLoopThread(const ThreadInitCallback& cb =ThreadInitCallback());
     virtual ~EventLoopThread();
+    const SharedPtr<EventLoop>& loop() const
+    {
+        return loop_;
+    }
     EventLoop *startLoop();
     void stopLoop()
     {
@@ -21,6 +25,7 @@ private:
     SimThreadPtr thread_;
     ThreadInitCallback callback_;
 };
+typedef SharedPtr<EventLoopThread> EventLoopThreadPtr;
 }
 }
 

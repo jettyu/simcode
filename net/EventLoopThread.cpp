@@ -10,6 +10,8 @@ EventLoopThread::EventLoopThread(const ThreadInitCallback& cb) :
 
 EventLoopThread::~EventLoopThread()
 {
+    loop_->close();
+    thread_->join();
 }
 
 EventLoop *EventLoopThread::startLoop()

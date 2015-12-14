@@ -17,6 +17,7 @@ EventLoop::EventLoop() :
 
 EventLoop::~EventLoop()
 {    
+    this->close();
     ::close(wakeupChannel_->fd());
 }
 
@@ -116,7 +117,7 @@ void EventLoop::execInLoop(const TaskCallback& b)
 
 void EventLoop::close()
 {
-    addTask(simex::bind(&EventLoop::setClose, this));
+    if (!isClosed()) addTask(simex::bind(&EventLoop::setClose, this));
 }
 
 void EventLoop::doTask()

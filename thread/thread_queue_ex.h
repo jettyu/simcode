@@ -13,7 +13,7 @@ class ThreadQueueEx
 public:
     typedef SimFunction<void(simex::any *context)> TaskCallback;
     ThreadQueueEx();
-    ~ThreadQueueEx();
+    virtual ~ThreadQueueEx();
     void start();
     void stop();
     int push_back(const TaskCallback& func);

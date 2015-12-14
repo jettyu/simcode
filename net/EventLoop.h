@@ -16,7 +16,7 @@ public:
     typedef simex::function<void()> TaskCallback;
     EventLoop();
     virtual ~EventLoop();
-    const bool isClosed() const {return closed_.load() == 1;}
+    bool isClosed() const {return closed_.load() == 1;}
     void runInLoop(const EventChannelPtr& c);
     void removeInLoop(int id);
     void modifyChannel(const EventChannelPtr& c);
