@@ -44,7 +44,8 @@ public:
         }
         else if (keys.size() - depth > 1)
         {
-            return Search(keys, ++depth);
+            const Node* n = Child(keys[depth]);
+            if (n != NULL) return n->Search(keys, ++depth);
         }
         return NULL;
     }

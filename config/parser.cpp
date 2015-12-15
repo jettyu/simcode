@@ -23,7 +23,7 @@ int Parser::ParseString(const std::string& buf)
             }
             else
             {
-                node->AddChild(key, new Node(key));
+                node = node->AddChild(key, new Node(key));
             }
         }
         else
@@ -47,7 +47,7 @@ int Parser::ParseString(const std::string& buf)
 int Parser::LoadFile(const std::string& filename)
 {
     std::ifstream fi(filename);
-    if (!fi.is_open()) return 2;
+    if (!fi.is_open()) return 12;
     std::string line;
     int ret = 0;
     while (getline(fi, line)) 

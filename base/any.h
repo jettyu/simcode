@@ -2,6 +2,7 @@
 #define SIMCODE_BASE_ANY_H
 #include <stdio.h>
 #include <algorithm>
+#include <typeinfo>
 namespace simcode
 {
 namespace simex

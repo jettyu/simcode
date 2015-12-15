@@ -28,11 +28,11 @@ void flush_xnode_interface(const simcode::simex::any& value)
 {
     if (!value.empty())
     {
-        delete simcode::any_cast<XNodeInterface*>(value);
+        delete simcode::simex::any_cast<XNodeInterface*>(value);
     }
 }
 
-class XNodeParserI : ParseInterface
+class XNodeParserI : public ParseInterface
 {
 public:
     XNodeParserI(XNodeInterface * xi__):xi(xi__)
@@ -63,11 +63,11 @@ public:
     }
     virtual int Parse(Node* node, const std::string& buf)
     {
-        if (node->Value() == NULL)
+        if (node->Value().empty())
         {
             node->SetValue(xi->assign());
         }
-        return node->Value()->Parse(buf);
+        return (simcode::simex::any_cast<XNodeInterface*>(node->Value()))->Parse(buf);
     }
 private:
     XNodeInterface *xi;
@@ -81,6 +81,6 @@ public:
     {
     }
     virtual ~XNodeParser(){}
-}
+};
 
 #endif
