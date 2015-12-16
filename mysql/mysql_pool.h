@@ -11,7 +11,7 @@ namespace mysql{
 class MysqlPool
 {
 public:
-    MysqlPool(simcode::net::EventLoop* loop, 
+    MysqlPool(net::EventLoop* loop, 
               const simex::function<SharedPtr<Mysql>()>& f);
     virtual ~MysqlPool();
 

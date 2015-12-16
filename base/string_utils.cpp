@@ -1,8 +1,8 @@
 #include <simcode/base/string_utils.h>
 #include <fstream>
 using namespace std;
-using namespace simcode;
 
+namespace simcode {
 std::string StrLoadFile(const std::string& file)
 {
     string str,tmp;
@@ -78,12 +78,14 @@ int StrSplit(const std::string &src, T ch, std::vector<std::string> &dest)
     return lastset;
 }
 
-int simcode::split(const std::string& src, char ch, std::vector<std::string>& dest)
+int split(const std::string& src, char ch, std::vector<std::string>& dest)
 {
     return StrSplit<char>(src, ch, dest);
 }
-int simcode::split(const std::string& src, const std::string& ch, std::vector<std::string>& dest)
+int split(const std::string& src, const std::string& ch, std::vector<std::string>& dest)
 {
     return StrSplit<const std::string&>(src, ch, dest);
 }
 
+
+}//endof namespace simcode

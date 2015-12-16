@@ -1,4 +1,5 @@
 #include <simcode/mysql/mysql_pool.h>
+#include <simcode/net/EventLoop.h>
 
 using namespace simcode;
 using namespace mysql;

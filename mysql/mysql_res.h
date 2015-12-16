@@ -42,6 +42,14 @@ public:
     {
         return mysql_num_fields(res_);
     }
+    MYSQL_FIELD* Fields()
+    {
+        return res_->fields;
+    }
+    MYSQL_FIELD *Field(int i)
+    {
+        return mysql_fetch_field_direct(res_, i);
+    }
     char *FieldName(int i)
     {
         return mysql_fetch_field_direct(res_, i)->name;
