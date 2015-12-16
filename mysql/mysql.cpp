@@ -28,6 +28,8 @@ int Mysql::Connect()
     {
         return 1;
     }
+    char value = 1;
+    mysql_options(sql_, MYSQL_OPT_RECONNECT, (char *)&value); //设置Ping时自动重连
     status_ |= 1;
     return 0;
 }
