@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <mysql/mysql.h>
+#include <simcode/base/any.h> //context
 
 namespace simcode
 {
@@ -36,13 +37,12 @@ typedef std::vector<MysqlOption> MysqlOptionVec;
 class Mysql
 {
 public:
-
     Mysql():sql_(NULL),status_(0) {}
     Mysql(const MysqlInfo& in):sql_(NULL),status_(0)
     {
         Reset(in);
     }
-    ~Mysql()
+    virtual ~Mysql()
     {
         Destroy();
     }
@@ -63,6 +63,18 @@ public:
     {
         if(!sql_) sql_=mysql_init(sql_);
     };
+    const simex::any& getContext() const
+    {
+        return context_;
+    }
+    simex::any* getMutableContext()
+    {
+        return &context_;
+    }
+    void setContext(const simex::any& c)
+    {
+        context_ = c;
+    }
     void Destroy(void);
     int Options(mysql_option opt, const std::string& arg);
     int Connect(void);
@@ -97,6 +109,7 @@ private:
     MysqlInfo info_;
     MysqlOptionVec options_;
     std::string charset_;
+    simex::any context_;
 };
 
 inline void Mysql::Destroy()
