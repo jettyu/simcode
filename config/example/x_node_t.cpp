@@ -16,16 +16,14 @@ class XNodes : public XNodeInterface
 public:
     virtual int Parse(const std::string& buf)
     {
-        cout<<"value="<<buf<<endl;
+        cout<<"value="<<buf<<"|size="<<buf.size()<<endl;
         int offset = buf.find('=');
-        if (offset == std::string::npos) return 1;
+        if (offset == std::string::npos) return 0;
         XNode xnode;
         xnode.key = buf.substr(0, offset);
         if (offset != buf.size()-1) xnode.value = buf.substr(offset+1);
-        xnode.key = StringTrimRight(xnode.key, ' ');
-        xnode.key = StringTrimRight(xnode.key, '\t');
-        xnode.value = StringTrimLeft(xnode.value, ' ');
-        xnode.value = StringTrimLeft(xnode.value, '\t');
+        xnode.key = TrimRight(xnode.key);
+        xnode.value = TrimLeft(xnode.value);
         nodes_.push_back(xnode);
         return 0;
     }
@@ -45,12 +43,14 @@ int main()
 {
     XNodeParser xNodeParser(new XNodes);
     int ret = 0;
-    ret = xNodeParser.LoadFile("xn.conf");
+    ret = xNodeParser.LoadFile("dbproxy_presql_cfg.conf");
+    //ret = xNodeParser.LoadFile("xn.conf");
     cout<<"ret="<<ret<<endl;
     const Node * node = xNodeParser.getNode();
-    node = node->Search(command("root")("node"));
+    node = node->Search(command("root")("pre_sql_cfgs"));
     const std::map<std::string, Node*>& allchild = node->AllChild();
     std::map<std::string, Node*>::const_iterator mit;
+    cout<<"child num="<<allchild.size()<<endl;
     for (mit=allchild.begin(); mit!=allchild.end(); ++mit)
     {
         const Node* child = mit->second;

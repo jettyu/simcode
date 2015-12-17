@@ -44,6 +44,7 @@ int Parser::ParseString(const std::string& buf)
     }
     return 0;
 }
+
 int Parser::LoadFile(const std::string& filename)
 {
     std::ifstream fi(filename);
@@ -52,15 +53,8 @@ int Parser::LoadFile(const std::string& filename)
     int ret = 0;
     while (getline(fi, line)) 
     {
-        line = StringTrimLeft(line, ' ');
-        line = StringTrimLeft(line, '\t');
-        line = StringTrimLeft(line, '\r');
-        line = StringTrimLeft(line, '\n');
-        line = StringTrimRight(line, ' ');
-        line = StringTrimRight(line, '\t');
-        line = StringTrimRight(line, '\r');
-        line = StringTrimRight(line, '\n');
-        
+        line = TrimLeft(line);
+        line = TrimRight(line);        
         if (line.empty() || line[0] == '#') continue;
         ret = ParseString(line);
         if (ret != 0) break;

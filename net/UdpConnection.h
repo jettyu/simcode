@@ -29,7 +29,7 @@ public:
     void close();
     const SockAddr& peerAddr() const;
     uint64_t id() const;
-
+    
     void setCloseCallback(const CloseCallback& c);
 
     void setContext(const simex::any& c);

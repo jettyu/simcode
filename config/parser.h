@@ -4,6 +4,38 @@
 #include <string>
 namespace simcode {
 namespace config {
+
+static std::string TrimLeft(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        if (str[i] == ' ' || str[i] == '\t' || str[i] == '\r' || str[i] == '\n' || isspace(str[i]))
+        continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(i);
+}
+
+static std::string TrimRight(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        char c = str[str.size()-i-1];
+        if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || isspace(c))
+        continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(0, str.size()-i);
+}
+
+
+
 class ParseInterface
 {
 public:
