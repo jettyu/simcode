@@ -3,6 +3,7 @@
 #include <simcode/base/command.h>
 #include <iostream>
 using namespace simcode;
+using namespace config;
 using namespace std;
 
 typedef struct XNode {
@@ -42,11 +43,11 @@ private:
 
 int main()
 {
-    XNodeParser XNodeParser(new XNodes);
+    XNodeParser xNodeParser(new XNodes);
     int ret = 0;
-    ret = XNodeParser.LoadFile("xn.conf");
+    ret = xNodeParser.LoadFile("xn.conf");
     cout<<"ret="<<ret<<endl;
-    const Node * node = XNodeParser.getNode();
+    const Node * node = xNodeParser.getNode();
     node = node->Search(command("root")("node"));
     const std::map<std::string, Node*>& allchild = node->AllChild();
     std::map<std::string, Node*>::const_iterator mit;

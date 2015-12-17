@@ -2,6 +2,8 @@
 #define __SIMCODE_CONFIG_PARSER_H__
 #include <simcode/config/node.h>
 #include <string>
+namespace simcode {
+namespace config {
 class ParseInterface
 {
 public:
@@ -35,5 +37,6 @@ public:
     ParseInterface* pi;
     Node::FlushValueCallback node_flush_callback_;
 };
-
+}//endof namespace config
+}//endof namespace simcode
 #endif

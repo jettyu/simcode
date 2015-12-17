@@ -13,7 +13,10 @@ DynamicThreadPool::DynamicThreadPool(EventLoop* loop)
      isClosed_(0)
 {
 }
-DynamicThreadPool::~DynamicThreadPool(){}
+DynamicThreadPool::~DynamicThreadPool()
+{
+    stop();
+}
 
 void DynamicThreadPool::start()
 {
@@ -29,6 +32,7 @@ void DynamicThreadPool::start()
 
 void DynamicThreadPool::stop()
 {
+    if (isClosed_.load() == 1) return;
     isClosed_.store(1);
     cond_.notify_all();
     std::for_each(defaultPool_.begin(), defaultPool_.end(),

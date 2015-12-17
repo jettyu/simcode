@@ -14,7 +14,6 @@ public:
     MysqlPool(net::EventLoop* loop, 
               const simex::function<SharedPtr<Mysql>()>& f);
     virtual ~MysqlPool();
-
     SharedPtr<Mysql> Get();
     void Put(const SharedPtr<Mysql>& p);
     void setMaxIdle(int n){default_max_=n;}

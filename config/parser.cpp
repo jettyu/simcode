@@ -1,10 +1,10 @@
-#include <simcode/config/parser.h>
 #include <simcode/base/string_utils.h>
+#include <simcode/config/parser.h>
 #include <fstream>
 #include <stdlib.h>
-using namespace simcode;
 using namespace std;
-
+namespace simcode {
+namespace config {
 int Parser::ParseString(const std::string& buf)
 {
     std::string key;
@@ -67,3 +67,5 @@ int Parser::LoadFile(const std::string& filename)
     }
     return ret;
 }
+}//endof namespace config
+}//endof namespace simcode

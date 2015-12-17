@@ -5,10 +5,14 @@
 #include <map>
 #include <string>
 #include <vector>
+
+namespace simcode {
+namespace config {
+
 class Node 
 {
 public:
-    typedef void (*FlushValueCallback)(const simcode::simex::any& value);
+    typedef void (*FlushValueCallback)(const simex::any& value);
     Node(const std::string& name__, const FlushValueCallback fc=NULL)
         :name(name__),
          root(NULL),
@@ -49,7 +53,7 @@ public:
         }
         return NULL;
     }
-    const simcode::simex::any& Value() const
+    const simex::any& Value() const
     {
         return value;
     }
@@ -57,7 +61,7 @@ public:
     {
         root = root__;
     }
-    void SetValue(const simcode::simex::any& value__)
+    void SetValue(const simex::any& value__)
     {
         value = value__;
     }
@@ -69,11 +73,14 @@ public:
     }
 private:
     std::string name;
-    simcode::simex::any value;
+    simex::any value;
     Node *root;
     std::map<std::string, Node*> child;
     FlushValueCallback flush_value_callback_;
 };
+
+}//endof namespace config
+}//endof namespace simcode
 
 #endif
 

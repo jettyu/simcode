@@ -15,7 +15,8 @@
    </node>
 </root>
  */
-
+namespace simcode {
+namespace config {
 class XNodeInterface
 {
 public:
@@ -24,11 +25,11 @@ public:
     virtual XNodeInterface* assign() = 0;
 };
 
-void flush_xnode_interface(const simcode::simex::any& value)
+void flush_xnode_interface(const simex::any& value)
 {
     if (!value.empty())
     {
-        delete simcode::simex::any_cast<XNodeInterface*>(value);
+        delete simex::any_cast<XNodeInterface*>(value);
     }
 }
 
@@ -67,7 +68,7 @@ public:
         {
             node->SetValue(xi->assign());
         }
-        return (simcode::simex::any_cast<XNodeInterface*>(node->Value()))->Parse(buf);
+        return (simex::any_cast<XNodeInterface*>(node->Value()))->Parse(buf);
     }
 private:
     XNodeInterface *xi;
@@ -82,5 +83,8 @@ public:
     }
     virtual ~XNodeParser(){}
 };
+
+}//endof namespace config
+}//endof namespace simcode
 
 #endif
