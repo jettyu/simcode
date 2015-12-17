@@ -42,7 +42,12 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     {
         if (deq_.size() > threadNum_*5 && threadNum_.load() < maxTaskSize_)
         {
+            turnOn();
             addThread();
+        }
+        else
+        {
+            turnOff();
         }
         deq_.push_back(cb);
         cond_.notify_one();
@@ -59,6 +64,7 @@ void DynamicThreadPool::AddThread()
     SharedPtr<ThreadInfo> t(new ThreadInfo);
     threadNum_++;
     t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
+    t->status.store(0x1);
     pool_[t->thread_ptr->get_id()] = t;
 }
 
@@ -80,7 +86,7 @@ void DynamicThreadPool::timerHandle()
         it->second->status++;
         if (it->second->status > 3 || isClosed_.load() != 0) 
         {
-            it->second->status.store(100);
+            it->second->status.store(0xf);
         }
     }
 }
@@ -90,9 +96,9 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     bool flag = true;
     simex::any context;
     ScopeLock lock(mtx_);
-    while (ti->status.load() < 100 && isClosed_.load() == 0)
+    while (ti->status.load() < 0xf && isClosed_.load() == 0)
     {
-        while(!deq_.empty() && flag)
+        while(!deq_.empty() && flag && (!ti->is_dynamic || (ti->is_dynamic && isTurnOn())))
         {
             TaskCallback e = deq_.front();
             deq_.pop_front();

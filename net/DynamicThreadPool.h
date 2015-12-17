@@ -9,11 +9,12 @@ class ThreadInfo
 public:
     ThreadInfo():status(0){}
     ~ThreadInfo(){}
-    std::atomic<int> status; //100表示stop
+    std::atomic<int> status; //0xf表示stop
+    bool is_dynamic; //是否动态创建的
     SimThreadPtr thread_ptr;
     void stop()
     {
-        status.store(100); 
+        status.store(0xf); 
         if (thread_ptr) thread_ptr->join();
     }
 };
@@ -35,6 +36,9 @@ private:
     void addThread();
     void timerHandle();
     void doTask(const SharedPtr<ThreadInfo>&);
+    void turnOn(){dynamic_turn_.store(0xf);}
+    void turnOff(){dynamic_turn_.store(0x0);}
+    bool isTurnOn(){return dynamic_turn_.load() == 0xf;}
 private:
     
     EventLoop* loop_; //定时器
@@ -48,6 +52,7 @@ private:
     int maxTaskSize_;
     std::atomic<int> threadNum_;
     std::atomic<int> isClosed_;
+    std::atomic<int> dynamic_turn_;
 };
 
 }//endof namespace net
