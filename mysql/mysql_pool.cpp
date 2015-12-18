@@ -25,6 +25,9 @@ SharedPtr<Mysql> MysqlPool::Get()
     SharedPtr<Mysql> p = getDefault();
     if (p) return p;
     p = getActive();
+    if (!p)
+    {
+    }
     return p;
 }
 void MysqlPool::Put(const SharedPtr<Mysql>& p)

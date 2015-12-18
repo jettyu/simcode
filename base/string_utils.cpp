@@ -32,11 +32,9 @@ std::string StrReplace(const std::string& s,
     {
         end_pos = s.find(str, start_pos);
         if (end_pos == string::npos) break;
-        cout<<"start_pos="<<start_pos<<"end_pos="<<end_pos<<endl;
         dest.append(s, start_pos, end_pos - start_pos);
         dest.append(dst);
         start_pos = end_pos + str_len;
-        cout<<"i="<<i<<endl;
     }
     dest.append(s, start_pos, s.length()-start_pos);
     return dest;

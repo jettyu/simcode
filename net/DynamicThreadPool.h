@@ -21,7 +21,7 @@ public:
 class DynamicThreadPool
 {
 public:
-    typedef simex::function<void(simex::any* context)> TaskCallback;
+    typedef simex::function<void()> TaskCallback;
     DynamicThreadPool(EventLoop*);
     virtual ~DynamicThreadPool();
     void start();

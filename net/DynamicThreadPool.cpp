@@ -26,6 +26,7 @@ void DynamicThreadPool::start()
     {
         SharedPtr<ThreadInfo> t(new ThreadInfo);
         t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
+        t->thread_ptr->detach();
         defaultPool_.push_back(t);
     }
 }
@@ -108,7 +109,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
             deq_.pop_front();
             ti->status.store(0);
             lock.unlock();
-            e(&context);
+            e();
             lock.lock();
         }
         if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
