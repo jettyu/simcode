@@ -20,6 +20,10 @@ public:
     {
         return res_!=NULL;
     }
+    MYSQL_RES* operator->() const
+    {
+        return res_;
+    }
     void reset(MYSQL_RES* res)
     {
         Free();

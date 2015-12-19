@@ -94,6 +94,7 @@ private:
 
 #endif // BOOST
 
+
 } //endof namespace simex
 
 #define SharedPtr simex::shared_ptr
@@ -101,6 +102,10 @@ private:
 #define SimBind simex::bind
 #define SimFunction simex::function
 #define SimThread simex::thread
+static inline const std::thread::id cur_thread_id()
+{
+    return std::this_thread::get_id();
+}
 
 //#define SharedPtr boost::shared_ptr
 typedef SharedPtr<SimThread> SimThreadPtr;

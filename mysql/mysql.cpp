@@ -36,7 +36,10 @@ int Mysql::Connect()
 
 void Mysql::DisConnect()
 {
-    if (status_ & 1) mysql_close(sql_);
+    if ((status_ & 1) && sql_) 
+    {
+        mysql_close(sql_);
+    }
     status_ &= ~(1);
     sql_ = NULL;
 }
@@ -66,7 +69,7 @@ int Mysql::Update()
 
 int Mysql::Query(const std::string& sql)
 {
-    if (!(status_&1) && Update()) return 1;
+    //if (!(status_&1) && Update()) return 1;
     return mysql_real_query(sql_, sql.data(), sql.size());
 }
 

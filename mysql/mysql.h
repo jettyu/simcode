@@ -37,14 +37,25 @@ typedef std::vector<MysqlOption> MysqlOptionVec;
 class Mysql
 {
 public:
-    Mysql():sql_(NULL),status_(0) {}
-    Mysql(const MysqlInfo& in):sql_(NULL),status_(0)
+    Mysql()
+        :
+        sql_(NULL),
+        status_(0)
+    {}
+    Mysql(const MysqlInfo& in)
+        :
+        sql_(NULL),
+        status_(0)
     {
         Reset(in);
     }
     virtual ~Mysql()
     {
         Destroy();
+    }
+    MYSQL* operator->() const
+    {
+        return sql_;
     }
     void Reset(const MysqlInfo& _info)
     {
@@ -61,7 +72,10 @@ public:
     }
     void Init(void)
     {
-        if(!sql_) sql_=mysql_init(sql_);
+        if(!sql_) 
+        {
+            sql_=mysql_init(sql_);
+        }
     };
     const simex::any& getContext() const
     {

@@ -90,7 +90,7 @@ int MysqlPool::putActive(const SharedPtr<Mysql>& p)
 }
 SharedPtr<Mysql> MysqlPool::newObject()
 {
-    new_object_callback_;
+    return new_object_callback_();
 }
 
 void MysqlPool::timerHandle()
