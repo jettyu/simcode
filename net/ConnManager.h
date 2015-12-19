@@ -36,7 +36,8 @@ public:
     virtual void SendSome(const std::vector<ID_TYPE>& ids, const std::string& data)
     {
     }
-    virtual void AddTask(const simex::function<void (const simex::any& connStore)>& b)
+    //virtual void AddTask(const simex::function<void (const simex::any& connStore)>& b)
+    void AddCallback(const simex::function<void(std::map<ID_TYPE, CONN_TYPE>& connList)>& b)
     {
     }
 };
@@ -92,9 +93,10 @@ public:
     {
         loop_->addTask(simex::bind(&ConnManager::sendSome, this, ids, data));
     }
-    void AddCallback(const simex::function<void (const simex::any& connStore)>& b)
+//    void AddCallback(const simex::function<void (const simex::any& connStore)>& b)
+    void AddCallback(const simex::function<void(std::map<ID_TYPE, CONN_TYPE>& connList)>& b)
     {
-        loop_->addTask(simex::bind(b, &this->connectionList_));
+        loop_->addTask(simex::bind(b, this->connectionList_));
     }
 private:
     void add(const ID_TYPE&id, const CONN_TYPE& conn)

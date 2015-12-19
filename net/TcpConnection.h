@@ -77,6 +77,10 @@ public:
     {
         return errcode_;
     }
+    void shutdownRead()
+    {
+        read_able_ = 0;
+    }
     void shutdown()
     {
         isClosed_ = true;
@@ -118,6 +122,7 @@ private:
     simex::any context_;
     bool isClosed_;
     uint64_t id_;
+    volatile uint8_t read_able_;
 };
 
 }

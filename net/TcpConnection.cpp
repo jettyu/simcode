@@ -10,7 +10,8 @@ TcpConnection::TcpConnection(EventLoop* loop, int connfd, const SockAddr& peerAd
     localAddr_(SockAddr(socket_.getLocalAddr())),
     highWaterSize_(DEF_HIGHWATERSIZE),
     isClosed_(false),
-    id_(id__)
+    id_(id__),
+    read_able_(1)
 {
     socket_.setKeepAlive(true);
 }
@@ -47,6 +48,11 @@ void TcpConnection::eventHandle(EventChannel* ec)
 
 void TcpConnection::handleRead()
 {
+    if (read_able_ == 0) 
+    {
+        channel_->disableReading();
+        return;
+    }
     // saved an ioctl()/FIONREAD call to tell how much to read
     int fd = socket_.sockfd();
     const size_t writable = 65536;

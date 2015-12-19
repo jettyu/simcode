@@ -31,6 +31,21 @@ void TcpServer::start()
     loop_->runInLoop(acceptChannel_);
 }
 
+static void stopAllConn(std::map<uint64_t, TcpConnectionPtr>& connList)
+{
+    std::map<uint64_t, TcpConnectionPtr>::iterator it;
+    for (it=connList.begin(); it!=connList.end(); ++it)
+    {
+        it->second->shutdownRead();
+    }
+}
+
+void TcpServer::stop()
+{
+    loop_->removeInLoop(acceptChannel_->fd());
+    connectionManager_->AddCallback(simex::bind(stopAllConn, _1));
+}
+
 void TcpServer::onClose(const TcpConnectionPtr& conn)
 {
     if (closeCallback_) closeCallback_(conn);

@@ -26,6 +26,7 @@ public:
               const std::string& name,
               bool reuseport = false);
     void start();
+    void stop();
     void setThreadNum(int n)
     {
         threadNum_ = n;
