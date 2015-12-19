@@ -16,7 +16,7 @@ public:
     typedef simex::function<void()> TaskCallback;
     EventLoop();
     virtual ~EventLoop();
-    bool isClosed() const {return closed_.load() == 1;}
+    bool isClosed() const {return closed_ == 1;}
     void runInLoop(const EventChannelPtr& c);
     void removeInLoop(int id);
     void modifyChannel(const EventChannelPtr& c);
@@ -55,7 +55,7 @@ private:
     void timerHandler(EventChannel*, const simex::shared_ptr<Timer>& timer);
     void setClose()
     {
-        closed_.store(1);
+        closed_ = 1;
     }
 private:
     void removeTimer(int id);
@@ -69,7 +69,7 @@ private:
     EventChannelPtr wakeupChannel_;
     bool isWakeuped_;
     simex::thread::id curThreadId_;
-    std::atomic<int> closed_;
+    volatile bool closed_;
     simex::any context_;
 };
 }

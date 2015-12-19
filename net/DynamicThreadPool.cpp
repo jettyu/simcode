@@ -33,8 +33,8 @@ void DynamicThreadPool::start()
 
 void DynamicThreadPool::stop()
 {
-    if (isClosed_.load() == 1) return;
-    isClosed_.store(1);
+    if (isClosed_ == 1) return;
+    isClosed_ = 1;
     cond_.notify_all();
     std::for_each(defaultPool_.begin(), defaultPool_.end(),
                   simex::bind(&ThreadInfo::stop, _1));
@@ -69,7 +69,8 @@ void DynamicThreadPool::AddThread()
     SharedPtr<ThreadInfo> t(new ThreadInfo);
     threadNum_++;
     t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
-    t->status.store(0x1);
+    t->status = 0x1;
+	t->is_dynamic = true;
     pool_[t->thread_ptr->get_id()] = t;
 }
 
@@ -89,9 +90,9 @@ void DynamicThreadPool::timerHandle()
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
         it->second->status++;
-        if (it->second->status > 3 || isClosed_.load() != 0) 
+        if (it->second->status > 3 || isClosed_ != 0) 
         {
-            it->second->status.store(0xf);
+            it->second->status = 0xf;
         }
     }
 }
@@ -101,13 +102,13 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     bool flag = true;
     simex::any context;
     ScopeLock lock(mtx_);
-    while (ti->status.load() < 0xf && isClosed_.load() == 0)
+    while (ti->status < 0xf && isClosed_ == 0)
     {
-        while(!deq_.empty() && flag && (!ti->is_dynamic || (ti->is_dynamic && isTurnOn())))
+        while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
         {
             TaskCallback e = deq_.front();
             deq_.pop_front();
-            ti->status.store(0);
+            ti->status = 0;
             lock.unlock();
             e();
             lock.lock();
