@@ -7,10 +7,11 @@ namespace net {
 class ThreadInfo
 {
 public:
-    ThreadInfo():status(0), is_dynamic(false){}
+    ThreadInfo():status(0), is_dynamic(false), is_busy(false){}
     ~ThreadInfo(){}
     volatile uint8_t status; //0xf表示stop
     bool is_dynamic; //是否动态创建的
+    volatile bool is_busy; //是否忙碌
     SimThreadPtr thread_ptr;
     void stop()
     {
@@ -31,6 +32,8 @@ public:
     void setMaxActive(int n){maxActive_ = n;}
     void setMaxTaskSize(int n){maxTaskSize_ = n;}
 private:
+    int taskNum();       //当前队列的任务数
+    void busyThread(std::vector<std::thread::id>&); //当前正在执行任务的线程数
     void AddThread();
     void DelThread(const SharedPtr<ThreadInfo>&);
     void addThread();
@@ -46,6 +49,7 @@ private:
     std::map<std::thread::id, SharedPtr<ThreadInfo>> pool_;
     std::deque<TaskCallback> deq_;
     Mutex mtx_;
+    Mutex mapMtx_;
     ConditionVar cond_;
     int maxIdle_;
     int maxActive_;

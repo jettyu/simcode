@@ -40,6 +40,31 @@ void DynamicThreadPool::stop()
                   simex::bind(&ThreadInfo::stop, _1));
 }
 
+int DynamicThreadPool::taskNum()
+{
+    ScopeLock lock(mtx_);
+    return deq_.size();
+}
+
+void DynamicThreadPool::busyThread(std::vector<std::thread::id>& vec)
+{
+    std::vector<SharedPtr<ThreadInfo>>::iterator it;
+    for (it=defaultPool_.begin(); it!=defaultPool_.end(); ++it)
+    {
+        if ((*it)->is_busy)
+            vec.push_back((*it)->thread_ptr->get_id());
+    }
+    {
+        std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator mit;
+        ScopeLock lock(mapMtx_);
+        for (mit=pool_.begin(); mit!=pool_.end(); ++mit)
+        {
+            if (mit->second->is_busy)
+                vec.push_back(mit->second->thread_ptr->get_id());
+        }
+    }
+}
+
 int DynamicThreadPool::addTask(const TaskCallback& cb)
 {
     ScopeLock lock(mtx_);    
@@ -69,13 +94,16 @@ void DynamicThreadPool::AddThread()
     SharedPtr<ThreadInfo> t(new ThreadInfo);
     threadNum_++;
     t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
-    t->status = 0x1;
-	t->is_dynamic = true;
+    t->is_dynamic = true;
+    {
+    ScopeLock lock(mapMtx_);
     pool_[t->thread_ptr->get_id()] = t;
+    }
 }
 
 void DynamicThreadPool::DelThread(const SharedPtr<ThreadInfo>& t)
 {
+    ScopeLock lock(mapMtx_);
     pool_.erase(t->thread_ptr->get_id());
 }
 
@@ -86,23 +114,20 @@ void DynamicThreadPool::addThread()
 
 void DynamicThreadPool::timerHandle()
 {
+    ScopeLock lock(mapMtx_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
         it->second->status++;
-        if (it->second->status > 3 || isClosed_ != 0) 
-        {
-            it->second->status = 0xf;
-        }
     }
 }
 
 void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
 {
+    {
     bool flag = true;
-    simex::any context;
     ScopeLock lock(mtx_);
-    while (ti->status < 0xf && isClosed_ == 0)
+    while (ti->status < 0x3 && isClosed_ == 0)
     {
         while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
         {
@@ -110,7 +135,9 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
             deq_.pop_front();
             ti->status = 0;
             lock.unlock();
+            ti->is_busy = true;
             e();
+            ti->is_busy = false;
             lock.lock();
         }
         if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
@@ -121,7 +148,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
         {
             flag = true;
         }
-//        cond_.wait(lock);
+    }
     }
     threadNum_--;
     loop_->addTask(simex::bind(&DynamicThreadPool::DelThread, this, ti));
