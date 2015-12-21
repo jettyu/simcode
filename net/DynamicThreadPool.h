@@ -9,7 +9,7 @@ class ThreadInfo
 public:
     ThreadInfo():status(0), is_dynamic(false){}
     ~ThreadInfo(){}
-    volatile status; //0xf表示stop
+    volatile uint8_t status; //0xf表示stop
     bool is_dynamic; //是否动态创建的
     SimThreadPtr thread_ptr;
     void stop()
