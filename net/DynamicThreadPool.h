@@ -31,9 +31,9 @@ public:
     void setMaxIdle(int n){maxIdle_ = n;}
     void setMaxActive(int n){maxActive_ = n;}
     void setMaxTaskSize(int n){maxTaskSize_ = n;}
-private:
     int taskNum();       //当前队列的任务数
     void busyThread(std::vector<std::thread::id>&); //当前正在执行任务的线程数
+private:
     void AddThread();
     void DelThread(const SharedPtr<ThreadInfo>&);
     void addThread();
