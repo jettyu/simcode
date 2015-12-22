@@ -68,8 +68,10 @@ public:
     ///
     int setKeepAlive(bool on = true);
 
+    int setNonBlock();
     int setNonBlockAndCloseOnExec();
 
+    static int setNonBlock(int sockfd);
     static int setNonBlockAndCloseOnExec(int sockfd);
     int getError() const;
     struct sockaddr_in getLocalAddr() const;

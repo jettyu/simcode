@@ -121,9 +121,23 @@ int Socket::setKeepAlive(bool on)
                         &optval, static_cast<socklen_t>(sizeof optval));
 }
 
+int Socket::setNonBlock()
+{
+    Socket::setNonBlock(sockfd_);
+}
+
 int Socket::setNonBlockAndCloseOnExec()
 {
     Socket::setNonBlockAndCloseOnExec(sockfd_);
+}
+
+int Socket::setNonBlock(int _sockfd)
+{
+    //set-nonblock
+    int flags = ::fcntl(_sockfd, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    int ret = ::fcntl(_sockfd, F_SETFL, flags);
+    return ret;
 }
 
 int Socket::setNonBlockAndCloseOnExec(int _sockfd)

@@ -33,6 +33,7 @@ public:
     void setMaxActive(int n){maxActive_ = n;}
     void setMaxTaskSize(int n){maxTaskSize_ = n;}
     int taskNum();       //当前队列的任务数
+    int threadNum() {return threadNum_.load();}
     void busyThread(std::vector<std::thread::id>&); //当前正在执行任务的线程数
 private:
     void AddThread();
