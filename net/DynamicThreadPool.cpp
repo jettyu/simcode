@@ -26,7 +26,6 @@ void DynamicThreadPool::start()
     {
         SharedPtr<ThreadInfo> t(new ThreadInfo);
         t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
-        t->thread_ptr->detach();
         defaultPool_.push_back(t);
     }
 }
@@ -36,8 +35,19 @@ void DynamicThreadPool::stop()
     if (isClosed_ == 1) return;
     isClosed_ = 1;
     cond_.notify_all();
-    std::for_each(defaultPool_.begin(), defaultPool_.end(),
-                  simex::bind(&ThreadInfo::stop, _1));
+    std::vector<SharedPtr<ThreadInfo>>::iterator vit;
+    for (vit=defaultPool_.begin(); vit!=defaultPool_.end(); ++vit)
+    {
+        (*vit)->stop();
+    }
+    {
+        std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator mit;
+        ScopeLock lock(mapMtx_);
+        for (mit=pool_.begin(); mit!=pool_.end(); ++mit)
+        {
+            mit->second->stop();
+        }
+    }
 }
 
 int DynamicThreadPool::taskNum()
@@ -67,6 +77,7 @@ void DynamicThreadPool::busyThread(std::vector<std::thread::id>& vec)
 
 int DynamicThreadPool::addTask(const TaskCallback& cb)
 {
+    if (isClosed_) return 1;
     ScopeLock lock(mtx_);    
     if (deq_.size() < maxTaskSize_)
     {
@@ -114,6 +125,7 @@ void DynamicThreadPool::addThread()
 
 void DynamicThreadPool::timerHandle()
 {
+    if (isClosed_) return;
     ScopeLock lock(mapMtx_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
@@ -127,7 +139,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     {
     bool flag = true;
     ScopeLock lock(mtx_);
-    while (ti->status < 0x3 && isClosed_ == 0)
+    while (ti->status < 0x3 && !isClosed_)
     {
         while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
         {
@@ -151,5 +163,8 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     }
     }
     threadNum_--;
-    loop_->addTask(simex::bind(&DynamicThreadPool::DelThread, this, ti));
+    if (ti->is_dynamic && !isClosed_)
+    {
+        loop_->addTask(simex::bind(&DynamicThreadPool::DelThread, this, ti));
+    }
 }

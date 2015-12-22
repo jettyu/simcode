@@ -8,7 +8,7 @@ class ThreadInfo
 {
 public:
     ThreadInfo():status(0), is_dynamic(false), is_busy(false){}
-    ~ThreadInfo(){}
+    ~ThreadInfo(){stop();}
     volatile uint8_t status; //0xf表示stop
     bool is_dynamic; //是否动态创建的
     volatile bool is_busy; //是否忙碌
@@ -17,6 +17,7 @@ public:
     {
         status = 0xf; 
         if (thread_ptr) thread_ptr->join();
+        thread_ptr.reset();
     }
 };
 class DynamicThreadPool
