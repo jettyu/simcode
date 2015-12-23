@@ -1,5 +1,4 @@
 #include <simcode/log/logasync.h>
-
 static const char* LogLevelName[]=
 {
     "[TRACE]",

@@ -1,5 +1,4 @@
 #include <simcode/log/logging.h>
-
 using namespace simcode;
 using namespace log;
 

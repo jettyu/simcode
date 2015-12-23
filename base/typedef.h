@@ -34,6 +34,18 @@ inline std::string NewUuid()
     return ss.str();
 }
 
+static inline int64_t get_local_thread_id()
+{
+    char tmp[20];
+    snprintf(tmp, sizeof(tmp), "%lu", boost::this_thread::get_id());
+    return atoll(tmp);
+}
+
+static boost::thread_specific_ptr<int64_t> __local_thread_id__(get_local_thread_id());
+static inline int64_t  cur_thread_id()
+{
+    return *__local_thread_id__.get();
+}
 #else
 
 #include <memory>
@@ -48,6 +60,18 @@ inline std::string NewUuid()
 using namespace std::placeholders;
 #define get_pointer(shared_pointer) shared_pointer.get()
 
+static inline int64_t get_local_thread_id()
+{
+    char tmp[20];
+    snprintf(tmp, sizeof(tmp), "%lu", std::this_thread::get_id());
+    return atoll(tmp);
+}
+
+static thread_local int64_t __local_thread_id__ = get_local_thread_id();
+static inline int64_t  cur_thread_id()
+{
+    return __local_thread_id__;
+}
 #endif // BOOST
 
 namespace simcode
@@ -103,17 +127,6 @@ private:
 #define SimFunction simex::function
 #define SimThread simex::thread
 
-static inline int64_t get_local_thread_id()
-{
-    char tmp[20];
-    snprintf(tmp, sizeof(tmp), "%lu", std::this_thread::get_id());
-    return atoll(tmp);
-}
-static thread_local int64_t __local_thread_id__ = get_local_thread_id();
-static inline int64_t  cur_thread_id()
-{
-    return __local_thread_id__;
-}
 
 //#define SharedPtr boost::shared_ptr
 typedef SharedPtr<SimThread> SimThreadPtr;
