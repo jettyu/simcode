@@ -63,7 +63,7 @@ using namespace std::placeholders;
 static inline int64_t get_local_thread_id()
 {
     char tmp[20];
-    snprintf(tmp, sizeof(tmp), "%llu", std::this_thread::get_id());
+    snprintf(tmp, sizeof(tmp), "%lu", std::this_thread::get_id());
     return atoll(tmp);
 }
 
