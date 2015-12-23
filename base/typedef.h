@@ -102,9 +102,17 @@ private:
 #define SimBind simex::bind
 #define SimFunction simex::function
 #define SimThread simex::thread
-static inline const std::thread::id cur_thread_id()
+
+static inline int64_t get_local_thread_id()
 {
-    return std::this_thread::get_id();
+    char tmp[20];
+    snprintf(tmp, sizeof(tmp), "%lu", std::this_thread::get_id());
+    return atoll(tmp);
+}
+static thread_local int64_t __local_thread_id__ = get_local_thread_id();
+static inline int64_t  cur_thread_id()
+{
+    return __local_thread_id__;
 }
 
 //#define SharedPtr boost::shared_ptr
