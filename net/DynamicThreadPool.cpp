@@ -1,4 +1,5 @@
 #include <simcode/net/DynamicThreadPool.h>
+#include <simcode/base/logger.h>
 
 using namespace simcode;
 using namespace net;
@@ -25,6 +26,7 @@ void DynamicThreadPool::start()
     defaultPool_.reserve(maxIdle_);
     for (size_t i=0; i<maxIdle_; ++i)
     {
+        threadNum_++;
         SharedPtr<ThreadInfo> t(new ThreadInfo);
         t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
         defaultPool_.push_back(t);
@@ -82,7 +84,8 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     ScopeLock lock(mtx_);    
     if (deq_.size() < maxTaskSize_)
     {
-        if (deq_.size() > threadNum_*5 && threadNum_.load() < maxTaskSize_)
+        LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
+        if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxTaskSize_)
         {
             turnOn();
             addThread();
