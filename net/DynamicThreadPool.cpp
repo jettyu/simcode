@@ -139,7 +139,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     {
     bool flag = true;
     ScopeLock lock(mtx_);
-    while (ti->status < 0x3 && !isClosed_)
+    while (ti->status < 0x9 && !isClosed_) //9秒回收空闲线程
     {
         while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
         {

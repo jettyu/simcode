@@ -108,11 +108,12 @@ void MysqlPool::timerHandle()
         int i = 0;
         if (c.empty()) {p->setContext(i);}
         i = simex::any_cast<int>(p->getContext());
-        if (i > 2) 
+        if (i > 20) 
         {
             active_size_--;
-            return; //超过2轮超时
+            return; //超过20秒回收
         }
+        p->setContext(++i);
         p->Ping();
         Put(p);
     }
