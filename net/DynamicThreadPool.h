@@ -7,15 +7,16 @@ namespace net {
 class ThreadInfo
 {
 public:
-    ThreadInfo():status(0), is_dynamic(false), is_busy(false){}
+    ThreadInfo():status(0), is_dynamic(false), is_busy(false), is_closed(false){}
     ~ThreadInfo(){stop();}
-    volatile uint8_t status; //0xf表示stop
     bool is_dynamic; //是否动态创建的
+    volatile int status; //0xf表示stop
     volatile bool is_busy; //是否忙碌
+    volatile bool is_closed; //是否关闭
     SimThreadPtr thread_ptr;
     void stop()
     {
-        status = 0xf; 
+        is_closed = true;
         if (thread_ptr) thread_ptr->join();
         thread_ptr.reset();
     }
@@ -32,6 +33,7 @@ public:
     void setMaxIdle(int n){maxIdle_ = n;}
     void setMaxActive(int n){maxActive_ = n;}
     void setMaxTaskSize(int n){maxTaskSize_ = n;}
+    void setmaxLifeTime(int n){maxLifeTime_ = n;}
     int taskNum();       //当前队列的任务数
     int threadNum() {return threadNum_.load();}
     void busyThread(std::vector<std::thread::id>&); //当前正在执行任务的线程数
@@ -56,6 +58,7 @@ private:
     int maxIdle_;
     int maxActive_;
     int maxTaskSize_;
+    int maxLifeTime_;
     std::atomic<int> threadNum_;
     volatile bool isClosed_;
     volatile bool dynamic_turn_;

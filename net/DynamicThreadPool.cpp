@@ -9,6 +9,7 @@ DynamicThreadPool::DynamicThreadPool(EventLoop* loop)
      maxIdle_(1),
      maxActive_(0),
      maxTaskSize_(1024),
+     maxLifeTime_(10),
      threadNum_(0),
      isClosed_(0)
 {
@@ -130,7 +131,8 @@ void DynamicThreadPool::timerHandle()
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
-        it->second->status++;
+        if (it->second->status < maxLifeTime_)
+            it->second->is_closed = true;
     }
 }
 
@@ -139,7 +141,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     {
     bool flag = true;
     ScopeLock lock(mtx_);
-    while (ti->status < 0x9 && !isClosed_) //9秒回收空闲线程
+    while ((!ti->is_closed) && (!isClosed_))  
     {
         while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
         {

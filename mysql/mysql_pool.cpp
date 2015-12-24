@@ -9,6 +9,7 @@ MysqlPool::MysqlPool(simcode::net::EventLoop* loop,
     :
     default_max_(0),
     active_max_(0),
+    life_time_max_(20),
     active_size_(0),
     loop_(loop),
     new_object_callback_(f)
@@ -108,7 +109,7 @@ void MysqlPool::timerHandle()
         int i = 0;
         if (c.empty()) {p->setContext(i);}
         i = simex::any_cast<int>(p->getContext());
-        if (i > 20) 
+        if (i > life_time_max_) 
         {
             active_size_--;
             return; //超过20秒回收

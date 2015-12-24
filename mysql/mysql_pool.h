@@ -18,6 +18,7 @@ public:
     void Put(const SharedPtr<Mysql>& p);
     void setMaxIdle(int n){default_max_=n;}
     void setMaxActive(int n){active_max_=n;}
+    void setMaxLifeTime(int n){life_time_max_=n;}
 private:
     SharedPtr<Mysql> getDefault();
     int putDefault(const SharedPtr<Mysql>& p);
@@ -34,6 +35,7 @@ private:
     std::deque<SharedPtr<Mysql>> active_deque_;
     Mutex active_mtx_;
     int active_max_;
+    int life_time_max_;
     std::atomic<int> active_size_;
     net::EventLoop* loop_;
     simex::function<SharedPtr<Mysql>()> new_object_callback_;
