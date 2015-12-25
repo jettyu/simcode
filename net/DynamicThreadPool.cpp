@@ -85,7 +85,7 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     if (deq_.size() < maxTaskSize_)
     {
         LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
-        if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxTaskSize_)
+        if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxActive_)
         {
             turnOn();
             addThread();
@@ -109,6 +109,7 @@ void DynamicThreadPool::AddThread()
     SharedPtr<ThreadInfo> t(new ThreadInfo);
     threadNum_++;
     t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
+    t->thread_ptr->detach();
     t->is_dynamic = true;
     {
     ScopeLock lock(mapMtx_);

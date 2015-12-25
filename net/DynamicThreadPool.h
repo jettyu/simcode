@@ -17,8 +17,6 @@ public:
     void stop()
     {
         is_closed = true;
-        if (thread_ptr) thread_ptr->join();
-        thread_ptr.reset();
     }
 };
 class DynamicThreadPool
