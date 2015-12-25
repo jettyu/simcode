@@ -171,7 +171,7 @@ void DynamicThreadPool::timerHandle()
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
-        if (it->second->status++ < maxLifeTime_)
+        if (it->second->status++ > maxLifeTime_)
             it->second->is_closed = true;
     }
     }
