@@ -41,9 +41,9 @@ private:
     void addThread();
     void timerHandle();
     void doTask(const SharedPtr<ThreadInfo>&);
-    void turnOn(){dynamic_turn_ = 0xf;}
-    void turnOff(){dynamic_turn_ = 0x0;}
-    bool isTurnOn(){return dynamic_turn_  == 0xf;}
+    void turnOn(){dynamic_turn_ = true;}
+    void turnOff(){dynamic_turn_ = false;}
+    bool isTurnOn(){return dynamic_turn_;}
 private:
     
     EventLoop* loop_; //定时器

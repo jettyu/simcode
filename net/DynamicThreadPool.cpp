@@ -85,15 +85,15 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     if (deq_.size() < maxTaskSize_)
     {
         LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
-        if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxActive_)
-        {
-            turnOn();
-            addThread();
-        }
-        else
-        {
-            turnOff();
-        }
+        //if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxActive_)
+        //{
+        //    turnOn();
+        //    addThread();
+        //}
+        //else
+        //{
+        //    turnOff();
+        //}
         deq_.push_back(cb);
         cond_.notify_one();
     }
@@ -131,12 +131,49 @@ void DynamicThreadPool::addThread()
 void DynamicThreadPool::timerHandle()
 {
     if (isClosed_) return;
+    //检查所有线程状态
+    {
+    bool flag = true;
+    std::vector<SharedPtr<ThreadInfo>>::iterator it;
+    for (it=defaultPool_.begin(); it!=defaultPool_.end(); ++it)
+    {
+        if (!(*it)->is_busy)
+        {
+            flag = false;
+            break;
+        }
+    }
+    if (flag)
+    {
+        ScopeLock lock(mapMtx_);
+        std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
+        for (it=pool_.begin(); it!=pool_.end(); ++it)
+        {
+            if (!it->second->is_busy)
+            {
+                flag = false;
+                break;
+            }
+        }    
+    }
+    if (flag) 
+    {
+        turnOn();
+        addThread();
+    }
+    else
+    {
+        turnOff();
+    }
+    }
+    {
     ScopeLock lock(mapMtx_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
-        if (it->second->status < maxLifeTime_)
+        if (it->second->status++ < maxLifeTime_)
             it->second->is_closed = true;
+    }
     }
 }
 
@@ -147,7 +184,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     ScopeLock lock(mtx_);
     while ((!ti->is_closed) && (!isClosed_))  
     {
-        while(!deq_.empty() && flag && (isTurnOn() || !ti->is_dynamic))
+        while(!deq_.empty() && flag && (!ti->is_dynamic || isTurnOn()))
         {
             TaskCallback e = deq_.front();
             deq_.pop_front();
