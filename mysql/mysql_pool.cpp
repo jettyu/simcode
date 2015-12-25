@@ -42,6 +42,15 @@ void MysqlPool::Put(const SharedPtr<Mysql>& p)
     }
 }
 
+void MysqlPool::Init()
+{
+    for (int i=0; i<default_max_; i++) 
+    {
+        SharedPtr<Mysql> p = newObject();
+        Put(p);
+    }
+}
+
 SharedPtr<Mysql> MysqlPool::getDefault()
 {
     SharedPtr<Mysql> p;

@@ -19,6 +19,7 @@ public:
     void setMaxIdle(int n){default_max_=n;}
     void setMaxActive(int n){active_max_=n;}
     void setMaxLifeTime(int n){life_time_max_=n;}
+    void Init();
 private:
     SharedPtr<Mysql> getDefault();
     int putDefault(const SharedPtr<Mysql>& p);
