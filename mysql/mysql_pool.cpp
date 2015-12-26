@@ -11,8 +11,11 @@ MysqlPool::MysqlPool(simcode::net::EventLoop* loop,
     active_max_(0),
     life_time_max_(20),
     active_size_(0),
+    pool_size_(0),
     loop_(loop),
-    new_object_callback_(f)
+    new_object_callback_(f),
+    timer_state_(0),
+    is_busy_(false)
 {
     loop->runEvery(1.0, simex::bind(&MysqlPool::timerHandle, this));
 }
@@ -23,23 +26,17 @@ MysqlPool::~MysqlPool()
 
 SharedPtr<Mysql> MysqlPool::Get()
 {
-    SharedPtr<Mysql> p = getDefault();
-    if (p) return p;
-    p = getActive();
-    if (!p)
-    {
-    }
+    is_busy_ = true;
+    SharedPtr<Mysql> p = getFromPool();
+    if (!p) p = newObject();
     return p;
 }
+
 void MysqlPool::Put(const SharedPtr<Mysql>& p)
 {
-    if (0 != putDefault(p))
-    {
-        if (0 != putActive(p))
-        {
-            active_size_--;
-        }
-    }
+    ScopeLock lock(pool_mtx_);
+    pool_.push_back(p);
+    pool_size_++;
 }
 
 void MysqlPool::Init()
@@ -51,93 +48,55 @@ void MysqlPool::Init()
     }
 }
 
-SharedPtr<Mysql> MysqlPool::getDefault()
+SharedPtr<Mysql> MysqlPool::getFromPool()
 {
     SharedPtr<Mysql> p;
-    ScopeLock lock(default_mtx_);
-    if (!default_deque_.empty())
+    ScopeLock lock(pool_mtx_);
+    if (!pool_.empty())
     {
-        p = default_deque_.front();
-        default_deque_.pop_front();
+        p = pool_.front();
+        pool_.pop_front();
+        pool_size_--;
     }
     return p;
-}
-int MysqlPool::putDefault(const SharedPtr<Mysql>& p)
-{
-    ScopeLock lock(default_mtx_);
-    if (default_deque_.size() < default_max_)
-    {
-        default_deque_.push_back(p);
-        return 0;
-    }
-    return 1;
 }
 
-SharedPtr<Mysql> MysqlPool::getActive()
-{
-    SharedPtr<Mysql> p;
-    ScopeLock lock(active_mtx_);
-    if (!active_deque_.empty())
-    {
-        p = active_deque_.front();
-        active_deque_.pop_front();
-    } else if (active_size_ < active_max_)
-    {
-        active_size_++;
-        p = newObject();
-    } 
-    return p;
-}
-int MysqlPool::putActive(const SharedPtr<Mysql>& p)
-{
-    ScopeLock lock(active_mtx_);
-    if (active_deque_.size() < active_max_)
-    {
-        active_deque_.push_back(p);
-        return 0;
-    }
-    return 1;
-}
 SharedPtr<Mysql> MysqlPool::newObject()
 {
-    return new_object_callback_();
+    SharedPtr<Mysql> p;
+    if (active_size_ < active_max_)
+    {
+        p = new_object_callback_();
+        if (p) active_size_++;
+    }
+    return p;
 }
 
 void MysqlPool::timerHandle()
 {
-    SharedPtr<Mysql> p = getDefault();
-    if (p)
-    { 
-        p->Ping(); 
-        Put(p);
-    }
-    p = onlyGetActive();
-    if (p) 
+    if (pool_size_ > default_max_)
     {
-        const simex::any& c = p->getContext();
-        int i = 0;
-        if (c.empty()) {p->setContext(i);}
-        i = simex::any_cast<int>(p->getContext());
-        if (i > life_time_max_) 
+        if (++timer_state_ > life_time_max_ || !is_busy_)
         {
+            ScopeLock lock(pool_mtx_);
+            pool_.pop_front();
+            pool_size_--;
             active_size_--;
-            return; //超过20秒回收
         }
-        p->setContext(++i);
-        p->Ping();
-        Put(p);
     }
-}
-
-SharedPtr<Mysql> MysqlPool::onlyGetActive()
-{
-    SharedPtr<Mysql> p;
-    ScopeLock lock(active_mtx_);
-    if (!active_deque_.empty())
+    else
     {
-        p = active_deque_.front();
-        active_deque_.pop_front();
+        timer_state_ = 0;
     }
-    return p;
+    if (!is_busy_)
+    {
+        SharedPtr<Mysql> p = getFromPool();
+        if (p)
+        {
+            p->Ping();
+            Put(p);
+        }
+    }
+    is_busy_ = false;
 }
 
