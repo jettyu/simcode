@@ -24,7 +24,8 @@ DynamicThreadPool::~DynamicThreadPool()
 
 void DynamicThreadPool::start()
 {
-    loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerHandle, this));
+    loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerCreate, this));
+    loop_->runEvery(double(maxLifeTime_)/2, simex::bind(&DynamicThreadPool::timerClose, this));
     defaultPool_.reserve(maxIdle_);
     for (size_t i=0; i<maxIdle_; ++i)
     {
@@ -87,15 +88,6 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     if (deq_.size() < maxTaskSize_)
     {
         LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
-        //if (deq_.size() > threadNum_.load()*5 && threadNum_.load() < maxActive_)
-        //{
-        //    turnOn();
-        //    addThread();
-        //}
-        //else
-        //{
-        //    turnOff();
-        //}
         deq_.push_back(cb);
         cond_.notify_one();
     }
@@ -130,9 +122,10 @@ void DynamicThreadPool::addThread()
     loop_->addTask(simex::bind(&DynamicThreadPool::AddThread, this));
 }
 
-void DynamicThreadPool::timerHandle()
+void DynamicThreadPool::timerCreate()
 {
     if (isClosed_) return;
+    int64_t lastmsec = curmsec_;
     struct timeval tv;
     gettimeofday(&tv, NULL);
     curmsec_ = int64_t(tv.tv_sec)*1000 
@@ -143,7 +136,7 @@ void DynamicThreadPool::timerHandle()
     std::vector<SharedPtr<ThreadInfo>>::iterator it;
     for (it=defaultPool_.begin(); it!=defaultPool_.end(); ++it)
     {
-        if (!(*it)->is_busy || (curmsec_-(*it)->status) < maxWaitTime_)
+        if (!(*it)->is_busy || (lastmsec-(*it)->status) < maxWaitTime_)
         {
             flag = false;
             break;
@@ -156,7 +149,7 @@ void DynamicThreadPool::timerHandle()
         for (it=pool_.begin(); it!=pool_.end(); ++it)
         {
             if (!it->second->is_busy 
-               || (curmsec_-it->second->status) < maxWaitTime_ )
+               || (lastmsec-it->second->status) < maxWaitTime_ )
             {
                 flag = false;
                 break;
@@ -173,14 +166,17 @@ void DynamicThreadPool::timerHandle()
         turnOff();
     }
     }
-    {
+}
+
+void DynamicThreadPool::timerClose()
+{
+    int64_t lastmsec = curmsec_;
     ScopeLock lock(mapMtx_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
-        if (it->second->status++ > maxLifeTime_)
+        if ((lastmsec-it->second->status) > maxLifeTime_)
             it->second->is_closed = true;
-    }
     }
 }
 

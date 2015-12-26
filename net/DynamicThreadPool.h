@@ -40,7 +40,8 @@ private:
     void AddThread();
     void DelThread(const SharedPtr<ThreadInfo>&);
     void addThread();
-    void timerHandle();
+    void timerCreate(); //定时扫描并创建所需线程
+    void timerClose();  //定时扫描并关闭多余线程
     void doTask(const SharedPtr<ThreadInfo>&);
     void turnOn(){dynamic_turn_ = true;}
     void turnOff(){dynamic_turn_ = false;}
