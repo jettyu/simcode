@@ -1,5 +1,6 @@
 #include <simcode/net/DynamicThreadPool.h>
 #include <simcode/base/logger.h>
+#include <sys/time.h>
 
 using namespace simcode;
 using namespace net;
@@ -11,6 +12,7 @@ DynamicThreadPool::DynamicThreadPool(EventLoop* loop)
      maxActive_(0),
      maxTaskSize_(1024),
      maxLifeTime_(10),
+     maxWaitTime_(1000),
      threadNum_(0),
      isClosed_(0)
 {
@@ -22,7 +24,7 @@ DynamicThreadPool::~DynamicThreadPool()
 
 void DynamicThreadPool::start()
 {
-    loop_->runEvery(1.0, simex::bind(&DynamicThreadPool::timerHandle, this));
+    loop_->runEvery(double(maxWaitTime_)/1000, simex::bind(&DynamicThreadPool::timerHandle, this));
     defaultPool_.reserve(maxIdle_);
     for (size_t i=0; i<maxIdle_; ++i)
     {
@@ -131,13 +133,17 @@ void DynamicThreadPool::addThread()
 void DynamicThreadPool::timerHandle()
 {
     if (isClosed_) return;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    curmsec_ = int64_t(tv.tv_sec)*1000 
+               + int64_t(tv.tv_usec)/1000;
     //检查所有线程状态
     {
     bool flag = true;
     std::vector<SharedPtr<ThreadInfo>>::iterator it;
     for (it=defaultPool_.begin(); it!=defaultPool_.end(); ++it)
     {
-        if (!(*it)->is_busy)
+        if (!(*it)->is_busy || (curmsec_-(*it)->status) < maxWaitTime_)
         {
             flag = false;
             break;
@@ -149,7 +155,8 @@ void DynamicThreadPool::timerHandle()
         std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
         for (it=pool_.begin(); it!=pool_.end(); ++it)
         {
-            if (!it->second->is_busy)
+            if (!it->second->is_busy 
+               || (curmsec_-it->second->status) < maxWaitTime_ )
             {
                 flag = false;
                 break;
@@ -188,11 +195,12 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
         {
             TaskCallback e = deq_.front();
             deq_.pop_front();
-            ti->status = 0;
             lock.unlock();
+            ti->status = curmsec_;
             ti->is_busy = true;
             e();
             ti->is_busy = false;
+            ti->status = curmsec_;
             lock.lock();
         }
         if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
@@ -208,6 +216,6 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     threadNum_--;
     if (ti->is_dynamic && !isClosed_)
     {
-        loop_->addTask(simex::bind(&DynamicThreadPool::DelThread, this, ti));
+        DelThread(ti);
     }
 }

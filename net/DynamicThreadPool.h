@@ -10,9 +10,9 @@ public:
     ThreadInfo():status(0), is_dynamic(false), is_busy(false), is_closed(false){}
     ~ThreadInfo(){stop();}
     bool is_dynamic; //是否动态创建的
-    volatile int status; //0xf表示stop
     volatile bool is_busy; //是否忙碌
     volatile bool is_closed; //是否关闭
+    volatile int64_t status; 
     SimThreadPtr thread_ptr;
     void stop()
     {
@@ -32,6 +32,7 @@ public:
     void setMaxActive(int n){maxActive_ = n;}
     void setMaxTaskSize(int n){maxTaskSize_ = n;}
     void setMaxLifeTime(int n){maxLifeTime_ = n;}
+    void setMaxWaitTime(int n){maxWaitTime_ = n;}
     int taskNum();       //当前队列的任务数
     int threadNum() {return threadNum_.load();}
     void busyThread(std::vector<std::thread::id>&); //当前正在执行任务的线程数
@@ -57,9 +58,11 @@ private:
     int maxActive_;
     int maxTaskSize_;
     int maxLifeTime_;
+    int64_t maxWaitTime_; //msec 允许等待时间
     std::atomic<int> threadNum_;
     volatile bool isClosed_;
     volatile bool dynamic_turn_;
+    volatile int64_t curmsec_;
 };
 
 }//endof namespace net
