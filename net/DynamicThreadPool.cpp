@@ -24,7 +24,7 @@ DynamicThreadPool::~DynamicThreadPool()
 
 void DynamicThreadPool::start()
 {
-    loop_->runEvery(double(maxWaitTime_)/1000, simex::bind(&DynamicThreadPool::timerHandle, this));
+    loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerHandle, this));
     defaultPool_.reserve(maxIdle_);
     for (size_t i=0; i<maxIdle_; ++i)
     {
