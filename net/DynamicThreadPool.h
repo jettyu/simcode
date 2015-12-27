@@ -64,6 +64,7 @@ private:
     volatile bool isClosed_;
     volatile bool dynamic_turn_;
     volatile int64_t curmsec_;
+    std::vector<int> timerfds_;
 };
 
 }//endof namespace net

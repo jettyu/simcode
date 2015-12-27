@@ -24,8 +24,11 @@ DynamicThreadPool::~DynamicThreadPool()
 
 void DynamicThreadPool::start()
 {
-    loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerCreate, this));
-    loop_->runEvery(double(maxLifeTime_)/2, simex::bind(&DynamicThreadPool::timerClose, this));
+    int timerfd = loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerCreate, this));
+    timerfds_.push_back(timerfd);
+    timerfd = loop_->runEvery(double(maxLifeTime_)/2, simex::bind(&DynamicThreadPool::timerClose, this));
+    timerfds_.push_back(timerfd);
+    
     defaultPool_.reserve(maxIdle_);
     for (size_t i=0; i<maxIdle_; ++i)
     {
@@ -39,6 +42,11 @@ void DynamicThreadPool::start()
 void DynamicThreadPool::stop()
 {
     if (isClosed_ == 1) return;
+    std::vector<int>::iterator iit;
+    for (iit=timerfds_.begin(); iit!=timerfds_.end(); ++iit)
+    {
+        loop_->cancelTimer(*iit);
+    }
     isClosed_ = 1;
     cond_.notify_all();
     std::vector<SharedPtr<ThreadInfo>>::iterator vit;

@@ -40,7 +40,7 @@ void EventLoop::loop()
     }
 }
 
-void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
+int EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
 {
     TimerPtr timer(new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, afterTime);
@@ -53,9 +53,10 @@ void EventLoop::runAfter(double afterTime, const Timer::EventCallback& c)
     ec->enableReading();
     runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
+	return timer->timerfd();
 }
 
-void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
+int EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
 {
     TimerPtr timer (new Timer(simex::bind(&EventLoop::removeTimer, this, _1)));
     timer->setTimer(c, intervalTime, intervalTime, 0);
@@ -68,6 +69,12 @@ void EventLoop::runEvery(double intervalTime, const Timer::EventCallback& c)
     ec->enableReading();
     runInLoop(ec);
     timerList_[timer->timerfd()] = timer;
+	return timer->timerfd();
+}
+
+void EventLoop::cancelTimer(int timerfd)
+{
+	removeTimer(timerfd);
 }
 
 void EventLoop::modifyChannel(const EventChannelPtr& ec)

@@ -22,9 +22,9 @@ public:
     void modifyChannel(const EventChannelPtr& c);
 
     void loop();
-    void runAfter(double afterTime, const Timer::EventCallback& c);
-    void runEvery(double intervalTime, const Timer::EventCallback& c);
-
+    int runAfter(double afterTime, const Timer::EventCallback& c); //return timerfd
+    int runEvery(double intervalTime, const Timer::EventCallback& c); //return timerfd
+	void cancelTimer(int timerfd);
     void addTask(const TaskCallback& b);
     void execInLoop(const TaskCallback& b); //no relation of time seq, if inOneThread, do at soon, else addTask
     void setContext(const simex::any& c)
