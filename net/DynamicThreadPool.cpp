@@ -111,7 +111,6 @@ void DynamicThreadPool::AddThread()
     SharedPtr<ThreadInfo> t(new ThreadInfo);
     threadNum_++;
     t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
-    t->thread_ptr->detach();
     t->is_dynamic = true;
     {
     ScopeLock lock(mapMtx_);
@@ -122,6 +121,7 @@ void DynamicThreadPool::AddThread()
 void DynamicThreadPool::DelThread(const SharedPtr<ThreadInfo>& t)
 {
     ScopeLock lock(mapMtx_);
+    t->thread_ptr->detach();
     pool_.erase(t->thread_ptr->get_id());
 }
 
