@@ -108,20 +108,43 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
 
 void DynamicThreadPool::AddThread()
 {
-    SharedPtr<ThreadInfo> t(new ThreadInfo);
-    threadNum_++;
-    t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
-    t->is_dynamic = true;
+    try
     {
-    ScopeLock lock(mapMtx_);
-    pool_[t->thread_ptr->get_id()] = t;
+        SharedPtr<ThreadInfo> t(new ThreadInfo);
+        threadNum_++;
+        t->thread_ptr.reset(new SimThread(SimBind(&DynamicThreadPool::doTask, this, t)));
+        t->is_dynamic = true;
+        {
+        ScopeLock lock(mapMtx_);
+        pool_[t->thread_ptr->get_id()] = t;
+        }
     }
+    catch(const std::exception& e)
+    {
+        LOG_ERROR("create thread failed|err=%s", e.what());
+    }
+    catch(...)
+    {
+        LOG_ERROR("create thread failed|err=%s", "unknown exception");
+    }
+    
 }
 
 void DynamicThreadPool::DelThread(const SharedPtr<ThreadInfo>& t)
 {
-    ScopeLock lock(mapMtx_);
-    pool_.erase(t->thread_ptr->get_id());
+    try
+    {
+        ScopeLock lock(mapMtx_);
+        pool_.erase(t->thread_ptr->get_id());
+    }
+    catch(const std::exception& e)
+    {
+        LOG_ERROR("remove thread failed|err=%s", e.what());
+    }
+    catch(...)
+    {
+        LOG_ERROR("remove thread failed|err=%s", "unknown exception");
+    }
 }
 
 void DynamicThreadPool::timerCreate()
