@@ -121,13 +121,7 @@ void DynamicThreadPool::AddThread()
 void DynamicThreadPool::DelThread(const SharedPtr<ThreadInfo>& t)
 {
     ScopeLock lock(mapMtx_);
-    t->thread_ptr->detach();
     pool_.erase(t->thread_ptr->get_id());
-}
-
-void DynamicThreadPool::addThread()
-{
-    loop_->addTask(simex::bind(&DynamicThreadPool::AddThread, this));
 }
 
 void DynamicThreadPool::timerCreate()
@@ -167,7 +161,7 @@ void DynamicThreadPool::timerCreate()
     if (flag) 
     {
         turnOn();
-        addThread();
+        AddThread();
     }
     else
     {

@@ -8,7 +8,7 @@ class ThreadInfo
 {
 public:
     ThreadInfo():status(0), is_dynamic(false), is_busy(false), is_closed(false){}
-    ~ThreadInfo(){stop();}
+    ~ThreadInfo(){if (thread_ptr) thread_ptr->detach();}
     bool is_dynamic; //是否动态创建的
     volatile bool is_busy; //是否忙碌
     volatile bool is_closed; //是否关闭
