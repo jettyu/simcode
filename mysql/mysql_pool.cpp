@@ -15,25 +15,31 @@ MysqlPool::MysqlPool(simcode::net::EventLoop* loop,
     loop_(loop),
     new_object_callback_(f),
     timer_state_(0),
-    is_busy_(false)
+    is_busy_(false),
+    is_closed_(false)
 {
-    loop->runEvery(1.0, simex::bind(&MysqlPool::timerHandle, this));
+    timerfd_ = loop->runEvery(1.0, simex::bind(&MysqlPool::timerHandle, this));
 }
 
 MysqlPool::~MysqlPool()
 {
+    if (!is_closed_) loop_->cancelTimer(timerfd_);
+    is_closed_ = true;
 }
 
 SharedPtr<Mysql> MysqlPool::Get()
 {
+    SharedPtr<Mysql> p;
+    if (is_closed_) return p;
     is_busy_ = true;
-    SharedPtr<Mysql> p = getFromPool();
+    p = getFromPool();
     if (!p) p = newObject();
     return p;
 }
 
 void MysqlPool::Put(const SharedPtr<Mysql>& p)
 {
+    if (is_closed_) return;
     ScopeLock lock(pool_mtx_);
     pool_.push_back(p);
     pool_size_++;
@@ -46,6 +52,15 @@ void MysqlPool::Init()
         SharedPtr<Mysql> p = newObject();
         Put(p);
     }
+}
+
+void MysqlPool::Close()
+{
+    if (is_closed_) return;
+    is_closed_ = true;
+    loop_->cancelTimer(timerfd_);
+    ScopeLock lock(pool_mtx_);
+    pool_.clear();
 }
 
 SharedPtr<Mysql> MysqlPool::getFromPool()
@@ -74,6 +89,7 @@ SharedPtr<Mysql> MysqlPool::newObject()
 
 void MysqlPool::timerHandle()
 {
+    if (is_closed_) return;
     if (pool_size_ > default_max_)
     {
         if (++timer_state_ > life_time_max_ || !is_busy_)

@@ -20,6 +20,7 @@ public:
     void setMaxActive(int n){active_max_=n;}
     void setMaxLifeTime(int n){life_time_max_=n;}
     void Init();
+    void Close();
 private:
     SharedPtr<Mysql> newObject();
     SharedPtr<Mysql> getFromPool();
@@ -37,6 +38,8 @@ private:
     simex::function<SharedPtr<Mysql>()> new_object_callback_;
     int timer_state_;
     volatile bool is_busy_;
+    volatile bool is_closed_;
+    int timerfd_;
 };
 
 }//endof namespace mysql
