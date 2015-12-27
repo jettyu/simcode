@@ -23,8 +23,7 @@ MysqlPool::MysqlPool(simcode::net::EventLoop* loop,
 
 MysqlPool::~MysqlPool()
 {
-    if (!is_closed_) loop_->cancelTimer(timerfd_);
-    is_closed_ = true;
+    Close();
 }
 
 SharedPtr<Mysql> MysqlPool::Get()
