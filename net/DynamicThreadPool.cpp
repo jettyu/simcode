@@ -212,7 +212,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     }
     }
     threadNum_--;
-    if (ti->is_dynamic && !isClosed_)
+    if (ti->is_dynamic)
     {
         DelThread(ti);
     }
