@@ -24,7 +24,7 @@ DynamicThreadPool::~DynamicThreadPool()
 
 void DynamicThreadPool::start()
 {
-    int timerfd = loop_->runEvery(double(maxWaitTime_)/2000, simex::bind(&DynamicThreadPool::timerCreate, this));
+    int timerfd = loop_->runEvery(double(double(maxWaitTime_)/2000), simex::bind(&DynamicThreadPool::timerCreate, this));
     timerfds_.push_back(timerfd);
     timerfd = loop_->runEvery(double(maxLifeTime_)/2, simex::bind(&DynamicThreadPool::timerClose, this));
     timerfds_.push_back(timerfd);

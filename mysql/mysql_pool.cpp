@@ -88,7 +88,14 @@ SharedPtr<Mysql> MysqlPool::newObject()
 
 void MysqlPool::timerHandle()
 {
-    if (is_closed_) return;
+    if (is_closed_) 
+    {
+        ScopeLock lock(pool_mtx_);
+        pool_.clear();
+        active_size_ -= pool_size_;
+        pool_size_ = 0;
+        return;
+    }
     if (pool_size_ > default_max_)
     {
         if (++timer_state_ > life_time_max_ || !is_busy_)
