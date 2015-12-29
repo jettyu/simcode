@@ -58,8 +58,11 @@ void MysqlPool::Close()
     if (is_closed_) return;
     is_closed_ = true;
     loop_->cancelTimer(timerfd_);
+    std::deque<SharedPtr<Mysql>> tmp;
+    {
     ScopeLock lock(pool_mtx_);
-    pool_.clear();
+    pool_.swap(tmp);
+    }
 }
 
 SharedPtr<Mysql> MysqlPool::getFromPool()
