@@ -35,6 +35,7 @@ private:
     std::atomic<int> active_size_;
     std::atomic<int> pool_size_;
     net::EventLoop* loop_;
+    Mutex new_mtx_;
     simex::function<SharedPtr<Mysql>()> new_object_callback_;
     int timer_state_;
     volatile bool is_busy_;
