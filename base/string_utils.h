@@ -36,6 +36,34 @@ std::string StringTrimRight(const std::string& str, const T& op)
     return str;
 }
 
+static std::string TrimSpaceLeft(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        if (isspace(str[i])) continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(i);
+}
+
+static std::string TrimSpaceRight(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        char c = str[str.size()-i-1];
+        if (isspace(c))
+        continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(0, str.size()-i);
+}
+
 //读取文件所有内容，转为string
 std::string StrLoadFile(const std::string& file);
 //字符串批量替换,将s串中str替换成dst,替换count次

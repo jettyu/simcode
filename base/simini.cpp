@@ -2,6 +2,7 @@
 #include <fstream>
 using namespace std;
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <simcode/base/simini.h>
 
@@ -16,6 +17,34 @@ SimIni::SimIni():isLoaded_(false)
 SimIni::~SimIni()
 {
 
+}
+
+static std::string TrimSpaceLeft(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        if (isspace(str[i])) continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(i);
+}
+
+static std::string TrimSpaceRight(const std::string& str)
+{
+    if (str.empty()) return str;
+    int i = 0;
+    for (i=0; i<str.size(); ++i)
+    {
+        char c = str[str.size()-i-1];
+        if (isspace(c))
+        continue;
+        break;
+    }
+    if (i == str.size()) return str;
+    return str.substr(0, str.size()-i);
 }
 
 int SimIni::LoadFile(const std::string& file)
@@ -108,7 +137,13 @@ int SimIni::LoadFile(const std::string& file)
                 ++i;
             }
             if (key_flag && !key.empty())
+            {
+                key = TrimSpaceLeft(key);
+                key = TrimSpaceRight(key);
+                val = TrimSpaceLeft(val);
+                val = TrimSpaceRight(val);
                 sessMap_[sess][key] = val;
+            }
         }
         else
         {
