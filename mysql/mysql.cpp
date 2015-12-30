@@ -1,11 +1,23 @@
 #include <simcode/mysql/mysql.h>
+#include <simcode/base/typedef.h>
 using namespace simcode;
 using namespace simcode::mysql;
+
+static Mutex init_mtx;
 
 int Mysql::Options(mysql_option option, const std::string& arg)
 {
     options_.push_back({option, arg});
     return 0;
+}
+
+void Mysql::Init(void)
+{
+    if(!sql_) 
+    {
+        ScopeLock lock(init_mtx);
+        sql_=mysql_init(sql_);
+    }
 }
 
 int Mysql::Connect()

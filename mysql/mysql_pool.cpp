@@ -83,7 +83,6 @@ SharedPtr<Mysql> MysqlPool::newObject()
     SharedPtr<Mysql> p;
     if (active_size_ < active_max_)
     {
-        ScopeLock lock(new_mtx_);
         p = new_object_callback_();
         if (p) active_size_++;
     }

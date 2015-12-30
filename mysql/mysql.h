@@ -70,13 +70,8 @@ public:
     {
         return mysql_error(sql_);
     }
-    void Init(void)
-    {
-        if(!sql_) 
-        {
-            sql_=mysql_init(sql_);
-        }
-    };
+    void Init(void);
+    
     const simex::any& getContext() const
     {
         return context_;
@@ -96,6 +91,10 @@ public:
     int SetConnectUtf8();
     int SetCharSet(const std::string& charset="utf8");
     int Update(void);
+    int64_t AffectedRows()
+    {
+        return mysql_affected_rows(sql_);
+    }
 
     int Query(const std::string& sql);
     MYSQL_RES* QueryRes(const std::string& sql);
