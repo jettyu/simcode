@@ -32,7 +32,7 @@ int main(void)
 
     EventLoop loop;
     loop.runAfter(0, simex::bind(printTime, 1));
-    loop.runEvery(2, simex::bind(printTime, 2));
+    loop.runEvery(0.5, simex::bind(printTime, 2));
     loop.loop();
     //EPollPoller poller;
     //Timer timer(simex::bind(&EPollPoller::removeEvent, &poller, _1));

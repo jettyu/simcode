@@ -58,11 +58,11 @@ void Timer::setTimer(const EventCallback& b, double afterTime, double intervalTi
     clock_gettime(CLOCK_REALTIME, &curValue);
     newValue.it_value.tv_sec = curValue.tv_sec + int(afterTime);
     newValue.it_value.tv_nsec = curValue.tv_nsec + int(double(double(afterTime-int(afterTime))*1000000000));
-    newValue.it_value.tv_sec = newValue.it_value.tv_nsec / 1000000000;
+    newValue.it_value.tv_sec += newValue.it_value.tv_nsec / 1000000000;
     newValue.it_value.tv_nsec = newValue.it_value.tv_nsec % 1000000000;
     newValue.it_interval.tv_sec = int(intervalTime);
     newValue.it_interval.tv_nsec = int(double((double(intervalTime) - int(intervalTime))*1000000000));
-    newValue.it_interval.tv_sec = newValue.it_interval.tv_nsec / 1000000000;
+    newValue.it_interval.tv_sec += newValue.it_interval.tv_nsec / 1000000000;
     newValue.it_interval.tv_nsec = newValue.it_interval.tv_nsec % 1000000000;
     printf("%f|%f\n", afterTime, intervalTime);
     printf("%ld|%ld|%ld|%ld\n", newValue.it_value.tv_sec, newValue.it_value.tv_nsec, newValue.it_interval.tv_sec, newValue.it_interval.tv_nsec);

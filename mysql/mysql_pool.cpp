@@ -63,6 +63,7 @@ void MysqlPool::Close()
     ScopeLock lock(pool_mtx_);
     pool_.swap(tmp);
     }
+    tmp.clear();
 }
 
 SharedPtr<Mysql> MysqlPool::getFromPool()
@@ -91,22 +92,16 @@ SharedPtr<Mysql> MysqlPool::newObject()
 
 void MysqlPool::timerHandle()
 {
-    if (is_closed_) 
+    if (pool_size_.load() > default_max_)
     {
-        ScopeLock lock(pool_mtx_);
-        pool_.clear();
-        active_size_ -= pool_size_;
-        pool_size_ = 0;
-        return;
-    }
-    if (pool_size_ > default_max_)
-    {
-        if (++timer_state_ > life_time_max_ || !is_busy_)
+        if ((++timer_state_ > life_time_max_) || !is_busy_)
         {
-            ScopeLock lock(pool_mtx_);
-            pool_.pop_front();
-            pool_size_--;
-            active_size_--;
+            SharedPtr<Mysql> p = getFromPool();
+            if (p)
+            {
+                p.reset();
+                active_size_--;
+            }
         }
     }
     else
@@ -118,8 +113,14 @@ void MysqlPool::timerHandle()
         SharedPtr<Mysql> p = getFromPool();
         if (p)
         {
-            p->Ping();
-            Put(p);
+            if (!p->Ping())
+            {
+                active_size_--;
+            }
+            else
+            {
+                Put(p);
+            }
         }
     }
     is_busy_ = false;
