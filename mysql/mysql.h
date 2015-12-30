@@ -19,10 +19,17 @@ struct MysqlInfo
     std::string user;
     std::string passwd;
     std::string db;
+    unsigned long clientflag;
     bool operator < (const MysqlInfo& info) const
     {
         if (host != info.host) return host < info.host;
         else return port < info.port;
+    }
+    MysqlInfo()
+    :
+    port(0),
+    clientflag(0)
+    {
     }
 };
 

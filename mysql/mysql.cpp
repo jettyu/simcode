@@ -35,7 +35,7 @@ int Mysql::Connect()
                             info_.db.c_str(),
                             info_.port,
                             NULL,
-                            0)
+                            info_.clientflag)
        )
     {
         return 1;
