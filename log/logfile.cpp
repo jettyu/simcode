@@ -91,7 +91,7 @@ void LogFile::rotate()
 
 int LogFile::logWrite(const char* data, int size)
 {
-    ::fwrite(data, size, 1, fp_);
+    size_t n =::fwrite(data, size, 1, fp_);
     ::fflush(fp_);
     stats_.w_curr += size;
     stats_.w_total += size;
@@ -99,7 +99,7 @@ int LogFile::logWrite(const char* data, int size)
     {
         rotate();
     }
-    return 0;
+    return n;
 }
 
 int LogFile::logWriteOnly(const char* data, int size)

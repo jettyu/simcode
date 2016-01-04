@@ -41,7 +41,12 @@ void Logging::log_out(int level,
                            get_level_name(level), buf);
     {
         ScopeLock lock(mutex_);
-        logFile_.logWrite(buf, len);
+        int n = logFile_.logWrite(buf, len);
+        if (n <= 0)
+        {
+            printf("logFile.logWrite failed|size=%d|errno=%d|errmsg=%s\n", 
+                    len,errno, strerror(errno));
+        }
     }
 }
 
