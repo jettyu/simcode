@@ -58,11 +58,10 @@ void LogAsync::Write()
             size_t len = buffer_.readableBytes() < 4096 ? buffer_.readableBytes():4096;
             size_t n = logFile_.logWrite(buffer_.peek(), len);
             //printf("readableBytes=%d|n=%d\n", buffer_.readableBytes(), n);
-            if (n < 0)
+            if (n <= 0)
             {
                 printf("logFile.logWrite failed|ret=%d|size=%d|errno=%d|errmsg=%s\n", 
                         n, len,errno, strerror(errno));
-                n = len;
             }
             buffer_.seek(len);
         }

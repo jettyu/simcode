@@ -110,16 +110,24 @@ void MysqlPool::timerHandle()
     }
     if (!is_busy_)
     {
-        SharedPtr<Mysql> p = getFromPool();
-        if (p)
+        int size = pool_size_.load() / 20 + 1;
+        for (int i=0; i<size; i++)
         {
-            if (!p->Ping())
+            SharedPtr<Mysql> p = getFromPool();
+            if (p)
             {
-                active_size_--;
+                if (!p->Ping())
+                {
+                    active_size_--;
+                }
+                else
+                {
+                    Put(p);
+                }
             }
             else
             {
-                Put(p);
+                break;
             }
         }
     }
