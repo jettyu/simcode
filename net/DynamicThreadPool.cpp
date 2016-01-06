@@ -95,7 +95,6 @@ int DynamicThreadPool::addTask(const TaskCallback& cb)
     ScopeLock lock(mtx_);    
     if (deq_.size() < maxTaskSize_)
     {
-        LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
         deq_.push_back(cb);
         cond_.notify_one();
     }
@@ -186,6 +185,7 @@ void DynamicThreadPool::timerClose()
 {
     int64_t lastmsec = curmsec_;
     ScopeLock lock(mapMtx_);
+	LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {
