@@ -156,18 +156,17 @@ void DynamicThreadPool::timerCreate()
     curmsec_ = int64_t(tv.tv_sec)*1000 
                + int64_t(tv.tv_usec)/1000;
     //检查所有线程状态
-    {
-    bool flag = true;
+
     std::vector<SharedPtr<ThreadInfo>>::iterator it;
     for (it=defaultPool_.begin(); it!=defaultPool_.end(); ++it)
     {
         if (!(*it)->is_busy || (lastmsec-(*it)->status) < maxWaitTime_)
         {
-            flag = false;
-            break;
+			turnOff();
+            return;
         }
     }
-    if (flag)
+	turnOn();
     {
         ScopeLock lock(mapMtx_);
         std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
@@ -176,21 +175,11 @@ void DynamicThreadPool::timerCreate()
             if (!it->second->is_busy 
                || (lastmsec-it->second->status) < maxWaitTime_ )
             {
-                flag = false;
-                break;
+                return;
             }
         }    
     }
-    if (flag) 
-    {
-        turnOn();
-        AddThread();
-    }
-    else
-    {
-        turnOff();
-    }
-    }
+    AddThread();
 }
 
 void DynamicThreadPool::timerClose()
