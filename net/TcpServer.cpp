@@ -63,9 +63,9 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     conn->setCloseCallback(simex::bind(&TcpServer::onClose, this, _1));
     conn->setMessageCallback(messageCallback_);
     LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
+    conn->run();
     if (connectionCallback_) connectionCallback_(conn);
     connectionManager_->Add(conn->id(), conn);
-    conn->run();
 }
 
 void TcpServer::acceptHandler(EventChannel*)
