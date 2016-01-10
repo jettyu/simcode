@@ -199,7 +199,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     {
     bool flag = true;
     ScopeLock lock(mtx_);
-    while ((!ti->is_closed) && (!isClosed_) && && (!ti->is_dynamic || isTurnOn()))  
+    while (!isClosed_)  
     {
         while(!deq_.empty() && flag)
         {
@@ -213,7 +213,10 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
             ti->status = curmsec_;
             lock.lock();
         }
-        if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
+		if (ti->is_closed || (ti->is_dynamic && !isTurnOn()))
+		{
+			break;
+		} else if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
         {
             flag = false;
         }
