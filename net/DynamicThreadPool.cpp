@@ -199,9 +199,9 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
     {
     bool flag = true;
     ScopeLock lock(mtx_);
-    while ((!ti->is_closed) && (!isClosed_))  
+    while ((!ti->is_closed) && (!isClosed_) && && (!ti->is_dynamic || isTurnOn()))  
     {
-        while(!deq_.empty() && flag && (!ti->is_dynamic || isTurnOn()))
+        while(!deq_.empty() && flag)
         {
             TaskCallback e = deq_.front();
             deq_.pop_front();
