@@ -213,10 +213,10 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
             ti->status = curmsec_;
             lock.lock();
         }
-		if (ti->is_closed || (ti->is_dynamic && !isTurnOn()))
-		{
-			break;
-		} else if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
+        if (ti->is_closed || (ti->is_dynamic && !isTurnOn()))
+        {
+            break;
+        } else if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
         {
             flag = false;
         }
