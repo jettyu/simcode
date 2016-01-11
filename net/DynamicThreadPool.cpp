@@ -41,13 +41,13 @@ void DynamicThreadPool::start()
 
 void DynamicThreadPool::stop()
 {
-    if (isClosed_ == 1) return;
+    if (isClosed_) return;
     std::vector<int>::iterator iit;
     for (iit=timerfds_.begin(); iit!=timerfds_.end(); ++iit)
     {
         loop_->cancelTimer(*iit);
     }
-    isClosed_ = 1;
+    isClosed_ = true;
     cond_.notify_all();
     std::vector<SharedPtr<ThreadInfo>>::iterator vit;
     for (vit=defaultPool_.begin(); vit!=defaultPool_.end(); ++vit)
@@ -178,7 +178,8 @@ void DynamicThreadPool::timerCreate()
             }
         }    
     }
-    AddThread();
+    if (threadNum_.load() < maxActive_)
+        AddThread();
 }
 
 void DynamicThreadPool::timerClose()
@@ -213,7 +214,7 @@ void DynamicThreadPool::doTask(const SharedPtr<ThreadInfo>& ti)
             ti->status = curmsec_;
             lock.lock();
         }
-        if (ti->is_closed || (ti->is_dynamic && !isTurnOn()))
+        if (isClosed_ || ti->is_closed || (ti->is_dynamic && !isTurnOn()))
         {
             break;
         } else if (cond_.wait_for(lock,std::chrono::seconds(3)) == std::cv_status::timeout)
