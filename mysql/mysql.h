@@ -19,6 +19,7 @@ struct MysqlInfo
     std::string user;
     std::string passwd;
     std::string db;
+    std::string charset;
     unsigned long clientflag;
     bool operator < (const MysqlInfo& info) const
     {

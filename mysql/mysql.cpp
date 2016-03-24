@@ -42,6 +42,13 @@ int Mysql::Connect()
     }
     char value = 1;
     mysql_options(sql_, MYSQL_OPT_RECONNECT, (char *)&value); //设置Ping时自动重连
+    if (!info_.charset.empty())
+    {
+        if (0 != SetCharSet(info_.charset))
+        {
+            return 1;
+        }
+    }
 //    SetConnectUtf8();
     status_ |= 1;
     return 0;
