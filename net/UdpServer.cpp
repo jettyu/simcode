@@ -55,19 +55,19 @@ void UdpServer::onMessage()
     int n = 0;
     do
     {
-        LOG_DEBUG("%s", "onMessage");
+        LOG_TRACE("%s", "onMessage");
         UdpConnector c(socket_.sockfd());
         char tmp[65535];
         if ((n=c.recv(tmp, 65535)) < 0)
         {
-            LOG_DEBUG("read error|errno=%d|errmsg=%s", errno, strerror(errno));
+            LOG_TRACE("read error|errno=%d|errmsg=%s", errno, strerror(errno));
             return;
         }
         uint64_t id = c.peerAddr().id();
         UdpConnectionPtr conn = connectionManager_->Get(id);
         if (!conn)
         {
-            LOG_DEBUG("recv new client|ip=%s|port=%u|id=%lu",
+            LOG_TRACE("recv new client|ip=%s|port=%u|id=%lu",
                       c.peerAddr().ip().c_str(), c.peerAddr().port(), id);
             conn.reset(new UdpConnection(c));
             conn->setCloseCallback(SimBind(&UdpServer::onClose, this, _1));
@@ -83,7 +83,7 @@ void UdpServer::onMessage()
 
 void UdpServer::onClose(uint64_t connId)
 {
-    LOG_DEBUG("client remove|id=%ld", connId);
+    LOG_TRACE("client remove|id=%ld", connId);
     connectionManager_->Remove(connId);
 }
 

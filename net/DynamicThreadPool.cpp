@@ -186,7 +186,7 @@ void DynamicThreadPool::timerClose()
 {
     int64_t lastmsec = curmsec_;
     ScopeLock lock(mapMtx_);
-    LOG_DEBUG("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
+    LOG_TRACE("taskNum=%d|threadNum=%d|maxTaskSize=%d", deq_.size(), threadNum_.load(), maxTaskSize_);
     std::map<std::thread::id, SharedPtr<ThreadInfo>>::iterator it;
     for (it=pool_.begin(); it!=pool_.end(); ++it)
     {

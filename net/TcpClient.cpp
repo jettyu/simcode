@@ -47,13 +47,13 @@ void TcpClient::onConnect()
     newConn->setMessageCallback(messageCallback_);
     conn_ = newConn;
     conn_->run();
-    LOG_DEBUG("new connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
+    LOG_TRACE("new connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
     if (connectionCallback_) connectionCallback_(conn_);
 }
 
 void TcpClient::onClose(const TcpConnectionPtr& conn)
 {
-    LOG_DEBUG("close connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
+    LOG_TRACE("close connection ip=%s|port=%d", conn_->peerAddr().ip().c_str(), conn_->peerAddr().port());
     if (closeCallback_) closeCallback_(conn);
     conn_.reset();
     if (retry_) connector_.Connect();

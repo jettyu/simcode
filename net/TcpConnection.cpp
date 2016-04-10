@@ -124,7 +124,7 @@ void TcpConnection::handleWrite()
             channel_->disableWriting();
             if (errno != EWOULDBLOCK)
             {
-                LOG_DEBUG("write error|errmsg=%s|port=%d", strerror(errno), peerAddr().port());
+                LOG_TRACE("write error|errmsg=%s|port=%d", strerror(errno), peerAddr().port());
                 if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
                 {
                     //shutdown();

@@ -23,7 +23,7 @@ void TcpServer::start()
     loopThreadPool_.start();
     acceptor_.setCallback(simex::bind(&TcpServer::onConnection, this, _1,_2));
     int ret = acceptor_.Listen();
-    LOG_DEBUG("ret=%d", ret);
+    LOG_TRACE("ret=%d", ret);
     assert(ret == 0);
 
     connectionManager_.reset(new TcpConnectionManager(sendLoop_, simex::bind(&TcpServer::send, this, _1,_2)));
@@ -49,9 +49,9 @@ void TcpServer::stop()
 void TcpServer::onClose(const TcpConnectionPtr& conn)
 {
     if (closeCallback_) closeCallback_(conn);
-    EventLoop* ioLoop = conn->getLoop();
-    ioLoop->removeInLoop(conn->connfd());
-    LOG_DEBUG("client close|ip=%s|port=%u", conn->peerAddr().ip().c_str(), conn->peerAddr().port());
+//    EventLoop* ioLoop = conn->getLoop();
+  //  ioLoop->removeInLoop(conn->connfd());
+    LOG_TRACE("client close|ip=%s|port=%u", conn->peerAddr().ip().c_str(), conn->peerAddr().port());
     connectionManager_->Remove(conn->id());
 }
 
@@ -62,10 +62,10 @@ void TcpServer::onConnection(int connfd, const SockAddr& peerAddr)
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connfd, peerAddr, ++connectionId_));
     conn->setCloseCallback(simex::bind(&TcpServer::onClose, this, _1));
     conn->setMessageCallback(messageCallback_);
-    LOG_DEBUG("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
+    LOG_TRACE("new client|ip=%s|port=%u", peerAddr.ip().c_str(), peerAddr.port());
+    connectionManager_->Add(conn->id(), conn);
     conn->run();
     if (connectionCallback_) connectionCallback_(conn);
-    connectionManager_->Add(conn->id(), conn);
 }
 
 void TcpServer::acceptHandler(EventChannel*)

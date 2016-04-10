@@ -10,7 +10,7 @@ Acceptor::Acceptor(const SockAddr& listenAddr, bool reuseport):
     socket_.setReuseAddr(true);
     socket_.setReusePort(reuseport);
     int ret = socket_.Bind(listenAddr);
-    LOG_DEBUG("ret=%d", ret);
+    LOG_TRACE("ret=%d", ret);
     assert(ret == 0);
     //socket_.setNonBlockAndCloseOnExec();
 }
