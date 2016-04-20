@@ -139,7 +139,7 @@ int LogFile::logData(const char* data, int size, const char* levelName, char buf
     time = tv.tv_sec;
     tm = localtime(&time);
     /* %3ld 在数值位数超过3位的时候不起作用, 所以这里转成int */
-    len = snprintf(ptr, LOG_BUF_LEN, "%04d-%02d-%02d %02d:%02d:%02d.%03d |%lu|",
+    len = snprintf(ptr, LOG_BUF_LEN, "%04d-%02d-%02d %02d:%02d:%02d.%03d |%llu|",
                    tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
                    tm->tm_hour, tm->tm_min, tm->tm_sec, (int)(tv.tv_usec/1000),
                    cur_thread_id());

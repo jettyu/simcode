@@ -34,15 +34,15 @@ inline std::string NewUuid()
     return ss.str();
 }
 
-static inline uint32_t get_local_thread_id()
+static inline unsigned long long get_local_thread_id()
 {
 
     boost::thread::id tid = boost::this_thread::get_id();
-    return *reinterpret_cast<uint32_t*>(&tid);
+    return *reinterpret_cast<unsigned long long*>(&tid);
 }
 
-static boost::thread_specific_ptr<uint32_t> __local_thread_id__(get_local_thread_id());
-static inline uint32_t cur_thread_id()
+static boost::thread_specific_ptr<unsigned long long> __local_thread_id__(get_local_thread_id());
+static inline unsigned long long cur_thread_id()
 {
     return *__local_thread_id__.get();
 }
@@ -60,15 +60,15 @@ static inline uint32_t cur_thread_id()
 using namespace std::placeholders;
 #define get_pointer(shared_pointer) shared_pointer.get()
 
-static inline uint32_t get_local_thread_id()
+static inline unsigned long long get_local_thread_id()
 {
     std::thread::id tid = std::this_thread::get_id();
-    return *reinterpret_cast<uint32_t*>(&tid);
+    return *reinterpret_cast<unsigned long long *>(&tid);
 }
 
-static thread_local uint32_t __local_thread_id__ = get_local_thread_id();
+static thread_local unsigned long long __local_thread_id__ = get_local_thread_id();
 
-static inline uint32_t cur_thread_id()
+static inline unsigned long long cur_thread_id()
 {
     return __local_thread_id__;
 }
