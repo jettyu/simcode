@@ -5,6 +5,7 @@
 #include <simcode/net/EventLoop.h>
 
 #include <simcode/net/EventChannel.h>
+#include <simcode/net/NetObj.h>
 #include <simcode/base/typedef.h>
 #include <simcode/base/noncopyable.h>
 #include <simcode/base/Buffer.h>
@@ -18,7 +19,8 @@ namespace net
 class TcpConnection;
 typedef simex::shared_ptr<TcpConnection> TcpConnectionPtr;
 class TcpConnection : noncopyable,
-    public simex::enable_shared_from_this<TcpConnection>
+    public simex::enable_shared_from_this<TcpConnection>,
+    public NetObj
 {
 public:
     typedef simex::function<void(const TcpConnectionPtr&)> CloseCallback;

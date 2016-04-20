@@ -11,7 +11,7 @@ int LogLevel::LEVEL_FATAL = 6;
 Logger GlobalLogger::logger_;
 
 Logger::Logger():
-    level_(LogLevel::LEVEL_DEBUG),
+    level_(LogLevel::LEVEL_TRACE),
     base_logger_(new BaseLogger)
 {
 }

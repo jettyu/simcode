@@ -2,6 +2,7 @@
 #define SIMCODE_NET_EVENT_CHANNEL_H
 
 #include <simcode/net/EventLoop.h>
+#include <simcode/net/NetObj.h>
 #include <simcode/base/typedef.h>
 namespace simcode
 {
@@ -9,7 +10,8 @@ namespace net
 {
 
 class EventChannel : noncopyable,
-    public simex::enable_shared_from_this<EventChannel>
+    public simex::enable_shared_from_this<EventChannel>,
+    public NetObj
 {
 public:
     typedef::simex::shared_ptr<EventChannel> Ptr;
@@ -33,7 +35,7 @@ public:
     {
         return revents_;
     }
-    void tie(const simex::shared_ptr<void> tie__)
+    void tie(const simex::shared_ptr<NetObj>& tie__)
     {
         tie_ = tie__;
         tieFlag_ = true;
@@ -141,7 +143,7 @@ private:
     uint32_t events_;
     uint32_t revents_;
     EventCallback eventCallback_;
-    simex::weak_ptr<void> tie_; //∑¿÷πeventCallback ß–ß
+    simex::weak_ptr<NetObj> tie_; //∑¿÷πeventCallback ß–ß
     bool tieFlag_;
     bool isRemoved_;
 };

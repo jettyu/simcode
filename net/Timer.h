@@ -2,12 +2,14 @@
 #define SIMCODE_NET_TIMER_H
 #include <simcode/base/noncopyable.h>
 #include <simcode/base/typedef.h>
+#include <simcode/net/NetObj.h>
 namespace simcode
 {
 namespace net
 {
 
-class Timer :  noncopyable
+class Timer :  noncopyable,
+    public NetObj
 {
 public:
     typedef simex::function<void()> EventCallback;

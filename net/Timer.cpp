@@ -34,7 +34,11 @@ void Timer::handleEvent(uint32_t events)
 {
     handler_.eventCallback();
     uint64_t s;
-    read(timerfd_, &s, sizeof(s));
+    if (read(timerfd_, &s, sizeof(s))!=sizeof(s))
+    {
+        //printf("errno=%d", errno);
+    }
+    
     if (handler_.intervalTime == 0 || //没有间隔时间，只执行1次
             handler_.surplusTimes == 1 //达到了最大次数
        )

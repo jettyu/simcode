@@ -44,7 +44,7 @@ void EventChannel::update()
 void EventChannel::handleEvent(uint32_t revents__)
 {
     revents_ = revents__;
-    simex::shared_ptr<void> tieObj;
+    simex::shared_ptr<NetObj> tieObj;
     if (tieFlag_)
     {
         tieObj = tie_.lock();
