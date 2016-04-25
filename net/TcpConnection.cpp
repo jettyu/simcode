@@ -71,7 +71,7 @@ void TcpConnection::handleRead()
     {
         errcode_ = errno;
         LOG_ERROR("read error|errno=%d|errmsg=%s", errcode_, strerror(errcode_));
-        this->close();
+        //this->close();
         return;
     }
     else if (n == 0)
